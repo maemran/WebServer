@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConfig.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:19:51 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/23 11:48:26 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/24 07:10:37 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ class LocationConfig
 		~LocationConfig();
 
 		const std::string&	getPath() const;
-		const std::string&	getPath() const;
+		const std::string&	getRoot() const;
 		const std::string&	getIndex() const;
 		const bool	getAutoindex() const;
 		const std::vector<std::string>&	getMethods() const;
