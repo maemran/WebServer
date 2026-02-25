@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/24 07:34:41 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/25 15:56:32 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../HttpConfig.hpp"
+//#include "../HttpConfig.hpp"
 #include  "HttpRequest.hpp"
 
 #include <iostream>
@@ -28,9 +28,9 @@ int main(void)
         "Content-Length: 27\r\n"
         "Connection: close\r\n"
         "\r\n"
-        "Hello this is POST body!!";
+        "oooooooooo";
 
     HttpRequest obj;
     obj.requestParsing(request);
-    std::cout << request << std::endl;
+    //std::cout << request << std::endl;
 }

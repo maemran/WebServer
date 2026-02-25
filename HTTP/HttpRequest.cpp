@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/24 07:25:33 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/25 15:51:19 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
+#include <vector>
+#include <iostream>
 
 HttpRequest::HttpRequest() {}
 
@@ -103,5 +105,35 @@ void    HttpRequest::setEntityBody(const std::string& entityBody)
 
 void    HttpRequest::requestParsing(const std::string& request)
 {
-    
+    int i = 0;
+	int start = 0;
+	int end = 0;
+	std::string temp;
+	std::vector<std::string>	requestElements;
+	while (i < (int)request.length())
+	{
+		if (i != 0 && (request[i - 1] == '\r' && request[i] == '\n'))
+		{
+			for (; start < i - 1; start++)
+				temp += request[start];
+			start = i + 1;
+			requestElements.push_back(temp);
+			temp = "";
+		}
+		i++;
+	}
+	for (int i = (int)request.length() - 1; i >= 0; i--)
+	{
+		if (i != 0 && (request[i - 3] == '\r' && request[i - 2] == '\n'
+			&& request[i - 1] == '\r' && request[i] == '\n'))
+		{	
+			end = i + 1;
+			break;
+		}
+	}
+	for (int i = end; i < (int)request.length(); i++)
+		this->entityBody += request[i];
+	for (int i = 0; i < (int)(requestElements.size()); i++)
+		std::cout << requestElements[i] << std::endl;
+	std::cout << this->entityBody << std::endl;
 }
