@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConfig.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/23 11:37:33 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/23 11:48:09 by maemran          ###   ########.fr       */
+/*   Created: 2026/02/23 11:21:11 by saabo-sh          #+#    #+#             */
+/*   Updated: 2026/02/23 14:40:03 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,13 @@ class ServerConfig
 		~ServerConfig();
 
 		const std::string&	getListenIp() const;
-		const int	getListenPort() const;
+		 int	getListenPort() const;
 		const std::string&	getRoot() const;
 		const std::string&	getIndex() const;
-		const bool	getAutoindex() const;
+		 bool	getAutoindex() const;
 		const std::vector<std::string>&	getMethods() const;
 		const std::map<int, std::string>&	getErrorPages() const;
-		const size_t getMaxBodySize() const;
+		 size_t getMaxBodySize() const;
 		const std::vector<LocationConfig>& getLocations() const;
 
 		void	setListenIp(const std::string& ip);

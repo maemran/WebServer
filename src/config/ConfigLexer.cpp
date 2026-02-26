@@ -1,0 +1,98 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ConfigLexer.cpp                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/23 11:52:13 by saabo-sh          #+#    #+#             */
+/*   Updated: 2026/02/23 14:47:33 by saabo-sh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "config/ConfigLexer.hpp"
+#include <cctype>   // isspace
+
+/* Constructor */
+ConfigLexer::ConfigLexer(const std::string& input)
+    : _input(input), _pos(0), _line(1) {}
+
+/* Check whitespace */
+bool ConfigLexer::isSpace(char c) const
+{
+    return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
+}
+
+/* Check special characters */
+bool ConfigLexer::isSpecial(char c) const
+{
+    return (c == '{' || c == '}' || c == ';');
+}
+
+/* Skip spaces and count lines */
+void ConfigLexer::skipSpace()
+{
+    while (_pos < _input.size() && isSpace(_input[_pos]))
+    {
+        if (_input[_pos] == '\n')
+            _line++;
+        _pos++;
+    }
+}
+
+/* Read word token */
+std::string ConfigLexer::readWord()
+{
+    std::string word;
+
+    while (_pos < _input.size() &&
+           !isSpace(_input[_pos]) &&
+           !isSpecial(_input[_pos]))
+    {
+        word += _input[_pos];
+        _pos++;
+    }
+    return word;
+}
+
+/* Main tokenize function */
+std::vector<Token> ConfigLexer::tokenize()
+{
+    std::vector<Token> tokens;
+
+    while (_pos < _input.size())
+    {
+        skipSpace();
+
+        if (_pos >= _input.size())
+            break;
+
+        char c = _input[_pos];
+
+        // Special tokens
+        if (c == '{')
+        {
+            tokens.push_back(Token(TOKEN_LBRACE, "{", _line));
+            _pos++;
+        }
+        else if (c == '}')
+        {
+            tokens.push_back(Token(TOKEN_RBRACE, "}", _line));
+            _pos++;
+        }
+        else if (c == ';')
+        {
+            tokens.push_back(Token(TOKEN_SEMICOLON, ";", _line));
+            _pos++;
+        }
+        else
+        {
+            // WORD token
+            std::string word = readWord();
+            tokens.push_back(Token(TOKEN_WORD, word, _line));
+        }
+    }
+
+    tokens.push_back(Token(TOKEN_EOF, "", _line));
+    return tokens;
+}

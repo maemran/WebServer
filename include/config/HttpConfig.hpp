@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpConfig.hpp                                     :+:      :+:    :+:   */
+/*   HttpConfig.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/23 11:44:40 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/23 11:50:58 by maemran          ###   ########.fr       */
+/*   Created: 2026/02/23 14:41:32 by saabo-sh          #+#    #+#             */
+/*   Updated: 2026/02/23 14:41:51 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ class HttpConfig
 
 		const std::string&	getRoot() const;
 		const std::string&	getIndex() const;
-		const bool	getAutoindex() const;
-		const size_t getMaxBodySize() const;
+		 bool	getAutoindex() const;
+		 size_t getMaxBodySize() const;
 		const std::map<int, std::string>&	getErrorPages() const;
 		const std::vector<std::string>&	getMethods() const;
 		const std::vector<ServerConfig>& getServers() const;
