@@ -3,18 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/25 15:51:19 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/27 23:53:31 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
-#include <vector>
 #include <iostream>
 
-HttpRequest::HttpRequest() {}
+HttpRequest::HttpRequest()
+{
+    statusCode = 200;
+}
 
 HttpRequest::HttpRequest(const HttpRequest& other)
 {
@@ -25,6 +27,7 @@ HttpRequest::HttpRequest(const HttpRequest& other)
     this->httpVersion = other.httpVersion;
     this->headers = other.headers;
     this->entityBody = other.entityBody;
+    this->statusCode = other.statusCode;
 }
 HttpRequest&    HttpRequest::operator=(const HttpRequest& other)
 {
@@ -37,6 +40,7 @@ HttpRequest&    HttpRequest::operator=(const HttpRequest& other)
         this->httpVersion = other.httpVersion;
         this->headers = other.headers;
         this->entityBody = other.entityBody;
+        this->statusCode = other.statusCode;
     }
     return *this;
 }
@@ -73,6 +77,11 @@ const std::string& HttpRequest::getEntityBody() const
     return this->entityBody;
 }
 
+int HttpRequest::getStatusCode() const
+{
+    return this->statusCode;
+}
+
 void    HttpRequest::setRequestLine(const std::string& requestLine)
 {
     this->requestLine = requestLine;
@@ -103,13 +112,110 @@ void    HttpRequest::setEntityBody(const std::string& entityBody)
     this->entityBody = entityBody;
 }
 
-void    HttpRequest::requestParsing(const std::string& request)
+void    HttpRequest::setStatusCode(int StatusCode)
+{
+    this->statusCode = StatusCode;
+}
+
+int HttpRequest::requestCheck(const std::string& request)
+{
+    int flag1 = 0, flag2 = 0, flag3 = 1, flag4 = 1;
+    if(request.c_str()[0] == '\r' && request.c_str()[1] == '\n' 
+        && request.c_str()[2] == '\0')
+        flag4 = 0;
+    for (int i = 0; i < (int)request.length(); i++)
+    {
+        if (i != 0 && request[i - 1] == '\r' && request[i] == '\n')
+            flag1 = 1;
+    }
+    for (int i = (int)request.length() - 1; i >= 0; i--)
+    {
+        if (request[(int)request.length() - 1] == '\n'
+            && request[(int)request.length() - 2] == '\r')
+        {
+            flag2 = 1;
+            break;
+        }
+        if (i > 2 && (request[i - 3] == '\r' && request[i - 2] == '\n'
+			&& request[i - 1] == '\r' && request[i] == '\n'))
+            flag2 = 1;
+    }
+    for (int i = 0; i < (int)request.size(); i++)
+    {
+        if (i != 0 && ((request[i - 1] == '\r' && request[i] != '\n')
+            || (request[i - 1] != '\r' && request[i] == '\n')))
+            flag3 = 0;
+    }
+    if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0)
+    {
+        statusCode = 400;
+        return 0;
+    }
+    return 1;
+}
+
+void    HttpRequest::requestLineParser()
+{
+    int start = 0;
+    std::string temp;
+    std::vector<std::string>    tempVector;
+    const char    *str = requestLine.c_str();
+    
+    for (int i = 0; i < (int)requestLine.length(); i++)
+    {
+        if (((((str[i] >= 0 && str[i] <= 126) && str[i] != 32) && str[i + 1] == ' ')
+        || (((str[i] >= 0 && str[i] <= 126) && str[i] != 32) && str[i + 1] == '\0')))
+        {
+            for (; start < i + 1; start++)
+				temp += requestLine[start];
+            start = i + 2;
+            tempVector.push_back(temp);
+            temp = "";
+        }
+    }
+    this->method = tempVector[0];
+    if (tempVector.size() >= 2)
+        this->uri.setUri(tempVector[1]);
+    if (tempVector.size() == 3)
+        this->httpVersion = tempVector[2];
+}
+
+void    HttpRequest::storingHeaders(std::vector<std::string> requestElements)
+{
+    int start;
+    int flag;
+    std::string temp1, temp2;
+    for (int i = 1; i < (int)requestElements.size(); i++)
+    {
+        start = 0, flag = 0;
+        temp1 = "", temp2 = "";
+        for (int j = 0; j < (int)requestElements[i].length(); j++)
+        {
+            if (requestElements[i][j] == ':')
+            {
+                flag = 1;
+                for (; start < j; start++)
+				    temp1 += requestElements[i][start];
+                j++;
+                for (; j < (int)requestElements[i].length(); j++)
+                    temp2 += requestElements[i][j];
+            }
+        }
+        if (flag != 1)
+            this->headers.insert(std::make_pair(requestElements[i], ""));
+        else
+            this->headers.insert(std::make_pair(temp1, temp2));
+    }
+}
+
+void    HttpRequest::requestParser(const std::string& request)
 {
     int i = 0;
 	int start = 0;
 	int end = 0;
 	std::string temp;
 	std::vector<std::string>	requestElements;
+    /*Request line & headers Parser*/
 	while (i < (int)request.length())
 	{
 		if (i != 0 && (request[i - 1] == '\r' && request[i] == '\n'))
@@ -117,23 +223,41 @@ void    HttpRequest::requestParsing(const std::string& request)
 			for (; start < i - 1; start++)
 				temp += request[start];
 			start = i + 1;
-			requestElements.push_back(temp);
+            if (temp != "")
+			    requestElements.push_back(temp);
 			temp = "";
 		}
 		i++;
 	}
+    this->requestLine = requestElements[0];
+    requestLineParser();
+    storingHeaders(requestElements);
+    /*Entity Body parser*/
 	for (int i = (int)request.length() - 1; i >= 0; i--)
 	{
-		if (i != 0 && (request[i - 3] == '\r' && request[i - 2] == '\n'
+        if (request[(int)request.length() - 1] == '\n'
+            && request[(int)request.length() - 2] == '\r')
+            break;
+		if (i > 2 && (request[i - 3] == '\r' && request[i - 2] == '\n'
 			&& request[i - 1] == '\r' && request[i] == '\n'))
 		{	
 			end = i + 1;
 			break;
 		}
 	}
-	for (int i = end; i < (int)request.length(); i++)
+	for (int i = end; i != 0 && i < (int)request.length(); i++)
 		this->entityBody += request[i];
-	for (int i = 0; i < (int)(requestElements.size()); i++)
-		std::cout << requestElements[i] << std::endl;
-	std::cout << this->entityBody << std::endl;
+}
+
+void    HttpRequest::printClassAtributes()
+{
+    std::cout << "Method: " << method << std::endl;
+    std::cout << "URL: " << uri.getUri() << std::endl;
+    std::cout << "version: " << httpVersion << std::endl;
+    for (std::map<std::string, std::string>::const_iterator it = headers.begin();
+    it != headers.end(); ++it)
+    {
+        std::cout << it->first << " : " << it->second << std::endl;
+    }
+    std::cout << "Entity Bode: " << entityBody << std::endl;
 }

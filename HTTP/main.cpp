@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/25 15:56:32 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/27 23:57:50 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,26 @@ int main(void)
     // ServerConfig server;
 
     std::string request =
-        "POST /upload HTTP/1.1\r\n"
-        "Host: localhost:7070\r\n"
+        "POST / HTTP/1.0\r\n"
+        // "Host: localhost:7070\r\n"
         "User-Agent: Mozilla/5.0\r\n"
         "Content-Type: text/plain\r\n"
-        "Content-Length: 27\r\n"
-        "Connection: close\r\n"
+        // "Content-Length: 27\r\n"
+        // "Connection: close\r\n"
         "\r\n"
         "oooooooooo";
 
     HttpRequest obj;
-    obj.requestParsing(request);
+    if (!obj.requestCheck(request))
+    {
+        std::cout << "status-code: " << obj.getStatusCode() <<std::endl;
+        std::cout << "problem" << std::endl;
+    }
+    else
+    {
+        obj.requestParser(request);
+        obj.printClassAtributes();
+    }
+        
     //std::cout << request << std::endl;
 }

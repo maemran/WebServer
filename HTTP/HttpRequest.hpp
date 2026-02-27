@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 05:40:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/24 07:23:48 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/27 22:27:04 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <map>
 #include "URI.hpp"
+#include <vector>
 
 class   HttpRequest
 {
@@ -25,6 +26,9 @@ class   HttpRequest
         std::string httpVersion;
         std::map<std::string, std::string> headers;
         std::string entityBody;
+        int statusCode;
+        void    storingHeaders(std::vector<std::string> requestElements);
+        void    requestLineParser();
         
     public:
         HttpRequest();
@@ -38,6 +42,7 @@ class   HttpRequest
         const std::string& getHttpVersion() const;
         const std::map<std::string, std::string>& getHeaders() const;
         const std::string& getEntityBody() const;
+        int   getStatusCode() const;
 
         void    setRequestLine(const std::string& requestLine);
         void    setMethod(const std::string& method);
@@ -45,8 +50,11 @@ class   HttpRequest
         void    setHttpVersion(const std::string& httpVersion);
         void    setHeaders(const std::map<std::string, std::string>& headers);
         void    setEntityBody(const std::string& entityBody);
+        void    setStatusCode(int StatusCode);
 
-        void    requestParsing(const std::string& request);
+        void    requestParser(const std::string& request);
+        int     requestCheck(const std::string& request);
+        void    printClassAtributes();
 };
 
 #endif
