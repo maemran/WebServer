@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 05:40:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/27 22:27:04 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/28 13:04:51 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class   HttpRequest
 
         const std::string& getRequestLine() const;
         const std::string& getMethod() const;
-        const URI& getUri() const;
+        URI& getUri();
         const std::string& getHttpVersion() const;
         const std::map<std::string, std::string>& getHeaders() const;
         const std::string& getEntityBody() const;

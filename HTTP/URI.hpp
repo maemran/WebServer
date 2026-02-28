@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   URI.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:18:25 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/24 06:23:18 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/28 12:58:16 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ class   URI
         std::string scheme;
         std::string host;
         std::string path;
-        unsigned int port;
+		int	uriError;
     
     public:
         URI();
@@ -35,14 +35,17 @@ class   URI
         const std::string& getScheme() const;
         const std::string& getHost() const;
         const std::string& getPath() const;
-        unsigned int getPort() const;
+		int getUriError() const;
 
         // void parseUri(const std::string& uri);
         void    setUri(const std::string& uri);
         void    setScheme(const std::string& scheme);
         void    setHost(const std::string& host);
         void    setPath(const std::string& path);
-        void    setPort(unsigned int port);
+		void	setUriError(int uriError);
+
+		//void    uriParser();
+        void     uriCheck();
 };
 
 #endif

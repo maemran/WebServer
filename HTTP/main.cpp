@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/27 23:57:50 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/28 15:04:02 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int main(void)
     // ServerConfig server;
 
     std::string request =
-        "POST / HTTP/1.0\r\n"
+        "POST http://webwhiteboard.com:9090/var/ HTTP/1.0\r\n"
         // "Host: localhost:7070\r\n"
         "User-Agent: Mozilla/5.0\r\n"
         "Content-Type: text/plain\r\n"
@@ -33,13 +33,17 @@ int main(void)
     HttpRequest obj;
     if (!obj.requestCheck(request))
     {
-        std::cout << "status-code: " << obj.getStatusCode() <<std::endl;
+        std::cout << "status-code: " << obj.getStatusCode() << std::endl;
         std::cout << "problem" << std::endl;
     }
     else
     {
         obj.requestParser(request);
-        obj.printClassAtributes();
+		obj.getUri().uriCheck();
+		if (obj.getUri().getUriError())
+			std::cout << "probelm" << std::endl;
+		else
+        	obj.printClassAtributes();
     }
         
     //std::cout << request << std::endl;

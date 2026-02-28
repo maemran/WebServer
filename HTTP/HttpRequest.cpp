@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/27 23:53:31 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/28 15:01:00 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ const std::string& HttpRequest::getMethod() const
     return this->method;
 }
 
-const URI& HttpRequest::getUri() const
+URI& HttpRequest::getUri()
 {
     return this->uri;
 }
@@ -120,7 +120,7 @@ void    HttpRequest::setStatusCode(int StatusCode)
 int HttpRequest::requestCheck(const std::string& request)
 {
     int flag1 = 0, flag2 = 0, flag3 = 1, flag4 = 1;
-    if(request.c_str()[0] == '\r' && request.c_str()[1] == '\n' 
+    if(request.c_str()[0] == '\r' && request.c_str()[1] == '\n'
         && request.c_str()[2] == '\0')
         flag4 = 0;
     for (int i = 0; i < (int)request.length(); i++)
@@ -154,30 +154,79 @@ int HttpRequest::requestCheck(const std::string& request)
     return 1;
 }
 
-void    HttpRequest::requestLineParser()
+void	HttpRequest::requestLineParser()
 {
-    int start = 0;
-    std::string temp;
-    std::vector<std::string>    tempVector;
-    const char    *str = requestLine.c_str();
-    
-    for (int i = 0; i < (int)requestLine.length(); i++)
-    {
-        if (((((str[i] >= 0 && str[i] <= 126) && str[i] != 32) && str[i + 1] == ' ')
-        || (((str[i] >= 0 && str[i] <= 126) && str[i] != 32) && str[i + 1] == '\0')))
-        {
-            for (; start < i + 1; start++)
+	int start = 0;
+	int end = 0;
+	int flag = 0;
+	std::string temp;
+	std::vector<std::string>    tempVector;
+	const char    *str = requestLine.c_str();
+
+	for (int i = 0; i < (int)requestLine.length(); i++)
+	{
+		if (requestLine[i] == ' ')
+			flag++;
+	}
+	if (flag == 1)
+	{
+		for (int i = 0; i < (int)requestLine.length(); i++)
+    	{
+    	    if (((((str[i] >= 0 && str[i] <= 126) && str[i] != 32) && str[i + 1] == ' ')
+    	    	|| (((str[i] >= 0 && str[i] <= 126) && str[i] != 32) && str[i + 1] == '\0')))
+    	    {
+    	        for (; start < i + 1; start++)
+					temp += requestLine[start];
+    	        start = i + 2;
+    	        tempVector.push_back(temp);
+    	        temp = "";
+    	    }
+    	}
+		this->method = tempVector[0];
+		if (tempVector.size() >= 2)
+			this->uri.setUri(tempVector[1]);
+		return ;
+	}
+	for(int i = 0; i < (int)requestLine.length(); i++)
+	{
+		if (str[i + 1] == ' ' || str[i + 1] == '\0')
+		{
+			for (; start < i + 1; start++)
 				temp += requestLine[start];
-            start = i + 2;
-            tempVector.push_back(temp);
-            temp = "";
-        }
-    }
-    this->method = tempVector[0];
+			if (str[i + 1] != '\0')
+				start = i + 2;
+			else
+				start = -1;
+			break;
+		}
+	}
+	if (start == -1)
+	{
+		this->method = temp;
+		return;
+	}
+	tempVector.push_back(temp);
+	temp = "";
+	for (int i = ((int)requestLine.length() - 1); i >= 0; i--)
+	{
+		if (str[i] == ' ')
+		{
+			for (end = i + 1; end < (int)requestLine.length(); end++)
+				temp += requestLine[end];
+			end = i - 1;
+			break;
+		}
+	}
+	tempVector.push_back(temp);
+	temp = "";
+	for (; start <= end; start++)
+		temp += requestLine[start];
+	tempVector.push_back(temp);
+	this->method = tempVector[0];
     if (tempVector.size() >= 2)
-        this->uri.setUri(tempVector[1]);
-    if (tempVector.size() == 3)
-        this->httpVersion = tempVector[2];
+		this->httpVersion = tempVector[1];
+    if (tempVector.size() >= 3)
+		this->uri.setUri(tempVector[2]);
 }
 
 void    HttpRequest::storingHeaders(std::vector<std::string> requestElements)
