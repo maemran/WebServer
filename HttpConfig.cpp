@@ -29,7 +29,7 @@ const std::vector<ServerConfig>& HttpConfig::getServers() const
 void HttpConfig:: addServer(const ServerConfig& /*server*/)
 {
     ServerConfig copy;
-    copy.setListenIp("127.0.0.1");
+    copy.setListenIp("127.0.0.9");
     copy.setListenPort(8080);
     servers.push_back(copy);
 
@@ -39,13 +39,12 @@ void HttpConfig:: addServer(const ServerConfig& /*server*/)
     servers.push_back(copy1);
 
     ServerConfig copy2;
-    copy2.setListenIp("127.0.0.3");
+    copy2.setListenIp("0.0.0.0");
     copy2.setListenPort(5050);
     servers.push_back(copy2);
 
     ServerConfig copy3;
-    copy2.setListenIp("");
-    copy2.setListenPort(9090);
-    servers.push_back(copy2);
-
+    copy3.setListenIp("0.0.0.0");
+    copy3.setListenPort(8081);
+    servers.push_back(copy3);
 }
