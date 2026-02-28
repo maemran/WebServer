@@ -6,7 +6,7 @@
 /*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/28 15:01:00 by maemran          ###   ########.fr       */
+/*   Updated: 2026/02/28 15:09:46 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ void    HttpRequest::setStatusCode(int StatusCode)
 
 int HttpRequest::requestCheck(const std::string& request)
 {
-    int flag1 = 0, flag2 = 0, flag3 = 1, flag4 = 1;
+    int flag1 = 0, flag2 = 0, flag4 = 1;
     if(request.c_str()[0] == '\r' && request.c_str()[1] == '\n'
         && request.c_str()[2] == '\0')
         flag4 = 0;
@@ -140,13 +140,13 @@ int HttpRequest::requestCheck(const std::string& request)
 			&& request[i - 1] == '\r' && request[i] == '\n'))
             flag2 = 1;
     }
-    for (int i = 0; i < (int)request.size(); i++)
-    {
-        if (i != 0 && ((request[i - 1] == '\r' && request[i] != '\n')
-            || (request[i - 1] != '\r' && request[i] == '\n')))
-            flag3 = 0;
-    }
-    if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0)
+    //for (int i = 0; i < (int)request.size(); i++)
+    //{
+    //    if (i != 0 && ((request[i - 1] == '\r' && request[i] != '\n')
+    //        || (request[i - 1] != '\r' && request[i] == '\n')))
+    //        flag3 = 0;
+    //}
+    if (flag1 == 0 || flag2 == 0 || flag4 == 0)
     {
         statusCode = 400;
         return 0;
