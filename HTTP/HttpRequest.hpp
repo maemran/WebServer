@@ -6,7 +6,7 @@
 /*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 05:40:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/28 13:04:51 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/02 16:37:46 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,11 @@ class   HttpRequest
         std::map<std::string, std::string> headers;
         std::string entityBody;
         int statusCode;
+		
+		std::vector<std::string>	requestLexar(const std::string& request);
+		std::string	extractBody(const std::string& request);
         void    storingHeaders(std::vector<std::string> requestElements);
+		int		withoutBodyCheck(const std::string& request);
         void    requestLineParser();
         
     public:
