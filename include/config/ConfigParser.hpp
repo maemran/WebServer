@@ -39,6 +39,7 @@ private:
     bool check(TokenType type) const;
     bool match(TokenType type);
     void expect(TokenType type, const std::string& message);
+    std::string expectWord(const std::string& message);
 
     // Parsing blocks
     ServerConfig parseServer();

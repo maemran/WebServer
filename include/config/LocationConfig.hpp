@@ -28,7 +28,10 @@ class LocationConfig
 		std::map<int , std::string> error_pages;
 		std::map<int , std::string> redirections;
    		std::vector<std::string> allowed_methods;
-		size_t max_body_size;
+		size_t client_max_body_size;
+		int redirect_code;
+		std::string redirect_url;
+		bool has_redirect;
 
 	public:
 		LocationConfig();
@@ -44,6 +47,8 @@ class LocationConfig
 		const std::map<int, std::string>&	getErrorPages() const;
 		const std::map<int, std::string>&	getRedirections() const;
 		 size_t getMaxBodySize() const;
+		 int getRedirectCode() const;
+		const std::string& getRedirectUrl() const;
 		
 		void	setPath(const std::string& path);
 		void	setRoot(const std::string& root);
@@ -53,6 +58,8 @@ class LocationConfig
 		void	addErrorPage(int code, const std::string& page);
 		void	addRedirection(int code, const std::string& url);
 		void	setMaxBodySize(size_t size);
+		void setRedirect(int code, const std::string& url);
+		bool hasRedirect() const;
 };
 
 #endif

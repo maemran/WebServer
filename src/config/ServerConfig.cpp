@@ -2,7 +2,7 @@
 
 // Default constructor
 ServerConfig::ServerConfig()
-    : listen_ip("0.0.0.0"), listen_port(80), root(""), index(""), autoindex(false), max_body_size(0)
+    : listen_ip("0.0.0.0"), listen_port(80), root(""), index(""), autoindex(false), client_max_body_size(0)
 {}
 
 // Copy constructor
@@ -14,7 +14,7 @@ ServerConfig::ServerConfig(const ServerConfig& other)
       autoindex(other.autoindex),
       error_pages(other.error_pages),
       allowed_methods(other.allowed_methods),
-      max_body_size(other.max_body_size),
+      client_max_body_size(other.client_max_body_size),
       locations(other.locations)
 {}
 
@@ -30,7 +30,7 @@ ServerConfig& ServerConfig::operator=(const ServerConfig& other)
         autoindex = other.autoindex;
         error_pages = other.error_pages;
         allowed_methods = other.allowed_methods;
-        max_body_size = other.max_body_size;
+        client_max_body_size = other.client_max_body_size;
         locations = other.locations;
     }
     return *this;
@@ -47,7 +47,7 @@ const std::string& ServerConfig::getIndex() const { return index; }
 bool ServerConfig::getAutoindex() const { return autoindex; }
 const std::vector<std::string>& ServerConfig::getMethods() const { return allowed_methods; }
 const std::map<int, std::string>& ServerConfig::getErrorPages() const { return error_pages; }
-size_t ServerConfig::getMaxBodySize() const { return max_body_size; }
+size_t ServerConfig::getMaxBodySize() const { return client_max_body_size; }
 const std::vector<LocationConfig>& ServerConfig::getLocations() const { return locations; }
 
 // Setters
@@ -58,5 +58,17 @@ void ServerConfig::setIndex(const std::string& i) { index = i; }
 void ServerConfig::setAutoindex(bool a) { autoindex = a; }
 void ServerConfig::addAllowedMethod(const std::string& method) { allowed_methods.push_back(method); }
 void ServerConfig::addErrorPage(int code, const std::string& page) { error_pages[code] = page; }
-void ServerConfig::setMaxBodySize(size_t size) { max_body_size = size; }
+void ServerConfig::setMaxBodySize(size_t size) { client_max_body_size = size; }
 void ServerConfig::addLocation(const LocationConfig& location) { locations.push_back(location); }
+
+void ServerConfig::resolveInheritance()
+{
+    for (size_t i = 0; i < locations.size(); i++)
+    {
+        if (locations[i].getRoot().empty())
+            locations[i].setRoot(root);
+
+        if (locations[i].getIndex().empty())
+            locations[i].setIndex(index);
+    }
+}

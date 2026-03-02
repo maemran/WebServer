@@ -21,7 +21,7 @@ class HttpConfig
     	std::string root;
     	std::string index;
 		bool autoindex;
-		size_t max_body_size;
+		size_t client_max_body_size;
 		std::map<int , std::string> error_pages;
 		std::vector<std::string> allowed_methods;
     	std::vector<ServerConfig> servers;
@@ -39,6 +39,8 @@ class HttpConfig
 		const std::map<int, std::string>&	getErrorPages() const;
 		const std::vector<std::string>&	getMethods() const;
 		const std::vector<ServerConfig>& getServers() const;
+		std::vector<ServerConfig>& getServers() ;
+
 
 		void	setRoot(const std::string& root);
 		void	setIndex(const std::string& index);

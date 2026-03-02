@@ -2,7 +2,7 @@
 
 // Default constructor
 LocationConfig::LocationConfig()
-    : path(""), root(""), index(""), autoindex(false), max_body_size(0)
+    : path(""), root(""), index(""), autoindex(false), client_max_body_size(0)
 {}
 
 // Copy constructor
@@ -14,7 +14,7 @@ LocationConfig::LocationConfig(const LocationConfig& other)
       error_pages(other.error_pages),
       redirections(other.redirections),
       allowed_methods(other.allowed_methods),
-      max_body_size(other.max_body_size)
+      client_max_body_size(other.client_max_body_size)
 {}
 
 // Assignment operator
@@ -29,7 +29,7 @@ LocationConfig& LocationConfig::operator=(const LocationConfig& other)
         error_pages = other.error_pages;
         redirections = other.redirections;
         allowed_methods = other.allowed_methods;
-        max_body_size = other.max_body_size;
+        client_max_body_size = other.client_max_body_size;
     }
     return *this;
 }
@@ -45,7 +45,13 @@ bool LocationConfig::getAutoindex() const { return autoindex; }
 const std::vector<std::string>& LocationConfig::getMethods() const { return allowed_methods; }
 const std::map<int, std::string>& LocationConfig::getErrorPages() const { return error_pages; }
 const std::map<int, std::string>& LocationConfig::getRedirections() const { return redirections; }
-size_t LocationConfig::getMaxBodySize() const { return max_body_size; }
+size_t LocationConfig::getMaxBodySize() const { return client_max_body_size; }
+void LocationConfig::setRedirect(int code, const std::string& url)
+{
+    redirect_code = code;
+    redirect_url = url;
+    has_redirect = true;
+}
 
 // Setters
 void LocationConfig::setPath(const std::string& p) { path = p; }
@@ -55,4 +61,4 @@ void LocationConfig::setAutoindex(bool a) { autoindex = a; }
 void LocationConfig::addAllowedMethod(const std::string& method) { allowed_methods.push_back(method); }
 void LocationConfig::addErrorPage(int code, const std::string& page) { error_pages[code] = page; }
 void LocationConfig::addRedirection(int code, const std::string& url) { redirections[code] = url; }
-void LocationConfig::setMaxBodySize(size_t size) { max_body_size = size; }
+void LocationConfig::setMaxBodySize(size_t size) { client_max_body_size = size; }

@@ -11,9 +11,8 @@
 /* ************************************************************************** */
 
 #include "config/ConfigLexer.hpp"
-#include <cctype>   // isspace
+#include <cctype>  
 
-/* Constructor */
 ConfigLexer::ConfigLexer(const std::string& input)
     : _input(input), _pos(0), _line(1) {}
 
@@ -69,6 +68,20 @@ std::vector<Token> ConfigLexer::tokenize()
 
         char c = _input[_pos];
 
+        // ⭐ HANDLE COMMENTS SAFELY
+        if (_input[_pos] == '#')
+        {
+            while (_pos < _input.size() && _input[_pos] != '\n')
+                _pos++;
+
+            if (_pos < _input.size() && _input[_pos] == '\n')
+            {
+                _pos++;
+                _line++;
+            }
+
+            continue;
+        }
         // Special tokens
         if (c == '{')
         {
@@ -87,9 +100,11 @@ std::vector<Token> ConfigLexer::tokenize()
         }
         else
         {
-            // WORD token
-            std::string word = readWord();
-            tokens.push_back(Token(TOKEN_WORD, word, _line));
+           std::string word = readWord();
+            if (!word.empty())
+                tokens.push_back(Token(TOKEN_WORD, word, _line));
+            else
+                _pos++;   // prevent infinite loop
         }
     }
 

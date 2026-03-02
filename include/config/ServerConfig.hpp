@@ -25,7 +25,7 @@ class ServerConfig
 		bool autoindex;
 		std::map<int , std::string> error_pages;
    		std::vector<std::string> allowed_methods;
-		size_t max_body_size;
+		size_t client_max_body_size;
     	std::vector<LocationConfig> locations;
 		
 	public:
@@ -53,6 +53,7 @@ class ServerConfig
 		void	addErrorPage(int code, const std::string& page);
 		void	setMaxBodySize(size_t size);
 		void	addLocation(const LocationConfig& location);
+		void 	resolveInheritance() ;
 };
 
 #endif

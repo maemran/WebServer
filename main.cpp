@@ -9,66 +9,122 @@
 /*   Updated: 2026/02/23 14:44:29 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
+
 #include "include/config/ConfigLexer.hpp"
 #include "include/config/ConfigParser.hpp"
+#include "include/config/ConfigValidator.hpp"
 #include "include/config/HttpConfig.hpp"
-#include "include/config/LocationConfig.hpp"
 #include "include/config/ServerConfig.hpp"
+#include "include/config/LocationConfig.hpp"
 
-int main()
+/* ========================================= */
+/*              PRINT HELPERS                */
+/* ========================================= */
+
+void printLocation(const LocationConfig& loc)
 {
+    std::cout << "    📁 Location: " << loc.getPath() << "\n";
+    std::cout << "       Root: " << loc.getRoot() << "\n";
+    std::cout << "       Index: " << loc.getIndex() << "\n";
+    std::cout << "       Autoindex: "
+              << (loc.getAutoindex() ? "ON" : "OFF") << "\n";
+
+    const std::vector<std::string>& methods = loc.getMethods();
+    if (!methods.empty())
+    {
+        std::cout << "       Methods: ";
+        for (size_t i = 0; i < methods.size(); i++)
+            std::cout << methods[i] << " ";
+        std::cout << "\n";
+    }
+
+    const std::map<int,std::string>& errors = loc.getErrorPages();
+    for (std::map<int,std::string>::const_iterator it = errors.begin();
+         it != errors.end(); ++it)
+    {
+        std::cout << "       ErrorPage " << it->first
+                  << " -> " << it->second << "\n";
+    }
+
+    const std::map<int,std::string>& redirects = loc.getRedirections();
+    for (std::map<int,std::string>::const_iterator it = redirects.begin();
+         it != redirects.end(); ++it)
+    {
+        std::cout << "       Redirect " << it->first
+                  << " -> " << it->second << "\n";
+    }
+}
+
+void printServer(const ServerConfig& srv, int index)
+{
+    std::cout << "\n=========== SERVER " << index << " ===========\n";
+    std::cout << "IP: " << srv.getListenIp() << "\n";
+    std::cout << "Port: " << srv.getListenPort() << "\n";
+    std::cout << "Root: " << srv.getRoot() << "\n";
+    std::cout << "Index: " << srv.getIndex() << "\n";
+    std::cout << "Autoindex: "
+              << (srv.getAutoindex() ? "ON" : "OFF") << "\n";
+
+    const std::vector<LocationConfig>& locs = srv.getLocations();
+    for (size_t i = 0; i < locs.size(); i++)
+        printLocation(locs[i]);
+}
+
+/* ========================================= */
+/*                  MAIN                     */
+/* ========================================= */
+
+int main(int argc, char** argv)
+{
+    std::string filename = "config.conf";
+    if (argc == 2)
+        filename = argv[1];
+
     try
     {
-        // 1️⃣ Read file
-        std::ifstream file("config.conf");
-        if (!file.is_open())
-        {
-            std::cerr << "Could not open config file\n";
-            return 1;
-        }
+        std::cout << "📂 Reading config: " << filename << "\n";
 
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        std::string content = buffer.str();
+        /* Read file */
+        std::ifstream file(filename.c_str());
+        if (!file)
+            throw std::runtime_error("Cannot open config file");
 
-        // 2️⃣ Tokenize
+        std::stringstream ss;
+        ss << file.rdbuf();
+        std::string content = ss.str();
+
+        /* Lexer */
+        std::cout << "🔍 Tokenizing...\n";
         ConfigLexer lexer(content);
         std::vector<Token> tokens = lexer.tokenize();
+        std::cout << "   Tokens count: " << tokens.size() << "\n";
 
-        // 3️⃣ Parse
+        /* Parser */
+        std::cout << "🧠 Parsing...\n";
         ConfigParser parser(tokens);
         HttpConfig http = parser.parse();
 
-        // 4️⃣ Print result
-        std::cout << "Parsed successfully!\n";
-        std::cout << "Number of servers: "
+        std::cout << "   Servers parsed: "
                   << http.getServers().size() << "\n";
+                  
+        std::cout << "🎉 Config OK!\n";
 
-        const std::vector<ServerConfig>& servers = http.getServers();
-
+        /* Print result */
+        std::vector<ServerConfig>& servers = http.getServers();
         for (size_t i = 0; i < servers.size(); i++)
         {
-            std::cout << "\n--- Server " << i + 1 << " ---\n";
-            std::cout << "Port: " << servers[i].getListenPort() << "\n";
-            std::cout << "Root: " << servers[i].getRoot() << "\n";
-
-            const std::vector<LocationConfig>& locations =
-                servers[i].getLocations();
-
-            for (size_t j = 0; j < locations.size(); j++)
-            {
-                std::cout << "  Location: "
-                          << locations[j].getPath() << "\n";
-            }
+            servers[i].resolveInheritance();
+            printServer(servers[i], i + 1);
         }
     }
     catch (std::exception& e)
     {
-        std::cerr << "Error: " << e.what() << "\n";
+        std::cerr << "\n❌ ERROR: " << e.what() << "\n";
+        return 1;
     }
-
-    return 0;
 }

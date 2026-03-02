@@ -10,11 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "config/ConfigParser.hpp"
 #include <stdexcept>
 #include <sstream>
-#include <cstdlib> // for atoi
+#include <cstdlib>
+
 /* ============================= */
 /*        Constructor            */
 /* ============================= */
@@ -29,16 +29,20 @@ ConfigParser::ConfigParser(const std::vector<Token>& tokens)
 
 bool ConfigParser::isAtEnd() const
 {
-    return peek().type == TOKEN_EOF;
+    return _pos >= _tokens.size() || _tokens[_pos].type == TOKEN_EOF;
 }
 
 const Token& ConfigParser::peek() const
 {
+    if (_pos >= _tokens.size())
+        throw std::runtime_error("Parser out of bounds");
     return _tokens[_pos];
 }
 
 const Token& ConfigParser::previous() const
 {
+    if (_pos == 0)
+        throw std::runtime_error("Parser internal error");
     return _tokens[_pos - 1];
 }
 
@@ -66,57 +70,50 @@ bool ConfigParser::match(TokenType type)
     return false;
 }
 
-void ConfigParser::expect(TokenType type, const std::string& message)
+std::string ConfigParser::expectWord(const std::string& msg)
 {
-    if (check(type))
-    {
-        advance();
-        return;
-    }
+    if (!check(TOKEN_WORD))
+        throw std::runtime_error(msg);
+    return advance().value;
+}
 
-    std::stringstream ss;
-    ss << "Parse error at line " << peek().line << ": " << message;
-    throw std::runtime_error(ss.str());
+void ConfigParser::expect(TokenType type, const std::string& msg)
+{
+    if (!check(type))
+        throw std::runtime_error(msg);
+    advance();
 }
 
 /* ============================= */
 /*          Entry Point          */
 /* ============================= */
+
 HttpConfig ConfigParser::parse()
 {
     HttpConfig http;
 
-    // Expect "http"
-    expect(TOKEN_WORD, "Expected 'http' at beginning of config");
-
-    if (previous().value != "http")
-        throw std::runtime_error("Config must start with 'http' block");
+    if (expectWord("Expected 'http'") != "http")
+        throw std::runtime_error("Config must start with http");
 
     expect(TOKEN_LBRACE, "Expected '{' after http");
 
     while (!check(TOKEN_RBRACE) && !isAtEnd())
     {
-        expect(TOKEN_WORD, "Expected directive inside http block");
-        std::string directive = previous().value;
+        std::string word = expectWord("Expected directive in http");
 
-        if (directive == "server")
-        {
+        if (word == "server")
             http.addServer(parseServer());
-        }
-        else if (directive == "client_max_body_size")
+
+        else if (word == "client_max_body_size")
         {
-            expect(TOKEN_WORD, "Expected value after client_max_body_size");
-            http.setMaxBodySize(std::atoi(previous().value.c_str()));
-            expect(TOKEN_SEMICOLON, "Expected ';'");
+            http.setMaxBodySize(std::atoi(expectWord("Expected size").c_str()));
+            expect(TOKEN_SEMICOLON, "Missing ';'");
         }
         else
-        {
-            throw std::runtime_error("Unknown directive inside http block");
-        }
+            throw std::runtime_error("Unknown directive in http: " + word);
     }
 
-    expect(TOKEN_RBRACE, "Expected closing '}' for http");
-
+    expect(TOKEN_RBRACE, "Missing '}' after http");
     return http;
 }
 
@@ -131,13 +128,63 @@ ServerConfig ConfigParser::parseServer()
     expect(TOKEN_LBRACE, "Expected '{' after server");
 
     while (!check(TOKEN_RBRACE) && !isAtEnd())
-    {
         parseServerDirective(server);
+
+    expect(TOKEN_RBRACE, "Missing '}' after server");
+    return server;
+}
+
+void ConfigParser::parseServerDirective(ServerConfig& server)
+{
+    std::string dir = expectWord("Expected directive in server");
+
+    if (dir == "listen")
+    {
+        std::string val = expectWord("Expected port");
+
+        size_t colon = val.find(':');
+        if (colon != std::string::npos)
+        {
+            server.setListenIp(val.substr(0, colon));
+            server.setListenPort(std::atoi(val.substr(colon + 1).c_str()));
+        }
+        else
+            server.setListenPort(std::atoi(val.c_str()));
+
+        expect(TOKEN_SEMICOLON, "Missing ';'");
     }
 
-    expect(TOKEN_RBRACE, "Expected '}' after server block");
+    else if (dir == "root")
+    {
+        server.setRoot(expectWord("Expected root path"));
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
 
-    return server;
+    else if (dir == "index")
+    {
+        server.setIndex(expectWord("Expected index"));
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+
+    else if (dir == "autoindex")
+    {
+        server.setAutoindex(expectWord("Expected on/off") == "on");
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+
+    else if (dir == "error_page")
+    {
+        int code = std::atoi(expectWord("Expected code").c_str());
+        std::string path = expectWord("Expected path");
+        server.addErrorPage(code, path);
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+
+    else if (dir == "location")
+        server.addLocation(parseLocation());
+
+    else
+        throw std::runtime_error("Unknown server directive: " + dir);
 }
 
 /* ============================= */
@@ -146,124 +193,61 @@ ServerConfig ConfigParser::parseServer()
 
 LocationConfig ConfigParser::parseLocation()
 {
-    LocationConfig location;
+    LocationConfig loc;
 
-    // Expect location path
-    expect(TOKEN_WORD, "Expected location path");
-    location.setPath(previous().value);
-
-    expect(TOKEN_LBRACE, "Expected '{' after location path");
+    loc.setPath(expectWord("Expected location path"));
+    expect(TOKEN_LBRACE, "Missing '{' after location");
 
     while (!check(TOKEN_RBRACE) && !isAtEnd())
-    {
-        parseLocationDirective(location);
-    }
+        parseLocationDirective(loc);
 
-    expect(TOKEN_RBRACE, "Expected '}' after location block");
-
-    return location;
+    expect(TOKEN_RBRACE, "Missing '}' after location");
+    return loc;
 }
 
-/* ============================= */
-/*     Server Directives         */
-/* ============================= */
-
-void ConfigParser::parseServerDirective(ServerConfig& server)
+void ConfigParser::parseLocationDirective(LocationConfig& loc)
 {
-    expect(TOKEN_WORD, "Expected directive inside server block");
-    std::string directive = previous().value;
+    std::string dir = expectWord("Expected directive in location");
 
-    if (directive == "listen")
-{
-    expect(TOKEN_WORD, "Expected address after listen");
-
-    std::string value = previous().value;
-
-    size_t colon = value.find(':');
-
-    if (colon != std::string::npos)
+    if (dir == "root")
     {
-        server.setListenIp(value.substr(0, colon));
-        server.setListenPort(std::atoi(value.substr(colon + 1).c_str()));
+        loc.setRoot(expectWord("Expected path"));
+        expect(TOKEN_SEMICOLON, "Missing ';'");
     }
+
+    else if (dir == "index")
+    {
+        loc.setIndex(expectWord("Expected index"));
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+
+    else if (dir == "autoindex")
+    {
+        loc.setAutoindex(expectWord("Expected on/off") == "on");
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+
+    else if (dir == "allowed_methods")
+    {
+        while (check(TOKEN_WORD))
+            loc.addAllowedMethod(advance().value);
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+
+    else if (dir == "return")
+    {
+        int code = std::atoi(expectWord("Expected code").c_str());
+        std::string url = expectWord("Expected url");
+        loc.setRedirect(code, url);
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+
+    // else if (dir == "upload_path")
+    // {
+    //     loc.setUploadPath(expectWord("Expected path"));
+    //     expect(TOKEN_SEMICOLON, "Missing ';'");
+    // }
+
     else
-    {
-        server.setListenPort(std::atoi(value.c_str()));
-    }
-
-    expect(TOKEN_SEMICOLON, "Expected ';'");
-}
-    else if (directive == "root")
-    {
-        expect(TOKEN_WORD, "Expected path after root");
-        server.setRoot(previous().value);
-
-        expect(TOKEN_SEMICOLON, "Expected ';' after root");
-    }
-    else if (directive == "index")
-    {
-        expect(TOKEN_WORD, "Expected file after index");
-        server.setIndex(previous().value);
-
-        expect(TOKEN_SEMICOLON, "Expected ';' after index");
-    }
-    else if (directive == "autoindex")
-    {
-        expect(TOKEN_WORD, "Expected on/off after autoindex");
-        server.setAutoindex(previous().value == "on");
-
-        expect(TOKEN_SEMICOLON, "Expected ';' after autoindex");
-    }
-    else if (directive == "location")
-    {
-        server.addLocation(parseLocation());
-    }
-    else
-    {
-        std::stringstream ss;
-        ss << "Unknown directive '" << directive
-           << "' in server block at line "
-           << previous().line;
-        throw std::runtime_error(ss.str());
-    }
-}
-
-/* ============================= */
-/*    Location Directives        */
-/* ============================= */
-
-void ConfigParser::parseLocationDirective(LocationConfig& location)
-{
-    expect(TOKEN_WORD, "Expected directive inside location block");
-    std::string directive = previous().value;
-
-    if (directive == "root")
-    {
-        expect(TOKEN_WORD, "Expected path after root");
-        location.setRoot(previous().value);
-
-        expect(TOKEN_SEMICOLON, "Expected ';' after root");
-    }
-    else if (directive == "index")
-    {
-        expect(TOKEN_WORD, "Expected file after index");
-        location.setIndex(previous().value);
-
-        expect(TOKEN_SEMICOLON, "Expected ';' after index");
-    }
-    else if (directive == "autoindex")
-    {
-        expect(TOKEN_WORD, "Expected on/off after autoindex");
-        location.setAutoindex(previous().value == "on");
-
-        expect(TOKEN_SEMICOLON, "Expected ';' after autoindex");
-    }
-    else
-    {
-        std::stringstream ss;
-        ss << "Unknown directive '" << directive
-           << "' in location block at line "
-           << previous().line;
-        throw std::runtime_error(ss.str());
-    }
+        throw std::runtime_error("Unknown location directive: " + dir);
 }
