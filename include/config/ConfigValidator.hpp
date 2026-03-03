@@ -10,12 +10,45 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-// Responsibilities:
+// Check:
+// port range
+// duplicate ports
+// missing root
+// invalid methods
+// empty location path
+// client_max_body_size
+//upload rules
 
-// Invalid port
+#ifndef CONFIGVALIDATOR_HPP
+#define CONFIGVALIDATOR_HPP
 
-// Missing root
+#include <set>
+#include <stdexcept>
+#include <iostream>
+#include <vector>
 
-// Duplicate listen
+#include "HttpConfig.hpp"
+#include "ServerConfig.hpp"
+#include "LocationConfig.hpp"
 
-// Unknown directive
+class ConfigValidator
+{
+private:
+    void validateServer(const ServerConfig& server);
+    void validateLocation(const LocationConfig& location);
+
+    void checkPortRange(int port);
+    void checkDuplicatePorts(const std::vector<ServerConfig>& servers);
+    void checkRootExists(const std::string& root);
+    void checkMethods(const std::vector<std::string>& methods);
+    void checkClientMaxBodySize(size_t size);
+    void applyInheritance(HttpConfig& http);
+
+public:
+    ConfigValidator();
+    ~ConfigValidator();
+
+    void validate(HttpConfig& http);
+};
+
+#endif

@@ -39,3 +39,11 @@ std::vector<ServerConfig>& HttpConfig::getServers()
 {
     return servers;
 }
+
+const std::string& HttpConfig::getRoot() const {
+    return this->root;
+}
+
+const std::string& HttpConfig::getIndex() const {
+    return this->index;
+}

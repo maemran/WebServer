@@ -42,6 +42,7 @@ class HttpConfig
 		std::vector<ServerConfig>& getServers() ;
 
 
+
 		void	setRoot(const std::string& root);
 		void	setIndex(const std::string& index);
 		void	setAutoindex(bool autoindex);

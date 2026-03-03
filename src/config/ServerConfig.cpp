@@ -49,7 +49,7 @@ const std::vector<std::string>& ServerConfig::getMethods() const { return allowe
 const std::map<int, std::string>& ServerConfig::getErrorPages() const { return error_pages; }
 size_t ServerConfig::getMaxBodySize() const { return client_max_body_size; }
 const std::vector<LocationConfig>& ServerConfig::getLocations() const { return locations; }
-
+std::vector<LocationConfig>& ServerConfig::getLocations() {return this->locations;}
 // Setters
 void ServerConfig::setListenIp(const std::string& ip) { listen_ip = ip; }
 void ServerConfig::setListenPort(int port) { listen_port = port; }

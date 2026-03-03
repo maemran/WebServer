@@ -43,6 +43,8 @@ class ServerConfig
 		const std::map<int, std::string>&	getErrorPages() const;
 		 size_t getMaxBodySize() const;
 		const std::vector<LocationConfig>& getLocations() const;
+		std::vector<LocationConfig>& getLocations();
+		std::vector<ServerConfig>& getServers();
 
 		void	setListenIp(const std::string& ip);
 		void	setListenPort(int port);
