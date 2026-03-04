@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:18:25 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/04 15:43:04 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 16:51:05 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,10 @@ class   URI
         std::string host;
         std::string path;
         void	pathWithSpacesCheck();
+        void    printClassAtributes();
+        void    uriParser();
+        void    uriCheck();
+        void    uriValidate();
         
     public:
         URI();
@@ -43,8 +47,7 @@ class   URI
         void    setHost(const std::string& host);
         void    setPath(const std::string& path);
 
-		//void    uriParser();
-        void     uriCheck();
+        void    uriHandler();
 
         class   badURIException: std::exception
         {

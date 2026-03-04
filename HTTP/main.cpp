@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/04 15:44:31 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 20:03:38 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,17 @@
 
 #include <iostream>
 
+//400   Bad Request
+//501   Not Implemented
+//505   HTTP Version Not Supported
 int main(void)
 {
+    //handle   hhttp://----------------------------------------------------------
     // HttpConfig config;
     // ServerConfig server;
 
     std::string request =
-        "POST http:///webwhiteboard.com:9090/var/ HTTP/1.0\r\n" // ///var/
+        "GET hhttp://webwhiteboard.com:9090/var/ HTTP/1.0\r\n" // ///var/
         // "Host: localhost:7070\r\n"
         "User-Agent: Mozilla/5.0\r\n";
         // "Content-Type: text/plain\r\n"

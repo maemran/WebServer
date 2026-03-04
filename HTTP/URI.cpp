@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:52:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/04 15:43:12 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 17:16:58 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ void	URI::pathWithSpacesCheck()
 {
 	for (int i = 0; i < (int)uri.length(); i++)
 	{
-		if (uri[i] == ' ')
+		if ((uri[i] >= 9 && uri[i] <= 13) || uri[i] == ' ')
 			throw	badURIException("URL contain spaces");
 	}
 }
@@ -119,4 +119,46 @@ void     URI::uriCheck()
 	}
 }
 
-//void    uriParser(const std::string& request);
+void    URI::uriParser()
+{
+    int i = 7;
+    if (uri[0] != '/')
+    {
+        this->scheme = uri.substr(0, 7);
+        for (; i < (int)uri.length(); i++)
+        {
+            if (uri[i] == '/')
+                break;
+            this->host += uri[i];
+        }
+        for (; i < (int)uri.length(); i++)
+            this->path += uri[i];
+    }
+    else
+        this->path = uri;
+}
+
+void    URI::uriValidate()
+{
+    if (path.find("<") != std::string::npos 
+        || path.find(">") != std::string::npos
+        || path.find("\\") != std::string::npos
+        || path.find("{") != std::string::npos
+        || path.find("}") != std::string::npos)
+		throw badURIException("Wrong Path");
+}
+
+void    URI::printClassAtributes()
+{
+    std::cout << "URI Scheme: " << this->scheme << std::endl;
+    std::cout << "URI Host: " << this->host << std::endl;
+    std::cout << "URI Path: " << this->path << std::endl;
+}
+
+void    URI::uriHandler()
+{
+    uriCheck();
+    uriParser();
+    uriValidate();
+    printClassAtributes();
+}

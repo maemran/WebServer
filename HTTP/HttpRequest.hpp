@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 05:40:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/04 14:05:51 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 19:49:42 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,19 @@ class   HttpRequest
         std::string httpVersion;
         std::map<std::string, std::string> headers;
         std::string entityBody;
-        int statusCode;
+        std::string statusCode;
+        double  versionNum;
 		
 		std::vector<std::string>	requestLexer(const std::string& request);
 		std::string	extractBody(const std::string& request);
         void    storingHeaders(std::vector<std::string> requestElements);
         void    requestParser(const std::string& request);
-        int     requestCheck(const std::string& request);
+        void    requestCheck(const std::string& request);
         void    requestLineParser();
+        void    methodValidation();
+        void    versionValidation();
+        void    headersValidation();
+        void    requestValidate();
         void    printClassAtributes();
         
     public:
@@ -48,7 +53,7 @@ class   HttpRequest
         const std::string& getHttpVersion() const;
         const std::map<std::string, std::string>& getHeaders() const;
         const std::string& getEntityBody() const;
-        int   getStatusCode() const;
+        std::string   getStatusCode() const;
 
         void    setRequestLine(const std::string& requestLine);
         void    setMethod(const std::string& method);
@@ -56,9 +61,18 @@ class   HttpRequest
         void    setHttpVersion(const std::string& httpVersion);
         void    setHeaders(const std::map<std::string, std::string>& headers);
         void    setEntityBody(const std::string& entityBody);
-        void    setStatusCode(int StatusCode);
+        void    setStatusCode(const std::string& StatusCode);
 
         void    requestHandler(std::string& request);
+
+        class   badRequestException: std::exception
+        {
+            private:
+                char*   statusCode;
+            public:
+                badRequestException(const char* statCode);
+                const char* what() const throw();
+        };
 };
 
 #endif

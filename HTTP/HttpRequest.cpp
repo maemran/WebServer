@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/04 15:42:32 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 20:01:29 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 HttpRequest::HttpRequest()
 {
-    statusCode = 200;
+    statusCode = "200";
 }
 
 HttpRequest::HttpRequest(const HttpRequest& other)
@@ -77,7 +77,7 @@ const std::string& HttpRequest::getEntityBody() const
     return this->entityBody;
 }
 
-int HttpRequest::getStatusCode() const
+std::string HttpRequest::getStatusCode() const
 {
     return this->statusCode;
 }
@@ -112,9 +112,26 @@ void    HttpRequest::setEntityBody(const std::string& entityBody)
     this->entityBody = entityBody;
 }
 
-void    HttpRequest::setStatusCode(int StatusCode)
+void    HttpRequest::setStatusCode(const std::string& StatusCode)
 {
     this->statusCode = StatusCode;
+}
+
+HttpRequest::badRequestException::badRequestException(const char* statCode)
+{
+    this->statusCode = const_cast<char *>(statCode);
+}
+
+const char* HttpRequest::badRequestException::what() const throw()
+{
+    return statusCode;
+}
+
+char toLower(char c)
+{
+    if (c >= 'A' && c <= 'Z')
+        return c + 32;
+    return c;
 }
 
 std::vector<std::string>	HttpRequest::requestLexer(const std::string& request)
@@ -154,12 +171,12 @@ std::string	HttpRequest::extractBody(const std::string& request)
     return requestWithoutBody;
 }
 
-int HttpRequest::requestCheck(const std::string& request)
+void HttpRequest::requestCheck(const std::string& request)
 {
-    int flag1 = 0, flag2 = 0, flag3 = 1, flag4 = 1;
+    int flag1 = 0, flag2 = 0;
     if(request.c_str()[0] == '\r' && request.c_str()[1] == '\n'
         && request.c_str()[2] == '\0') // if the request just include "\r\n"
-        flag3 = 0;
+        throw badRequestException("400");
     for (int i = 0; i < (int)request.length(); i++)
     {
         if (i != 0 && request[i - 1] == '\r' && request[i] == '\n')
@@ -170,7 +187,6 @@ int HttpRequest::requestCheck(const std::string& request)
         if (request[(int)request.length() - 1] == '\n'
             && request[(int)request.length() - 2] == '\r')
         {
-
             flag2 = 1;
             break;
         }
@@ -182,14 +198,10 @@ int HttpRequest::requestCheck(const std::string& request)
     {
         if (i != 0 && ((request[i - 1] == '\r' && request[i] != '\n')
             || (request[i - 1] != '\r' && request[i] == '\n')))
-            flag4 = 0;
+            throw badRequestException("400");
     }
-    if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0)
-    {
-        statusCode = 400;
-        return 0;
-    }
-    return 1;
+    if (flag1 == 0 || flag2 == 0)
+        throw badRequestException("400");
 }
 
 void	HttpRequest::requestLineParser()
@@ -282,8 +294,12 @@ void    HttpRequest::storingHeaders(std::vector<std::string> requestElements)
             {
                 flag = 1;
                 for (; start < j; start++)
-				    temp1 += requestElements[i][start];
+				    temp1 += toLower(requestElements[i][start]);
                 j++;
+                if (requestElements[i][j] != ' ')
+                    throw badRequestException("400");
+                if (requestElements[i][j] == ' ')
+                    j += 1;
                 for (; j < (int)requestElements[i].length(); j++)
                     temp2 += requestElements[i][j];
             }
@@ -305,26 +321,66 @@ void    HttpRequest::requestParser(const std::string& request)
     storingHeaders(requestElements);
 }
 
+void    HttpRequest::methodValidation()
+{
+    if (method != "GET" && method != "HEAD"
+        && method != "POST" && method != "DELETE")
+        throw   badRequestException("501");
+}
+
+void    HttpRequest::versionValidation()
+{
+    if (httpVersion == "")
+        versionNum = 0.9;
+    else if (httpVersion == "HTTP/1.0")
+        versionNum = 1.0;
+    else if (httpVersion == "HTTP/1.1")
+        versionNum = 1.1;
+    else if(httpVersion == "HTTP/2"
+        || httpVersion == "HTTP/3")
+        throw badRequestException("505");
+    else
+        throw badRequestException("400");
+}
+
+void    HttpRequest::headersValidation()
+{
+    for (std::map<std::string, std::string>::const_iterator it = headers.begin();
+    it != headers.end(); ++it)
+    {
+        if (it->first.find(" ") != std::string::npos
+            || it->second.find(" ") != std::string::npos)
+            throw badRequestException("400");
+        if (it->second == "")
+            throw badRequestException("400");// not complete
+    }
+}
+
+void    HttpRequest::requestValidate()
+{
+    methodValidation();
+    headersValidation();
+    versionValidation();
+}
+
 void    HttpRequest::requestHandler(std::string& request)
 {
-    request = extractBody(request);
-    if (!requestCheck(request))
-    {
-        std::cout << "status-code: " << getStatusCode() << std::endl;
-        std::cout << "problem" << std::endl;
-    }
-    else
-    {
+    try {
+        request = extractBody(request);
+        requestCheck(request);
+        requestParser(request);
+        requestValidate();
+        printClassAtributes();
         try {
-            requestParser(request);
-		    getUri().uriCheck();
-            printClassAtributes();
+            std::cout << "------------------------------" << std::endl;
+            getUri().uriHandler();
         }
-        catch (URI::badURIException& e)
-        {
-            statusCode = 400;
-            std::cout << e.what() << std::endl;
-        }
+        catch (URI::badURIException& e) {throw badRequestException("400");}
+    }
+    catch (badRequestException& e)
+    {
+        statusCode = e.what();
+        std::cout << "Status Code: " << statusCode << std::endl;
     }
 }
 
@@ -333,6 +389,7 @@ void    HttpRequest::printClassAtributes()
     std::cout << "Method: " << method << std::endl;
     std::cout << "URL: " << uri.getUri() << std::endl;
     std::cout << "version: " << httpVersion << std::endl;
+    std::cout << "Version number: " << versionNum << std::endl;
     for (std::map<std::string, std::string>::const_iterator it = headers.begin();
     it != headers.end(); ++it)
     {
