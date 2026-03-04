@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpConfig.cpp                                     :+:      :+:    :+:   */
+/*   HttpConfig.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 14:41:32 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/02/23 14:41:51 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/03/04 15:39:03 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ class HttpConfig
 		const std::vector<ServerConfig>& getServers() const;
 		std::vector<ServerConfig>& getServers() ;
 
-
+		
 
 		void	setRoot(const std::string& root);
 		void	setIndex(const std::string& index);

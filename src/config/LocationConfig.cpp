@@ -1,9 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   LocationConfig.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/04 15:18:54 by saabo-sh          #+#    #+#             */
+/*   Updated: 2026/03/04 15:19:00 by saabo-sh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "config/LocationConfig.hpp"
 
 // Default constructor
 LocationConfig::LocationConfig()
-    : path(""), root(""), index(""), autoindex(false), client_max_body_size(0)
-{}
+    : path(""), root(""), index(""), autoindex(false), client_max_body_size(0){}
 
 // Copy constructor
 LocationConfig::LocationConfig(const LocationConfig& other)

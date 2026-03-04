@@ -6,7 +6,7 @@
 /*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:45 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/02/23 11:52:46 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/03/04 15:36:48 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ void ConfigParser::expect(TokenType type, const std::string& msg)
 /* ============================= */
 /*          Entry Point          */
 /* ============================= */
-
 HttpConfig ConfigParser::parse()
 {
     HttpConfig http;
@@ -102,21 +101,46 @@ HttpConfig ConfigParser::parse()
         std::string word = expectWord("Expected directive in http");
 
         if (word == "server")
+        {
             http.addServer(parseServer());
+        }
+
+        else if (word == "root")
+        {
+            http.setRoot(expectWord("Expected root path"));
+            expect(TOKEN_SEMICOLON, "Missing ';'");
+        }
+
+        else if (word == "index")
+        {
+            http.setIndex(expectWord("Expected index"));
+            expect(TOKEN_SEMICOLON, "Missing ';'");
+        }
+
+        else if (word == "autoindex")
+        {
+            std::string val = expectWord("Expected on/off");
+            http.setAutoindex(val == "on");
+            expect(TOKEN_SEMICOLON, "Missing ';'");
+        }
 
         else if (word == "client_max_body_size")
         {
-            http.setMaxBodySize(std::atoi(expectWord("Expected size").c_str()));
+            http.setMaxBodySize(
+                std::atoi(expectWord("Expected size").c_str())
+            );
             expect(TOKEN_SEMICOLON, "Missing ';'");
         }
+
         else
+        {
             throw std::runtime_error("Unknown directive in http: " + word);
+        }
     }
 
     expect(TOKEN_RBRACE, "Missing '}' after http");
     return http;
 }
-
 /* ============================= */
 /*         Server Block          */
 /* ============================= */
