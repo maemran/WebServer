@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   URI.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:18:25 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/28 12:58:16 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 15:43:04 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define URI_HPP
 
 #include <string>
+#include <exception>
 
 class   URI
 {
@@ -22,8 +23,8 @@ class   URI
         std::string scheme;
         std::string host;
         std::string path;
-		int	uriError;
-    
+        void	pathWithSpacesCheck();
+        
     public:
         URI();
         URI(const std::string& uri);
@@ -35,17 +36,24 @@ class   URI
         const std::string& getScheme() const;
         const std::string& getHost() const;
         const std::string& getPath() const;
-		int getUriError() const;
 
         // void parseUri(const std::string& uri);
         void    setUri(const std::string& uri);
         void    setScheme(const std::string& scheme);
         void    setHost(const std::string& host);
         void    setPath(const std::string& path);
-		void	setUriError(int uriError);
 
 		//void    uriParser();
         void     uriCheck();
+
+        class   badURIException: std::exception
+        {
+            private:
+                char *errMessage;
+            public:
+                badURIException(const char *errMessage);
+                const char* what() const throw();
+        };
 };
 
 #endif

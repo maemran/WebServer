@@ -3,19 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   URI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:52:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/28 14:26:29 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 15:43:12 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "URI.hpp"
+#include <iostream>
 
-URI::URI()
-{
-	uriError = 0;
-}
+URI::URI() {}
 
 URI::URI(const std::string& uri)
 {
@@ -64,11 +62,6 @@ const std::string& URI::getPath() const
     return this->path;
 }
 
-int URI::getUriError() const
-{
-	return this->uriError;
-}
-
 void URI::setUri(const std::string& uri)
 {
     this->uri = uri;
@@ -89,58 +82,40 @@ void URI::setPath(const std::string& path)
     this->path = path;
 }
 
-void URI::setUriError(int uriError)
+URI::badURIException::badURIException(const char *errMessage)
 {
-	this->uriError = uriError;
+	this->errMessage = const_cast<char *>(errMessage);
+}
+
+const char* URI::badURIException::what() const throw()
+{
+	return errMessage;
+}
+
+void	URI::pathWithSpacesCheck()
+{
+	for (int i = 0; i < (int)uri.length(); i++)
+	{
+		if (uri[i] == ' ')
+			throw	badURIException("URL contain spaces");
+	}
 }
 
 void     URI::uriCheck()
 {
-	int colonFlag = 0;
 	if (uri == "")
-		uriError = 1;
-	if (uri[0] == ' ')
-		uriError = 1;
-	for (int i = 0; i < (int)uri.length(); i++)
-	{
-		if (uri[i] == ' ')
-			uriError = 1;
-		return;
-	}
+		throw badURIException("Empty URL");
+	pathWithSpacesCheck();
 	if (uri[0] != '/')
 	{
-		for (int i = 0; i < ((int)uri.length()); i++)
-		{
-			if (uri[i] == ':')
-				colonFlag++;
-		}
-		if (colonFlag == 0)
-		{
-			uriError = 1;
-			return;
-		}
+		/* http:///webwhiteboard.com:9090///var/ */
 		if(uri.find(":///") != std::string::npos
 			|| uri.find("///") != std::string::npos)
-			uriError = 1;
-		for (int i = 0; i < (int)uri.length(); i++)
-		{
-			if (i <= ((int)uri.length() - 3) && uri[i] == ':'
-				&& uri[i + 1] == '/' && uri[i + 2] != '/')
-			{
-				uriError = 1;
-				break;
-			}
-		}
-		for (int i = 0; i < (int)uri.length(); i++)
-		{
-			if (i <= ((int)uri.length() - 3) && uri[i] == ':'
-				&& uri[i + 1] != '/' && uri[i + 2] != '/' 
-				&& uri.find("://") == std::string::npos)
-			{
-				uriError = 1;
-				break;
-			}
-		}
+			throw badURIException("Multi forword slash");
+		/* Scheme check */
+		if (uri.find("http://") == std::string::npos
+			|| uri[0] != 'h')
+			throw badURIException("Scheme Error");
 	}
 }
 

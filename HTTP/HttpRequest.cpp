@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/02 17:14:00 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 15:42:32 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ void    HttpRequest::setStatusCode(int StatusCode)
     this->statusCode = StatusCode;
 }
 
-std::vector<std::string>	HttpRequest::requestLexar(const std::string& request)
+std::vector<std::string>	HttpRequest::requestLexer(const std::string& request)
 {
 	int i = 0;
 	int start = 0;
@@ -142,47 +142,23 @@ std::vector<std::string>	HttpRequest::requestLexar(const std::string& request)
 
 std::string	HttpRequest::extractBody(const std::string& request)
 {
-	std::string	res;
-	int end = 0;
-	
-	for (int i = (int)request.length() - 1; i >= 0; i--)
-	{
-        if (request[(int)request.length() - 1] == '\n'
-            && request[(int)request.length() - 2] == '\r')
-            break;
-		if (i > 2 && (request[i - 3] == '\r' && request[i - 2] == '\n'
-			&& request[i - 1] == '\r' && request[i] == '\n'))
-		{	
-			end = i + 1;
-			break;
-		}
-	}
-	for (int i = end; i != 0 && i < (int)request.length(); i++)
-		res += request[i];
-	return res;
-}
-
-int	HttpRequest::withoutBodyCheck(const std::string& request)
-{
-	std::string body = extractBody(request);
-	if (request[(int)request.length() - 1] == '\n'
-        && request[(int)request.length() - 2] == '\r')
-		    return 1;
-	
-	for (int i = 0; i < (int)request.size(); i++)
-    {
-        if (i != 0 && ((request[i - 1] == '\r' && request[i] != '\n')
-            || (request[i - 1] != '\r' && request[i] == '\n')))
-            return 0;
-    }
-	return 1;
+    std::string requestWithoutBody;
+    size_t  pos = request.find("\r\n\r\n");
+    if (pos == std::string::npos)
+        return request;
+    for (int i = 0; i < (int)pos + 4; i++)
+        requestWithoutBody += request[i];
+    pos += 4;
+    for (;pos < request.length(); pos++)
+        this->entityBody += request[pos];
+    return requestWithoutBody;
 }
 
 int HttpRequest::requestCheck(const std::string& request)
 {
-    int flag1 = 0, flag2 = 0, flag3 = 1;
+    int flag1 = 0, flag2 = 0, flag3 = 1, flag4 = 1;
     if(request.c_str()[0] == '\r' && request.c_str()[1] == '\n'
-        && request.c_str()[2] == '\0')
+        && request.c_str()[2] == '\0') // if the request just include "\r\n"
         flag3 = 0;
     for (int i = 0; i < (int)request.length(); i++)
     {
@@ -194,6 +170,7 @@ int HttpRequest::requestCheck(const std::string& request)
         if (request[(int)request.length() - 1] == '\n'
             && request[(int)request.length() - 2] == '\r')
         {
+
             flag2 = 1;
             break;
         }
@@ -201,7 +178,13 @@ int HttpRequest::requestCheck(const std::string& request)
 			&& request[i - 1] == '\r' && request[i] == '\n'))
             flag2 = 1;
     }
-    if (flag1 == 0 || flag2 == 0 || flag3 == 0)
+    for (int i = 0; i < (int)request.size(); i++)
+    {
+        if (i != 0 && ((request[i - 1] == '\r' && request[i] != '\n')
+            || (request[i - 1] != '\r' && request[i] == '\n')))
+            flag4 = 0;
+    }
+    if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0)
     {
         statusCode = 400;
         return 0;
@@ -316,12 +299,33 @@ void    HttpRequest::requestParser(const std::string& request)
 {
 	std::vector<std::string>	requestElements;
     /*Request line & headers Parser*/
-	requestElements = requestLexar(request);
+	requestElements = requestLexer(request);
     this->requestLine = requestElements[0];
     requestLineParser();
     storingHeaders(requestElements);
-    /*Entity Body parser*/
-	this->entityBody = extractBody(request);
+}
+
+void    HttpRequest::requestHandler(std::string& request)
+{
+    request = extractBody(request);
+    if (!requestCheck(request))
+    {
+        std::cout << "status-code: " << getStatusCode() << std::endl;
+        std::cout << "problem" << std::endl;
+    }
+    else
+    {
+        try {
+            requestParser(request);
+		    getUri().uriCheck();
+            printClassAtributes();
+        }
+        catch (URI::badURIException& e)
+        {
+            statusCode = 400;
+            std::cout << e.what() << std::endl;
+        }
+    }
 }
 
 void    HttpRequest::printClassAtributes()

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 05:40:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/02 16:37:46 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 14:05:51 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,13 @@ class   HttpRequest
         std::string entityBody;
         int statusCode;
 		
-		std::vector<std::string>	requestLexar(const std::string& request);
+		std::vector<std::string>	requestLexer(const std::string& request);
 		std::string	extractBody(const std::string& request);
         void    storingHeaders(std::vector<std::string> requestElements);
-		int		withoutBodyCheck(const std::string& request);
+        void    requestParser(const std::string& request);
+        int     requestCheck(const std::string& request);
         void    requestLineParser();
+        void    printClassAtributes();
         
     public:
         HttpRequest();
@@ -56,9 +58,7 @@ class   HttpRequest
         void    setEntityBody(const std::string& entityBody);
         void    setStatusCode(int StatusCode);
 
-        void    requestParser(const std::string& request);
-        int     requestCheck(const std::string& request);
-        void    printClassAtributes();
+        void    requestHandler(std::string& request);
 };
 
 #endif
