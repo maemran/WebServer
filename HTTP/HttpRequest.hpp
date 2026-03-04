@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 05:40:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/04 19:49:42 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 22:56:39 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ class   HttpRequest
         const std::map<std::string, std::string>& getHeaders() const;
         const std::string& getEntityBody() const;
         std::string   getStatusCode() const;
+        double  getVersionNum() const;
 
         void    setRequestLine(const std::string& requestLine);
         void    setMethod(const std::string& method);
@@ -62,6 +63,7 @@ class   HttpRequest
         void    setHeaders(const std::map<std::string, std::string>& headers);
         void    setEntityBody(const std::string& entityBody);
         void    setStatusCode(const std::string& StatusCode);
+        void    setVersionNum(double versionNum);
 
         void    requestHandler(std::string& request);
 

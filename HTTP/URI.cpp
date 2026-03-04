@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:52:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/04 17:16:58 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 23:09:24 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,8 +113,8 @@ void     URI::uriCheck()
 			|| uri.find("///") != std::string::npos)
 			throw badURIException("Multi forword slash");
 		/* Scheme check */
-		if (uri.find("http://") == std::string::npos
-			|| uri[0] != 'h')
+        std::string subUri = uri.substr(0, 7);
+		if (subUri.find("http://") == std::string::npos)
 			throw badURIException("Scheme Error");
 	}
 }

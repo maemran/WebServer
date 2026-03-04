@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/04 20:01:29 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/04 23:01:50 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 HttpRequest::HttpRequest()
 {
     statusCode = "200";
+    versionNum = 1.0;
 }
 
 HttpRequest::HttpRequest(const HttpRequest& other)
@@ -82,6 +83,11 @@ std::string HttpRequest::getStatusCode() const
     return this->statusCode;
 }
 
+double HttpRequest::getVersionNum() const
+{
+    return this->versionNum;
+}
+
 void    HttpRequest::setRequestLine(const std::string& requestLine)
 {
     this->requestLine = requestLine;
@@ -125,6 +131,11 @@ HttpRequest::badRequestException::badRequestException(const char* statCode)
 const char* HttpRequest::badRequestException::what() const throw()
 {
     return statusCode;
+}
+
+void    HttpRequest::setVersionNum(double versionNum)
+{
+    this->versionNum = versionNum;
 }
 
 char toLower(char c)
@@ -369,13 +380,13 @@ void    HttpRequest::requestHandler(std::string& request)
         request = extractBody(request);
         requestCheck(request);
         requestParser(request);
-        requestValidate();
-        printClassAtributes();
         try {
-            std::cout << "------------------------------" << std::endl;
             getUri().uriHandler();
+            std::cout << "------------------------------" << std::endl;
         }
         catch (URI::badURIException& e) {throw badRequestException("400");}
+        requestValidate();
+        printClassAtributes();
     }
     catch (badRequestException& e)
     {
