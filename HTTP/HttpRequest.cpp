@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/04 23:01:50 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/11 17:55:25 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -359,11 +359,10 @@ void    HttpRequest::headersValidation()
     for (std::map<std::string, std::string>::const_iterator it = headers.begin();
     it != headers.end(); ++it)
     {
-        if (it->first.find(" ") != std::string::npos
-            || it->second.find(" ") != std::string::npos)
+        if (it->first.find(" ") != std::string::npos)
             throw badRequestException("400");
         if (it->second == "")
-            throw badRequestException("400");// not complete
+            throw badRequestException("400");
     }
 }
 
