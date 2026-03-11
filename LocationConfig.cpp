@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 07:09:20 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/24 07:09:59 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/11 19:53:43 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ const std::string& LocationConfig::getIndex() const
     return index;
 }
 
-const bool LocationConfig::getAutoindex() const
+bool LocationConfig::getAutoindex() const
 {
     return autoindex;
 }
@@ -72,7 +72,7 @@ const std::map<int, std::string>& LocationConfig::getRedirections() const
     return redirections;
 }
 
-const size_t LocationConfig::getMaxBodySize() const
+size_t LocationConfig::getMaxBodySize() const
 {
     return max_body_size;
 }

@@ -1,6 +1,7 @@
 CXX = c++
 CXXFLAGS =  -Wall -Wextra -Werror -std=c++98 -g
-SRC = main.cpp HttpRequest.cpp URI.cpp
+SRC = main.cpp HttpRequest.cpp URI.cpp ../HttpConfig.cpp ../LocationConfig.cpp\
+ ../ServerConfig.cpp HttpResponse.cpp
 OBJ_DIR = OBJ
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
 NAME = a.out

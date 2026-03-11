@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 07:07:26 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/24 07:08:39 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/11 19:53:45 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ const std::string& ServerConfig::getListenIp() const
     return listen_ip;
 }
 
-const int ServerConfig::getListenPort() const
+int ServerConfig::getListenPort() const
 {
     return listen_port;
 }
@@ -58,7 +58,7 @@ const std::string& ServerConfig::getIndex() const
     return index;
 }
 
-const bool ServerConfig::getAutoindex() const
+bool ServerConfig::getAutoindex() const
 {
     return autoindex;
 }
@@ -73,7 +73,7 @@ const std::map<int, std::string>& ServerConfig::getErrorPages() const
     return error_pages;
 }
 
-const size_t ServerConfig::getMaxBodySize() const
+size_t ServerConfig::getMaxBodySize() const
 {
     return max_body_size;
 }

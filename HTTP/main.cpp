@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/11 18:33:13 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/11 20:41:21 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,6 @@ int main(void)
     HttpRequest obj;
     obj.requestHandler(request);
     HttpResponse resp(obj, config, 0);
-    std::string response = resp.generateResponse();
-    (void)response;
+    resp.responseHandler();
     //std::cout << request << std::endl;
 }

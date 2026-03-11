@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 07:05:07 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/24 07:06:49 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/11 19:53:41 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,12 @@ const std::string& HttpConfig::getIndex() const
     return index;
 }
 
-const bool HttpConfig::getAutoindex() const
+bool HttpConfig::getAutoindex() const
 {
     return autoindex;
 }
 
-const size_t HttpConfig::getMaxBodySize() const
+size_t HttpConfig::getMaxBodySize() const
 {
     return max_body_size;
 }
