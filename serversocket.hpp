@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include "ServerConfig.hpp"
 #include "HttpConfig.hpp"
+#include "connection.hpp"
 class ServerSocket
 {
     private:
@@ -11,6 +12,11 @@ class ServerSocket
         std::vector<ServerConfig> servers;
         std :: string acceptedIp;
         int acceptedport;
+
+        std::vector<Connection> connections;
+        Connection* getConnectionByFd(int fd);
+        void removeConnection(int fd);
+        size_t getServerIndexByFd(int serverFd);
     public:
         ServerSocket(const HttpConfig& config);
         ~ServerSocket();
@@ -25,6 +31,8 @@ class ServerSocket
         bool  isServerFd(int fd);
         std :: string getAcceptedIp(std :: string acceptedIp);
         int getAcceptedPort(int acceptedPort);
+
+        const std::vector<Connection>& getConnections() const;
 };
 
 #endif

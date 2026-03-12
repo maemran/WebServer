@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 01:30:51 by asaadeh           #+#    #+#             */
-/*   Updated: 2026/03/07 02:58:48 by asaadeh          ###   ########.fr       */
+/*   Updated: 2026/03/13 02:37:34 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <map>
 #include <stdexcept>
 #include <algorithm>
+#include "connection.hpp"
 
 ServerSocket::ServerSocket(const HttpConfig& config)
 {
@@ -39,14 +40,6 @@ ServerSocket::~ServerSocket()
             close(serverFds[i]);
     }
 }
- std :: string ServerSocket :: getAcceptedIp(std :: string acceptedIp)
- {
-    this->acceptedIp = acceptedIp;
- }
- int ServerSocket :: getAcceptedPort(int acceptedPort)
- {
-    return this->acceptedport = acceptedPort;
- }
 void ServerSocket::start()
 {
     for (size_t i = 0; i < servers.size(); i++)
@@ -54,7 +47,9 @@ void ServerSocket::start()
         serverFds[i] = socket(AF_INET, SOCK_STREAM, 0);
         if (serverFds[i] < 0)
             throw std::runtime_error("Socket creation failed");
-
+        
+        int opt = 1;
+        setsockopt(serverFds[i], SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
         // Make server socket non-blocking
         int flags = fcntl(serverFds[i], F_GETFL, 0); // this flag read the current configration from the socket
         fcntl(serverFds[i], F_SETFL, flags | O_NONBLOCK);// the default socket is blocking , here i change propereties of fd to be non blocking 
@@ -81,106 +76,6 @@ void ServerSocket::start()
                   << std::endl;
     }
 }
-
-// void ServerSocket::run()
-// {
-//     // Create epoll instance
-//     int epollFd = epoll_create1(0);
-//     std :: cout << "the fd of epoll is : "<<epollFd << std :: endl;
-//     if (epollFd < 0)
-//         throw std::runtime_error("Failed to create epoll instance");
-
-//     // Map server fd → port for printing
-//     std::map<int, int> serverFdToPort;
-//     for (size_t i = 0; i < serverFds.size(); i++)
-//         serverFdToPort[serverFds[i]] = servers[i].getListenPort();
-
-//     // Register all server sockets with epoll
-//     for (size_t i = 0; i < serverFds.size(); i++)
-//     {
-//         struct epoll_event ev;
-//         ev.events = EPOLLIN; // ready to read → incoming connection
-//         ev.data.fd = serverFds[i];
-
-//         if (epoll_ctl(epollFd, EPOLL_CTL_ADD, serverFds[i], &ev) < 0)
-//             throw std::runtime_error("Failed to add server fd to epoll");
-//     }
-
-//     struct epoll_event events[128]; // max 128 events per loop
-
-//     while (true)
-//     {
-//         int nfds = epoll_wait(epollFd, events, 128, -1); // wait indefinitely
-//         if (nfds < 0)
-//             continue;
-
-//         for (int i = 0; i < nfds; i++)
-//         {
-//             int fd = events[i].data.fd;
-
-//             // Check if fd is a server socket (incoming connection)
-//             if (std::find(serverFds.begin(), serverFds.end(), fd) != serverFds.end())
-//             {
-//                 // Accept all pending clients
-//                 while (true)
-//                 {
-//                     int clientFd = accept(fd, 0, 0);
-//                     if (clientFd < 0)
-//                     {
-//                         if (errno == EAGAIN || errno == EWOULDBLOCK)
-//                             break; // no more clients pending
-//                         else
-//                             throw std::runtime_error("accept failed");
-//                     }
-
-//                     // Make client socket non-blocking
-//                     int flags = fcntl(clientFd, F_GETFL, 0);
-//                     fcntl(clientFd, F_SETFL, flags | O_NONBLOCK);
-
-//                     // Add clientFd to epoll to monitor for data
-//                     struct epoll_event clientEv;
-//                     clientEv.events = EPOLLIN;
-//                     clientEv.data.fd = clientFd;
-//                     epoll_ctl(epollFd, EPOLL_CTL_ADD, clientFd, &clientEv);
-
-//                     // Correct port printing
-//                     int serverPort = serverFdToPort[fd];
-//                     std::cout << "Client connected on port "
-//                               << serverPort
-//                               << " (fd: " << clientFd << ")"
-//                               << std::endl;
-//                 }
-//             }
-//             else
-//             {
-//                 // Client socket ready to read
-//                 char buffer[4096];
-//                 int bytes = recv(fd, buffer, sizeof(buffer), 0);
-//                 if (bytes <= 0)
-//                 {
-//                     // Client disconnected
-//                     epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, 0);
-//                     close(fd);
-//                 }
-//                 else
-//                 {
-//                     // Hard-coded HTTP response
-//                     const char* response =
-//                         "HTTP/1.1 200 OK\r\n"
-//                         "Content-Length: 13\r\n"
-//                         "Content-Type: text/plain\r\n"
-//                         "\r\n"
-//                         "Hello, world!";
-
-//                     send(fd, response, strlen(response), 0);
-//                     epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, 0);
-//                     close(fd);
-//                 }
-//             }
-//         }
-//     }
-// }
-
 void ServerSocket::run()
 {
     int epollFd = createEpoll();
@@ -231,11 +126,15 @@ bool ServerSocket::isServerFd(int fd)
 {
     return std::find(serverFds.begin(), serverFds.end(), fd) != serverFds.end();
 }
+
 void ServerSocket::handleServerEvent(int epollFd, int serverFd)
 {
     while (true)
     {
-        int clientFd = accept(serverFd, 0, 0);
+        sockaddr_in clientAddr;
+        socklen_t clientLen = sizeof(clientAddr);
+        
+        int clientFd = accept(serverFd, (sockaddr*)&clientAddr, &clientLen);
         if (clientFd < 0)
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -243,21 +142,31 @@ void ServerSocket::handleServerEvent(int epollFd, int serverFd)
             else
                 throw std::runtime_error("accept failed");
         }
-        //----------------------------------------------------
+
+        // Get client IP and port
+        std::string clientIp = inet_ntoa(clientAddr.sin_addr);
+        int clientPort = ntohs(clientAddr.sin_port);
+
+        // Get server IP and port
         sockaddr_in localAddr;
-        socklen_t len = sizeof(localAddr); //How big is the structure where I will write the address?
+        socklen_t len = sizeof(localAddr);
+        getsockname(clientFd, (sockaddr*)&localAddr, &len);
+        
+        acceptedIp = inet_ntoa(localAddr.sin_addr);
+        acceptedport = ntohs(localAddr.sin_port);
 
-        getsockname(clientFd, (sockaddr*)&localAddr, &len);// it fill the localAddr
+       
+        size_t serverIndex = getServerIndexByFd(serverFd);
 
-        acceptedIp = inet_ntoa(localAddr.sin_addr); // it stored in binary format so we convert it to string
-        acceptedport = ntohs(localAddr.sin_port); // network --> text;
+        std::cout << "Client " << clientIp << ":" << clientPort
+                  << " connected to server[" << serverIndex << "] "
+                  << acceptedIp << ":" << acceptedport
+                  << " (fd: " << clientFd << ")" << std::endl;
 
-        std::cout << "Client connected to server "
-                << acceptedIp << ":" << acceptedport
-                << " (fd: " << clientFd << ")"
-                << std::endl;
+        
+        connections.push_back(Connection(clientFd, clientIp, clientPort,
+                                        acceptedIp, acceptedport, serverIndex));
 
-        //-------------------------------------------------------------
         // Make client non-blocking
         int flags = fcntl(clientFd, F_GETFL, 0);
         fcntl(clientFd, F_SETFL, flags | O_NONBLOCK);
@@ -266,11 +175,11 @@ void ServerSocket::handleServerEvent(int epollFd, int serverFd)
         struct epoll_event clientEv;
         clientEv.events = EPOLLIN;
         clientEv.data.fd = clientFd;
-        epoll_ctl(epollFd, EPOLL_CTL_ADD, clientFd, &clientEv);
-
-        std::cout << "New client fd: " << clientFd << std::endl;
+       if (epoll_ctl(epollFd, EPOLL_CTL_ADD, clientFd, &clientEv) < 0)
+            throw std::runtime_error("epoll_ctl client add failed");
     }
 }
+
 void ServerSocket::handleClientEvent(int epollFd, int clientFd)
 {
     char buffer[4096];
@@ -280,7 +189,16 @@ void ServerSocket::handleClientEvent(int epollFd, int clientFd)
     {
         epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, 0);
         close(clientFd);
+        removeConnection(clientFd);
         return;
+    }
+
+    Connection* conn = getConnectionByFd(clientFd);
+    if (conn)
+    {
+        std::cout << "Handling request from " << conn->getClientIp() 
+                  << ":" << conn->getClientPort() 
+                  << " (server[" << conn->getServerIndex() << "])" << std::endl;
     }
 
     const char* response =
@@ -294,4 +212,42 @@ void ServerSocket::handleClientEvent(int epollFd, int clientFd)
 
     epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, 0);
     close(clientFd);
+    removeConnection(clientFd);
+}
+
+Connection* ServerSocket::getConnectionByFd(int fd)
+{
+    for (size_t i = 0; i < connections.size(); i++)
+    {
+        if (connections[i].getClientFd() == fd)
+            return &connections[i];
+    }
+    return NULL;
+}
+
+void ServerSocket::removeConnection(int fd)
+{
+    for (size_t i = 0; i < connections.size(); i++)
+    {
+        if (connections[i].getClientFd() == fd)
+        {
+            connections.erase(connections.begin() + i);//erase take iterator not index
+            break;
+        }
+    }
+}
+
+size_t ServerSocket::getServerIndexByFd(int serverFd)
+{
+    for (size_t i = 0; i < serverFds.size(); i++)
+    {
+        if (serverFds[i] == serverFd)
+            return i;
+    }
+    return 0;
+}
+
+const std::vector<Connection>& ServerSocket::getConnections() const
+{
+    return connections;
 }

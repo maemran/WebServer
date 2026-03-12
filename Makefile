@@ -2,7 +2,7 @@ CXX = c++
 
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRC = main.cpp serversocket.cpp HttpConfig.cpp ServerConfig.cpp
+SRC = main.cpp serversocket.cpp HttpConfig.cpp ServerConfig.cpp connection.cpp
 
 NAME = socket
 
