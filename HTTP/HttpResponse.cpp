@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/11 21:24:07 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/15 01:25:04 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,15 +162,42 @@ std::string readFile(const std::string& path)
     return content;
 }
 
-// function combine all response elements
+// function combine all response element
 // function create auto index
 // function generate default error page                     DONE
 // function for redirection check new path
+//  | Request | Location used | Root used | Final path |
+//  | ------- | ------------- | --------- | ---------- |
+//  | `/old`  | `/old`        | ignored   | redirect   |
+//  | `/new`  | `/new`        | `/www`    | `/www/new` |
+
 // function check if the error page is exist or not
 // function find most match path
 
 // read files function                                      DONE
 // router to change all paths with root
+
+
+
+// Connection: close        close tcp connection after each response
+// 301 
+// HTTP/1.1 301 Moved Permanently
+// Date: Sun, 15 Mar 2026 12:30:00 GMT
+// Server: MyWebServer/1.0
+// Location: https://example.com/new-page
+// Content-Type: text/html
+// Content-Length: 178
+// Connection: close
+
+// <html>
+// <head>
+// <title>301 Moved Permanently</title>
+// </head>
+// <body>
+// <h1>Moved Permanently</h1>
+// <p>The document has moved <a href="https://example.com/new-page">here</a>.</p>
+// </body>
+// </html>
 
 void    HttpResponse::createResponse()
 {
