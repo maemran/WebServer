@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/15 01:25:04 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/15 03:55:39 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ void    HttpResponse::generateDefaultErrorPage(const std::string& statusCode, co
 
 std::string readFile(const std::string& path)
 {
-    std::ifstream file(path);
+    std::ifstream file(path.c_str());
     std::string line;
     std::string content;
     
@@ -175,7 +175,7 @@ std::string readFile(const std::string& path)
 // function find most match path
 
 // read files function                                      DONE
-// router to change all paths with root
+// router to change all paths with root                     DONE
 
 
 
@@ -199,6 +199,12 @@ std::string readFile(const std::string& path)
 // </body>
 // </html>
 
+// error_page 502 /errors/502.html; and (root var;)     عادي الباث لو مابلش ب (/)     ""Not important""
+
+// if the location is 
+// location /mo {} and the request is GET /mo/ HTTP/1.0  the /mo and th /mo/ is the same path
+// and if the location is location /mo/ {} and the request is GET /mo HTTP/1.0  the /mo/ and th /mo  is the same path
+
 void    HttpResponse::createResponse()
 {
     
@@ -206,7 +212,13 @@ void    HttpResponse::createResponse()
 
 void    HttpResponse::responseHandler()
 {
-    
+    router rout(config.getServers()[0].getLocations()[0]);
+    std::cout << "Routed Path: " << rout.getRoutedPath() << std::endl;
+    std::cout << "Routed Error Pages: " << std::endl;
+    for (std::map<int, std::string>::const_iterator it = rout.getRoutedErrorPages().begin(); it != rout.getRoutedErrorPages().end(); ++it)
+    {
+        std::cout << "Status Code: " << it->first << " Page: " << it->second << std::endl;
+    }
 }
 
 void    HttpResponse::printClassAtributes()

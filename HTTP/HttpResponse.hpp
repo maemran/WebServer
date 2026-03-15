@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/11 21:17:44 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/15 03:34:15 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <fstream>
 #include "HttpRequest.hpp"
 #include "../HttpConfig.hpp"
+#include "router.hpp"
 
 class   HttpResponse
 {

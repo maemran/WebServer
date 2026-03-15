@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/11 20:41:21 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/15 03:59:41 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,14 @@ int main(void)
     serverOne.addErrorPage(500, "/errors/500.html");
 
     LocationConfig serverOneRoot;
-    serverOneRoot.setPath("/");
-    serverOneRoot.setRoot("/var/www/server_one/public");
+    serverOneRoot.setPath("/hello/");
+    serverOneRoot.setRoot("./var/www/server_one/public");
     serverOneRoot.setIndex("index.html");
     serverOneRoot.setAutoindex(false);
     serverOneRoot.setMaxBodySize(1024 * 1024);
     serverOneRoot.addAllowedMethod("GET");
     serverOneRoot.addAllowedMethod("POST");
-    serverOneRoot.addErrorPage(404, "/errors/404.html");
+    serverOneRoot.addErrorPage(404, "errors/404.html");
 
     LocationConfig serverOneApi;
     serverOneApi.setPath("/api");
@@ -121,6 +121,9 @@ int main(void)
     HttpRequest obj;
     obj.requestHandler(request);
     HttpResponse resp(obj, config, 0);
+    std::cout << "===============================" << std::endl;
+    std::cout << "===> HTTP Response Handler <===" << std::endl;
+    std::cout << "===============================" << std::endl;
     resp.responseHandler();
     //std::cout << request << std::endl;
 }
