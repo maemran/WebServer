@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/11 17:55:25 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/17 00:12:25 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -345,10 +345,9 @@ void    HttpRequest::versionValidation()
         versionNum = 0.9;
     else if (httpVersion == "HTTP/1.0")
         versionNum = 1.0;
-    else if (httpVersion == "HTTP/1.1")
-        versionNum = 1.1;
     else if(httpVersion == "HTTP/2"
-        || httpVersion == "HTTP/3")
+        || httpVersion == "HTTP/3"
+        || httpVersion == "HTTP/1.1")
         throw badRequestException("505");
     else
         throw badRequestException("400");

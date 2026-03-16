@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/15 03:34:15 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/17 00:50:58 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include "HttpRequest.hpp"
 #include "../HttpConfig.hpp"
 #include "router.hpp"
+#include <sstream>
+
 
 class   HttpResponse
 {
@@ -27,13 +29,25 @@ class   HttpResponse
         std::string statusCode;
         std::string reasonPhrase;
         std::vector<std::string>    headers;
+        std::map<std::string, std::string>  statusValue;
+        std::map<std::string, std::string>  extensionTypes;
+        std::string location;
         HttpRequest request;
         HttpConfig config;
+        ServerConfig server;
+        LocationConfig loc;
         int serverIndex;
 
         void    generateDefaultErrorPage(const std::string& statusCode, const std::string&  ReasonPhrase);
         void    printClassAtributes();
         void    createResponse();
+        void    errorPageResponse();
+        void    findErrorPage();
+        void    findPath();
+        void    contentTypeSelector(const std::string& file);
+        std::string removeLastSlash(const std::string& path);
+        std::string getCurrentDate();
+        
     public:
         HttpResponse();
         HttpResponse(const HttpResponse& other);
@@ -56,10 +70,20 @@ class   HttpResponse
         void    setBody(const std::string& body);
         void    setStatusCode(const std::string& statusCode);
         void    setReasonPhrase(const std::string& reasonPhrase);
+        void    addHeader(const std::string& key, const std::string& value);
         void    addHeader(const std::string& header);
         
         
         void responseHandler();
+
+        class   errorResponseException: std::exception
+        {
+            private:
+                char*   statusCode;
+            public:
+                errorResponseException(const char* statCode);
+                const char* what() const throw();
+        };
 };
 
 #endif

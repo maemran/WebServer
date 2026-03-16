@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/15 03:59:41 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/17 01:02:58 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include "../HttpConfig.hpp"
 
 #include <iostream>
+
+// 405 Method Not Allowed   if the location not allow the method
 
 //400   Bad Request
 //501   Not Implemented
@@ -65,6 +67,7 @@ int main(void)
     serverOneApi.addAllowedMethod("POST");
     serverOneApi.addAllowedMethod("DELETE");
     serverOneApi.addRedirection(301, "https://api.server-one.local/v1");
+    serverOneApi.addErrorPage(404, "errors/404.html");
 
     serverOne.addLocation(serverOneRoot);
     serverOne.addLocation(serverOneApi);
@@ -109,7 +112,7 @@ int main(void)
     (void)config;
 
     std::string request =
-        "GET http://webwhiteboard.com:9090/var/ HTTP/1.0\r\n" // ///var/
+        "GET /ap/ HTTP/1.0\r\n" // ///var/
         // "Host: localhost:7070\r\n"
         "User-Agent: Mozilla/5.0;\r\n";
         // "Content-Type: text/plain;\r\n"

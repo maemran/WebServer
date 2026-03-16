@@ -6,12 +6,13 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/15 03:55:39 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/17 01:04:22 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 #include <iostream>
+#include <ctime>
 
 HttpResponse::HttpResponse() {}
 
@@ -47,9 +48,106 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
     this->request = request;
     this->config = config;
     this->serverIndex = serverIndex;
+    server = config.getServers()[serverIndex];
+    statusCode = "200";
+    statusValue["200"] = "OK";
+    statusValue["301"] = "Moved Permanently";
+    statusValue["400"] = "Bad Request";
+    statusValue["404"] = "Not Found";
+    statusValue["501"] = "Not Implemented";
+
+    extensionTypes[".aac"] = "audio/aac";
+    extensionTypes[".abw"] = "application/x-abiword";
+    extensionTypes[".apng"] = "image/apng";
+    extensionTypes[".arc"] = "application/x-freearc";
+    extensionTypes[".avif"] = "image/avif";
+    extensionTypes[".avi"] = "video/x-msvideo";
+    extensionTypes[".azw"] = "application/vnd.amazon.ebook";
+    extensionTypes[".bin"] = "application/octet-stream";
+    extensionTypes[".bmp"] = "image/bmp";
+    extensionTypes[".bz"] = "application/x-bzip";
+    extensionTypes[".bz2"] = "application/x-bzip2";
+    extensionTypes[".cda"] = "application/x-cdf";
+    extensionTypes[".csh"] = "application/x-csh";
+    extensionTypes[".css"] = "text/css";
+    extensionTypes[".csv"] = "text/csv";
+    extensionTypes[".doc"] = "application/msword";
+    extensionTypes[".docx"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    extensionTypes[".eot"] = "application/vnd.ms-fontobject";
+    extensionTypes[".epub"] = "application/epub+zip";
+    extensionTypes[".gz"] = "application/gzip";
+    extensionTypes[".gif"] = "image/gif";
+    extensionTypes[".htm"] = "text/html";
+    extensionTypes[".html"] = "text/html";
+    extensionTypes[".ico"] = "image/vnd.microsoft.icon";
+    extensionTypes[".ics"] = "text/calendar";
+    extensionTypes[".jar"] = "application/java-archive";
+    extensionTypes[".jpeg"] = "image/jpeg";
+    extensionTypes[".jpg"] = "image/jpeg";
+    extensionTypes[".js"] = "text/javascript";
+    extensionTypes[".json"] = "application/json";
+    extensionTypes[".jsonld"] = "application/ld+json";
+    extensionTypes[".md"] = "text/markdown";
+    extensionTypes[".mid"] = "audio/midi";
+    extensionTypes[".midi"] = "audio/midi";
+    extensionTypes[".mjs"] = "text/javascript";
+    extensionTypes[".mp3"] = "audio/mpeg";
+    extensionTypes[".mp4"] = "video/mp4";
+    extensionTypes[".mpeg"] = "video/mpeg";
+    extensionTypes[".mpkg"] = "application/vnd.apple.installer+xml";
+    extensionTypes[".odp"] = "application/vnd.oasis.opendocument.presentation";
+    extensionTypes[".ods"] = "application/vnd.oasis.opendocument.spreadsheet";
+    extensionTypes[".odt"] = "application/vnd.oasis.opendocument.text";
+    extensionTypes[".oga"] = "audio/ogg";
+    extensionTypes[".ogv"] = "video/ogg";
+    extensionTypes[".ogx"] = "application/ogg";
+    extensionTypes[".opus"] = "audio/ogg";
+    extensionTypes[".otf"] = "font/otf";
+    extensionTypes[".png"] = "image/png";
+    extensionTypes[".pdf"] = "application/pdf";
+    extensionTypes[".php"] = "application/x-httpd-php";
+    extensionTypes[".ppt"] = "application/vnd.ms-powerpoint";
+    extensionTypes[".pptx"] = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+    extensionTypes[".rar"] = "application/vnd.rar";
+    extensionTypes[".rtf"] = "application/rtf";
+    extensionTypes[".sh"] = "application/x-sh";
+    extensionTypes[".svg"] = "image/svg+xml";
+    extensionTypes[".tar"] = "application/x-tar";
+    extensionTypes[".tif"] = "image/tiff";
+    extensionTypes[".tiff"] = "image/tiff";
+    extensionTypes[".ts"] = "video/mp2t";
+    extensionTypes[".ttf"] = "font/ttf";
+    extensionTypes[".txt"] = "text/plain";
+    extensionTypes[".vsd"] = "application/vnd.visio";
+    extensionTypes[".wav"] = "audio/wav";
+    extensionTypes[".weba"] = "audio/webm";
+    extensionTypes[".webm"] = "video/webm";
+    extensionTypes[".webmanifest"] = "application/manifest+json";
+    extensionTypes[".webp"] = "image/webp";
+    extensionTypes[".woff"] = "font/woff";
+    extensionTypes[".woff2"] = "font/woff2";
+    extensionTypes[".xhtml"] = "application/xhtml+xml";
+    extensionTypes[".xls"] = "application/vnd.ms-excel";
+    extensionTypes[".xlsx"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    extensionTypes[".xml"] = "application/xml";
+    extensionTypes[".xul"] = "application/vnd.mozilla.xul+xml";
+    extensionTypes[".zip"] = "application/zip";
+    extensionTypes[".3gp"] = "video/3gpp";
+    extensionTypes[".3g2"] = "video/3gpp2";
+    extensionTypes[".7z"] = "application/x-7z-compressed";
 }
 
 HttpResponse::~HttpResponse() {}
+
+HttpResponse::errorResponseException::errorResponseException(const char* statCode) 
+{
+    this->statusCode = (char *)statCode;
+}
+
+const char *HttpResponse::errorResponseException::what() const throw()
+{
+    return this->statusCode;
+}
 
 const std::string& HttpResponse::getResponse() const
 {
@@ -126,6 +224,11 @@ void  HttpResponse::setReasonPhrase(const std::string& reasonPhrase)
     this->reasonPhrase = reasonPhrase;
 }
 
+void  HttpResponse::addHeader(const std::string& key, const std::string& value)
+{
+    this->headers.push_back(key + ": " + value);
+}
+
 void  HttpResponse::addHeader(const std::string& header)
 {
     this->headers.push_back(header);
@@ -162,20 +265,19 @@ std::string readFile(const std::string& path)
     return content;
 }
 
-// function combine all response element
 // function create auto index
-// function generate default error page                     DONE
-// function for redirection check new path
 //  | Request | Location used | Root used | Final path |
 //  | ------- | ------------- | --------- | ---------- |
 //  | `/old`  | `/old`        | ignored   | redirect   |
 //  | `/new`  | `/new`        | `/www`    | `/www/new` |
 
-// function check if the error page is exist or not
 // function find most match path
-
+ 
+// function generate default error page                     DONE
 // read files function                                      DONE
 // router to change all paths with root                     DONE
+// function combine all response element                    DONE
+
 
 
 
@@ -205,26 +307,159 @@ std::string readFile(const std::string& path)
 // location /mo {} and the request is GET /mo/ HTTP/1.0  the /mo and th /mo/ is the same path
 // and if the location is location /mo/ {} and the request is GET /mo HTTP/1.0  the /mo/ and th /mo  is the same path
 
+
+//request /mo/icons
+//locations /    /mo  /mo/iocons 
+
+//request /mo
+// Locations /  /mo  /mo/icons
+
+//request /mo/icons/icons.html
+// Locations /  /mo  /mo/icons
+
+//request /mo/hello
+// 
+
+int ft_itos(std::string str)
+{
+    std::stringstream ss(str);
+    int num;
+    ss >> num;
+    return num;
+}
+
+std::string ft_itos(int num)
+{
+    std::stringstream ss;
+    std::string str;
+    ss << num;
+    ss >> str;
+    if (num == 0)
+        str = "0";
+    return str;
+}
+
+std::string HttpResponse::getCurrentDate()
+{
+    std::time_t now = std::time(NULL);
+    std::tm* gmt = std::gmtime(&now);
+    char buffer[64];
+
+    if (gmt == NULL)
+        return "";
+    if (std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt) == 0)
+        return "";
+    return std::string(buffer);
+}
+
 void    HttpResponse::createResponse()
 {
-    
+    if (request.getVersionNum() != 0.9)
+    {
+        response = "HTTP/1.0 " + statusCode + " " + reasonPhrase + "\r\n";
+        for (size_t i = 0; i < headers.size(); i++)
+            response += headers[i] + "\r\n";
+        response += "\r\n";
+    }
+    response += body;
+}
+
+void    HttpResponse::contentTypeSelector(const std::string& file)
+{
+    size_t dotPos = file.find('.');
+    if (dotPos == std::string::npos)
+    {
+        addHeader("Content-Type", "application/octet-stream");
+        return;
+    }
+    std::string extension = file.substr(dotPos);
+    std::map<std::string, std::string>::iterator it = extensionTypes.find(extension);
+    if (it != extensionTypes.end())
+        addHeader("Content-Type", it->second);
+    else
+        addHeader("Content-Type", "application/octet-stream");
+}
+
+void    HttpResponse::findErrorPage()
+{
+    std::map<int, std::string>::const_iterator it = server.getErrorPages().find(ft_itos(statusCode));
+    if (it == server.getErrorPages().end())
+    {
+        generateDefaultErrorPage(statusCode, statusValue[statusCode]);
+        addHeader("Content-Type", "text/html");
+    }
+    else
+    {
+        body = readFile(it->second);
+        contentTypeSelector(it->second);
+    }
+} 
+
+void HttpResponse::errorPageResponse()
+{
+    if (request.getStatusCode() != "200")
+        statusCode = request.getStatusCode();
+    reasonPhrase = statusValue[statusCode];
+    findErrorPage();
+    addHeader("Content-Length", ft_itos(body.size()));
+    addHeader("Server", "WebServer/1.0");
+    addHeader("Date", getCurrentDate());
+    addHeader("Connection", "close");
+}
+
+std::string HttpResponse::removeLastSlash(const std::string& path)
+{
+    std::string normalized = path;
+
+    if (normalized.length() > 1 && normalized[normalized.length() - 1] == '/')
+        normalized.erase(normalized.length() - 1, 1);
+    return normalized;
+}
+
+void    HttpResponse::findPath()
+{
+    std::string requestPath = removeLastSlash(request.getUri().getPath());
+    std::string locationPath;
+    int  index = -1;
+    for (int i = 0; i < (int)server.getLocations().size(); i++)
+    {
+        locationPath = removeLastSlash(server.getLocations()[i].getPath());
+        if (locationPath == requestPath)
+            index = i;
+    }
+    if (index == -1)
+        throw errorResponseException("404");
+    loc = server.getLocations()[index];
 }
 
 void    HttpResponse::responseHandler()
 {
-    router rout(config.getServers()[0].getLocations()[0]);
-    std::cout << "Routed Path: " << rout.getRoutedPath() << std::endl;
-    std::cout << "Routed Error Pages: " << std::endl;
-    for (std::map<int, std::string>::const_iterator it = rout.getRoutedErrorPages().begin(); it != rout.getRoutedErrorPages().end(); ++it)
+    // router rout(config.getServers()[0].getLocations()[0]);
+    try
     {
-        std::cout << "Status Code: " << it->first << " Page: " << it->second << std::endl;
+        if (request.getStatusCode() != "200")
+        {
+            errorPageResponse();
+            createResponse();
+            printClassAtributes();
+            return;
+        }
+        findPath();
+        std::cout << loc.getPath() << std::endl;
     }
+    catch (errorResponseException& e)
+    {
+        statusCode = e.what();
+        errorPageResponse();
+    }
+    createResponse();
+    printClassAtributes();
 }
 
 void    HttpResponse::printClassAtributes()
 {
     // std::cout << "Response: " << response << std::endl;
-    std::cout << "Body: " << body << std::endl;
+    std::cout << response << std::endl;
     // std::cout << "Status Code: " << statusCode << std::endl;
     // std::cout << "Reason Phrase: " << reasonPhrase << std::endl;
     // std::cout << "Headers: " << std::endl;
