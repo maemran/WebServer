@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 07:09:20 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/11 19:53:43 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/17 02:11:44 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,19 @@ const std::map<int, std::string>& LocationConfig::getRedirections() const
 size_t LocationConfig::getMaxBodySize() const
 {
     return max_body_size;
+}
+
+bool LocationConfig::isRedirection() const
+{
+    return !redirections.empty();
+}
+
+const std::string& LocationConfig::getRedirectUrl() const
+{
+    if (!redirections.empty())
+        return redirections.begin()->second;
+    static const std::string emptyString = "";
+    return emptyString;
 }
 
 void LocationConfig::setPath(const std::string& path)
