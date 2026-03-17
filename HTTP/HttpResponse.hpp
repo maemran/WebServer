@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/17 00:50:58 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/17 03:39:50 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@
 #include "../HttpConfig.hpp"
 #include "router.hpp"
 #include <sstream>
-
+#include <iostream>
+#include <ctime>
 
 class   HttpResponse
 {
@@ -27,24 +28,29 @@ class   HttpResponse
         std::string response;
         std::string body;
         std::string statusCode;
-        std::string reasonPhrase;
         std::vector<std::string>    headers;
-        std::map<std::string, std::string>  statusValue;
+        std::map<std::string, std::string>  reasonPhrase;
         std::map<std::string, std::string>  extensionTypes;
-        std::string location;
         HttpRequest request;
         HttpConfig config;
         ServerConfig server;
         LocationConfig loc;
         int serverIndex;
 
-        void    generateDefaultErrorPage(const std::string& statusCode, const std::string&  ReasonPhrase);
-        void    printClassAtributes();
-        void    createResponse();
-        void    errorPageResponse();
-        void    findErrorPage();
         void    findPath();
+        void    findErrorPage();
+        void    createResponse();
+        void    redirectionCheck();
+        void    printClassAtributes();
+        void    errorPageResponse();
+        void    methodsHandler();
+        void    DELMethod();
+        void    POSTMethod();
+        void    HEADMethod();
+        void    GETMethod();
         void    contentTypeSelector(const std::string& file);
+        void    generateDefaultPage(const std::string& statusCode, const std::string&  ReasonPhrase);
+        std::map<int, std::string>    chosePagePos();
         std::string removeLastSlash(const std::string& path);
         std::string getCurrentDate();
         
@@ -71,7 +77,6 @@ class   HttpResponse
         void    setStatusCode(const std::string& statusCode);
         void    setReasonPhrase(const std::string& reasonPhrase);
         void    addHeader(const std::string& key, const std::string& value);
-        void    addHeader(const std::string& header);
         
         
         void responseHandler();
@@ -79,10 +84,21 @@ class   HttpResponse
         class   errorResponseException: std::exception
         {
             private:
-                char*   statusCode;
+                std::string statusCode;
             public:
-                errorResponseException(const char* statCode);
+                errorResponseException(const std::string& statCode);
                 const char* what() const throw();
+                ~errorResponseException() throw();
+        };
+
+        class   redirectResponseException: std::exception
+        {
+            private:
+                std::string statusCode;
+            public:
+                redirectResponseException(const std::string& statCode);
+                const char* what() const throw();
+                ~redirectResponseException() throw();
         };
 };
 

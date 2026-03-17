@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/17 01:02:58 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/17 03:54:06 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,23 +39,24 @@ int main(void)
     ServerConfig serverOne;
     serverOne.setListenIp("127.0.0.1");
     serverOne.setListenPort(8080);
-    serverOne.setRoot("/var/www/server_one");
+    serverOne.setRoot("../webroot");
     serverOne.setIndex("index.html");
     serverOne.setAutoindex(false);
     serverOne.setMaxBodySize(2 * 1024 * 1024);
     serverOne.addAllowedMethod("GET");
     serverOne.addAllowedMethod("POST");
-    serverOne.addErrorPage(500, "/errors/500.html");
+    serverOne.addErrorPage(404, "/error_pages/404.html");
 
     LocationConfig serverOneRoot;
-    serverOneRoot.setPath("/hello/");
-    serverOneRoot.setRoot("./var/www/server_one/public");
+    serverOneRoot.setPath("/website");
+    serverOneRoot.setRoot("../webroot");
     serverOneRoot.setIndex("index.html");
+    // serverOneRoot.addRedirection(302, "/new");
     serverOneRoot.setAutoindex(false);
     serverOneRoot.setMaxBodySize(1024 * 1024);
-    serverOneRoot.addAllowedMethod("GET");
+    // serverOneRoot.addAllowedMethod("GET");
     serverOneRoot.addAllowedMethod("POST");
-    serverOneRoot.addErrorPage(404, "errors/404.html");
+    serverOneRoot.addErrorPage(404, "error_pages/404.html");
 
     LocationConfig serverOneApi;
     serverOneApi.setPath("/api");
@@ -112,7 +113,7 @@ int main(void)
     (void)config;
 
     std::string request =
-        "GET /ap/ HTTP/1.0\r\n" // ///var/
+        "GET /website HTTP/1.0\r\n" // ///var/
         // "Host: localhost:7070\r\n"
         "User-Agent: Mozilla/5.0;\r\n";
         // "Content-Type: text/plain;\r\n"

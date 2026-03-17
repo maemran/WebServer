@@ -6,13 +6,12 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/17 01:04:22 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/17 04:05:07 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
-#include <iostream>
-#include <ctime>
+#include <algorithm>
 
 HttpResponse::HttpResponse() {}
 
@@ -50,11 +49,12 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
     this->serverIndex = serverIndex;
     server = config.getServers()[serverIndex];
     statusCode = "200";
-    statusValue["200"] = "OK";
-    statusValue["301"] = "Moved Permanently";
-    statusValue["400"] = "Bad Request";
-    statusValue["404"] = "Not Found";
-    statusValue["501"] = "Not Implemented";
+    reasonPhrase["200"] = "OK";
+    reasonPhrase["301"] = "Moved Permanently";
+    reasonPhrase["302"] = "Moved Temporarily";
+    reasonPhrase["400"] = "Bad Request";
+    reasonPhrase["405"] = "Method Not Allowed";
+    reasonPhrase["501"] = "Not Implemented";
 
     extensionTypes[".aac"] = "audio/aac";
     extensionTypes[".abw"] = "application/x-abiword";
@@ -139,15 +139,29 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
 
 HttpResponse::~HttpResponse() {}
 
-HttpResponse::errorResponseException::errorResponseException(const char* statCode) 
+HttpResponse::errorResponseException::errorResponseException(const std::string& statCode)
 {
-    this->statusCode = (char *)statCode;
+    this->statusCode = statCode;
 }
 
 const char *HttpResponse::errorResponseException::what() const throw()
 {
-    return this->statusCode;
+    return this->statusCode.c_str();
 }
+
+HttpResponse::errorResponseException::~errorResponseException() throw() {}
+
+HttpResponse::redirectResponseException::redirectResponseException(const std::string& statCode)
+{
+    statusCode = statCode;
+}
+
+const char *HttpResponse::redirectResponseException::what() const throw()
+{
+    return this->statusCode.c_str();
+}
+
+HttpResponse::redirectResponseException::~redirectResponseException() throw() {}
 
 const std::string& HttpResponse::getResponse() const
 {
@@ -177,11 +191,6 @@ const std::string& HttpResponse::getBody() const
 const std::string& HttpResponse::getStatusCode() const
 {
     return statusCode;
-}
-
-const std::string& HttpResponse::getReasonPhrase() const
-{
-    return reasonPhrase;
 }
 
 const std::vector<std::string>& HttpResponse::getHeaders() const
@@ -219,27 +228,17 @@ void  HttpResponse::setStatusCode(const std::string& statusCode)
     this->statusCode = statusCode;
 }
 
-void  HttpResponse::setReasonPhrase(const std::string& reasonPhrase)
-{
-    this->reasonPhrase = reasonPhrase;
-}
-
 void  HttpResponse::addHeader(const std::string& key, const std::string& value)
 {
     this->headers.push_back(key + ": " + value);
 }
 
-void  HttpResponse::addHeader(const std::string& header)
-{
-    this->headers.push_back(header);
-}
-
-void    HttpResponse::generateDefaultErrorPage(const std::string& statusCode, const std::string&  ReasonPhrase)
+void    HttpResponse::generateDefaultPage(const std::string& statusCode, const std::string&  ReasonPhrase)
 {
     std::string errorPage = 
     "<!DOCTYPE html>\n"
     "<html>\n"
-    "<head> <title> Error page </title>\n"
+    "<head> <title> html page </title>\n"
     "<style>\nh1 {\ntext-align: center;\n}\n</style>\n</head>"
     "<body>\n"
     "<h1>";
@@ -354,9 +353,12 @@ std::string HttpResponse::getCurrentDate()
 
 void    HttpResponse::createResponse()
 {
+    addHeader("Server", "WebServer/1.0");
+    addHeader("Date", getCurrentDate());
+    addHeader("Connection", "close");
     if (request.getVersionNum() != 0.9)
     {
-        response = "HTTP/1.0 " + statusCode + " " + reasonPhrase + "\r\n";
+        response = "HTTP/1.0 " + statusCode + " " + reasonPhrase[statusCode] + "\r\n";
         for (size_t i = 0; i < headers.size(); i++)
             response += headers[i] + "\r\n";
         response += "\r\n";
@@ -366,7 +368,7 @@ void    HttpResponse::createResponse()
 
 void    HttpResponse::contentTypeSelector(const std::string& file)
 {
-    size_t dotPos = file.find('.');
+    size_t dotPos = file.find_last_of('.');
     if (dotPos == std::string::npos)
     {
         addHeader("Content-Type", "application/octet-stream");
@@ -380,12 +382,25 @@ void    HttpResponse::contentTypeSelector(const std::string& file)
         addHeader("Content-Type", "application/octet-stream");
 }
 
+std::map<int, std::string>    HttpResponse::chosePagePos()
+{
+    if (statusCode == "400" || statusCode == "404"
+        || statusCode == "501" || statusCode == "505")
+    {
+        router r(server);
+        return r.getRoutedErrorPages();
+    }
+    router r(loc);
+    return r.getRoutedErrorPages();
+}
+
 void    HttpResponse::findErrorPage()
 {
-    std::map<int, std::string>::const_iterator it = server.getErrorPages().find(ft_itos(statusCode));
-    if (it == server.getErrorPages().end())
+    std::map<int, std::string>  errorPage = chosePagePos();
+    std::map<int, std::string>::const_iterator it = errorPage.find(ft_itos(statusCode));
+    if (it == errorPage.end())
     {
-        generateDefaultErrorPage(statusCode, statusValue[statusCode]);
+        generateDefaultPage(statusCode, reasonPhrase[statusCode]);
         addHeader("Content-Type", "text/html");
     }
     else
@@ -399,12 +414,8 @@ void HttpResponse::errorPageResponse()
 {
     if (request.getStatusCode() != "200")
         statusCode = request.getStatusCode();
-    reasonPhrase = statusValue[statusCode];
     findErrorPage();
     addHeader("Content-Length", ft_itos(body.size()));
-    addHeader("Server", "WebServer/1.0");
-    addHeader("Date", getCurrentDate());
-    addHeader("Connection", "close");
 }
 
 std::string HttpResponse::removeLastSlash(const std::string& path)
@@ -432,25 +443,73 @@ void    HttpResponse::findPath()
     loc = server.getLocations()[index];
 }
 
+void    HttpResponse::redirectionCheck()
+{
+    const std::map<int, std::string>& redirections = loc.getRedirections();
+    if (!(redirections.empty()))
+    {
+        std::map<int, std::string>::const_iterator it = redirections.begin();
+        addHeader("Location", it->second);
+        generateDefaultPage(ft_itos(it->first), reasonPhrase[ft_itos(it->first)]);
+        addHeader("Content-Length", ft_itos(body.size()));
+        throw redirectResponseException(ft_itos(it->first));
+    }
+}
+
+void     HttpResponse::GETMethod()
+{
+    
+}
+
+void     HttpResponse::HEADMethod()
+{
+    
+}
+
+void     HttpResponse::POSTMethod()
+{
+    
+}
+
+void     HttpResponse::DELMethod()
+{
+    
+}
+
+void    HttpResponse::methodsHandler()
+{
+    const std::vector<std::string>& allowedMethods = loc.getMethods();
+    if (std::find(allowedMethods.begin(), allowedMethods.end(), request.getMethod())
+        == allowedMethods.end())
+        throw errorResponseException("405");
+    if(request.getMethod() == "GET")
+        GETMethod();
+    else if (request.getMethod() == "HEAD")
+        HEADMethod();
+    else if (request.getMethod() == "POST")
+        POSTMethod();
+    else if (request.getMethod() == "DELETE")
+        DELMethod();
+}
+
 void    HttpResponse::responseHandler()
 {
-    // router rout(config.getServers()[0].getLocations()[0]);
     try
     {
         if (request.getStatusCode() != "200")
-        {
-            errorPageResponse();
-            createResponse();
-            printClassAtributes();
-            return;
-        }
+            throw errorResponseException(request.getStatusCode());
         findPath();
-        std::cout << loc.getPath() << std::endl;
+        redirectionCheck();
+        methodsHandler();
     }
     catch (errorResponseException& e)
     {
         statusCode = e.what();
         errorPageResponse();
+    }
+    catch (redirectResponseException& e)
+    {
+        statusCode = e.what();
     }
     createResponse();
     printClassAtributes();
@@ -458,12 +517,5 @@ void    HttpResponse::responseHandler()
 
 void    HttpResponse::printClassAtributes()
 {
-    // std::cout << "Response: " << response << std::endl;
     std::cout << response << std::endl;
-    // std::cout << "Status Code: " << statusCode << std::endl;
-    // std::cout << "Reason Phrase: " << reasonPhrase << std::endl;
-    // std::cout << "Headers: " << std::endl;
-    // for (size_t i = 0; i < headers.size(); i++)
-    //     std::cout << headers[i] << std::endl;
-    // std::cout << "Server Index: " << serverIndex << std::endl;
 }

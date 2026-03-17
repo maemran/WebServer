@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/15 03:01:42 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/15 03:52:38 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/17 01:47:27 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,19 @@ router::router(const LocationConfig& loc)
         if (it->second[0] != '/')
             addForwardSlash((std::string&)(it->second));
         std::string temp = loc.getRoot() + it->second;
+        routedErrorPages.insert(std::make_pair(it->first, temp));
+        temp = "";
+    }
+}
+
+router::router(const ServerConfig& serv)
+{
+    for (std::map<int, std::string>::const_iterator it = (serv.getErrorPages().begin());
+    it != serv.getErrorPages().end(); ++it)
+    {
+        if (it->second[0] != '/')
+            addForwardSlash((std::string&)(it->second));
+        std::string temp = serv.getRoot() + it->second;
         routedErrorPages.insert(std::make_pair(it->first, temp));
         temp = "";
     }
