@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/19 03:36:08 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/19 15:29:24 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -261,7 +261,11 @@ std::string readFile(const std::string& path)
     std::string content;
     
     while (std::getline(file, line))
-        content += line + "\n";
+	{
+        content += line;
+		if (!(file.eof()))
+			content += "\n";
+	}
     return content;
 }
 
@@ -453,13 +457,15 @@ void    HttpResponse::pathExists(const std::string& path)
     throw errorResponseException("404");
 }
 
-int HttpResponse::indexExist(std::string& path)
+int HttpResponse::indexExist(const std::string& path)
 {
     struct stat s;
-    if (path[path.length() - 1] != '/')
-        path += '/';
-    path.append("index.html");
-    if (stat(path.c_str(), &s) == 0)
+    std::string indexPath = path;
+
+    if (indexPath[indexPath.length() - 1] != '/')
+        indexPath += '/';
+    indexPath.append("index.html");
+    if (stat(indexPath.c_str(), &s) == 0)
         return 1;
     return 0;
 }
@@ -526,7 +532,7 @@ void    HttpResponse::findPath()
 void    HttpResponse::redirectionCheck()
 {
     const std::map<int, std::string>& redirections = loc.getRedirections();
-    if (loc.isRedirection())//!redirection.empty
+    if (!(redirections.empty()))//!redirection.empty
     {
         std::map<int, std::string>::const_iterator it = redirections.begin();
         addHeader("Location", it->second);
@@ -535,50 +541,47 @@ void    HttpResponse::redirectionCheck()
         throw redirectResponseException(ft_itos(it->first));
     }
 }
-
-std::string getSimpleHTMLDirectoryListing(const std::string& pathString) {
-    DIR* dir;
+void    HttpResponse::generateDirectoryListing(const std::string& path)
+{
+	DIR* dir;
     struct dirent* ent;
     std::stringstream html;
 
-    if ((dir = opendir(pathString.c_str())) != NULL) {
-        html << "<!DOCTYPE HTML>\n<html lang=\"en\">\n<head>\n"
+	dir = opendir(path.c_str());
+	if (dir == NULL)
+		throw errorResponseException("404");
+	html << "<!DOCTYPE HTML>\n<html lang=\"en\">\n<head>\n"
              << "<meta charset=\"utf-8\">\n"
-             << "<title>Directory listing for " << pathString << "</title>\n"
+             << "<title>Directory listing for " << path << "</title>\n"
              << "</head>\n<body>\n"
-             << "<h1>Directory listing for " << pathString << "</h1>\n"
+             << "<h1>Directory listing for " << path << "</h1>\n"
              << "<hr>\n<ul>\n";
-
-        while ((ent = readdir(dir)) != NULL) {
-            std::string name = ent->d_name;
-
-            if (name == ".") continue;
-
-
-            std::string fullPath = pathString + "/" + name;
-            if (isDirectory(fullPath)) {
-                name += "/";
-            }
-
-            html << "<li><a href=\"" << name << "\">" << name << "</a></li>\n";
-        }
-        closedir(dir);
-
-        html << "</ul>\n<hr>\n</body>\n</html>";
-    } else {
-        return "<html><body><h1>Directory Not Found</h1></body></html>";
+	while ((ent = readdir(dir)) != NULL) 
+	{
+        std::string name = ent->d_name;
+        if (name == "." || name == "..")
+			continue;
+        std::string fullPath = path + "/" + name;
+        if (isDirectory(fullPath)) 
+            name += "/";
+        html << "<li><a href=\"" << name << "\">" << name << "</a></li>\n";
     }
-
-    return html.str();
+	html << "</ul>\n<hr>\n</body>\n</html>"; 
+    closedir(dir);
+	body = html.str();
 }
-
 
 void     HttpResponse::GETMethod()
 {
-    if (directory != "")
+	if (directory != "")
     {
         if (indexExist(directory))
-            body = readFile(directory);
+        {
+            std::string indexPath = directory;
+            if (indexPath[indexPath.length() - 1] != '/')
+                indexPath += '/';
+            body = readFile(indexPath + "index.html");
+        }
         else
             generateDirectoryListing(directory);
     }
@@ -628,7 +631,7 @@ void    HttpResponse::responseHandler()
         if (request.getStatusCode() != "200")
             throw errorResponseException(request.getStatusCode());
         findPath();
-        // methodsHandler();
+        methodsHandler();
     }
     catch (errorResponseException& e)
     {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/19 02:53:43 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/19 15:31:28 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int main(void)
     serverOneRoot.addErrorPage(404, "error_pages/404.html");
 
     LocationConfig serverOneApi;
-    serverOneApi.setPath("/images/icons");
+    serverOneApi.setPath("/images/iconss");
     serverOneApi.setRoot("../webroot");
     serverOneApi.setIndex("index.json");
     serverOneApi.setAutoindex(false);
@@ -113,7 +113,7 @@ int main(void)
     (void)config;
 
     std::string request =
-        "GET /images/icons/ HTTP/1.0\r\n" // ///var/
+        "GET /images/icons/hello/dsd HTTP/1.0\r\n" // ///var/
         // "Host: localhost:7070\r\n"
         "User-Agent: Mozilla/5.0;\r\n";
         // "Content-Type: text/plain;\r\n"

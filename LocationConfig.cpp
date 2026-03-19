@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConfig.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 07:09:20 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/17 02:11:44 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/19 14:51:16 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ size_t LocationConfig::getMaxBodySize() const
 
 bool LocationConfig::isRedirection() const
 {
-    return !redirections.empty();
+    return has_redirect;
 }
 
 const std::string& LocationConfig::getRedirectUrl() const

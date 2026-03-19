@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/19 03:35:38 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/19 15:04:59 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ class   HttpResponse
         void    longestMatch();
         int     isDirectory(const std::string& path);
         void    pathExists(const std::string& path);
-        int     indexExist(std::string& path);
+        int     indexExist(const std::string& path);
         void    findErrorPage();
         void    createResponse();
         void    redirectionCheck();
