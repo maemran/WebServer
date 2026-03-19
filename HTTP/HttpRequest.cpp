@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/17 00:12:25 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/19 02:23:49 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ HttpRequest::HttpRequest(const HttpRequest& other)
     this->headers = other.headers;
     this->entityBody = other.entityBody;
     this->statusCode = other.statusCode;
+    this->versionNum = other.versionNum;
 }
 HttpRequest&    HttpRequest::operator=(const HttpRequest& other)
 {
@@ -42,6 +43,7 @@ HttpRequest&    HttpRequest::operator=(const HttpRequest& other)
         this->headers = other.headers;
         this->entityBody = other.entityBody;
         this->statusCode = other.statusCode;
+        this->versionNum = other.versionNum;
     }
     return *this;
 }

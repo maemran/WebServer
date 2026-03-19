@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/17 03:54:06 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/19 02:53:43 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,26 +48,26 @@ int main(void)
     serverOne.addErrorPage(404, "/error_pages/404.html");
 
     LocationConfig serverOneRoot;
-    serverOneRoot.setPath("/website");
+    serverOneRoot.setPath("/images");
     serverOneRoot.setRoot("../webroot");
     serverOneRoot.setIndex("index.html");
     // serverOneRoot.addRedirection(302, "/new");
     serverOneRoot.setAutoindex(false);
     serverOneRoot.setMaxBodySize(1024 * 1024);
-    // serverOneRoot.addAllowedMethod("GET");
+    serverOneRoot.addAllowedMethod("GET");
     serverOneRoot.addAllowedMethod("POST");
     serverOneRoot.addErrorPage(404, "error_pages/404.html");
 
     LocationConfig serverOneApi;
-    serverOneApi.setPath("/api");
-    serverOneApi.setRoot("/var/www/server_one/api");
+    serverOneApi.setPath("/images/icons");
+    serverOneApi.setRoot("../webroot");
     serverOneApi.setIndex("index.json");
     serverOneApi.setAutoindex(false);
     serverOneApi.setMaxBodySize(512 * 1024);
     serverOneApi.addAllowedMethod("GET");
     serverOneApi.addAllowedMethod("POST");
     serverOneApi.addAllowedMethod("DELETE");
-    serverOneApi.addRedirection(301, "https://api.server-one.local/v1");
+    // serverOneApi.addRedirection(301, "https://api.server-one.local/v1");
     serverOneApi.addErrorPage(404, "errors/404.html");
 
     serverOne.addLocation(serverOneRoot);
@@ -113,7 +113,7 @@ int main(void)
     (void)config;
 
     std::string request =
-        "GET /website HTTP/1.0\r\n" // ///var/
+        "GET /images/icons/ HTTP/1.0\r\n" // ///var/
         // "Host: localhost:7070\r\n"
         "User-Agent: Mozilla/5.0;\r\n";
         // "Content-Type: text/plain;\r\n"

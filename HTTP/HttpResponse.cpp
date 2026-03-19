@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/17 04:05:07 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/19 03:36:08 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
     reasonPhrase["301"] = "Moved Permanently";
     reasonPhrase["302"] = "Moved Temporarily";
     reasonPhrase["400"] = "Bad Request";
+    reasonPhrase["404"] = "Not Found";
     reasonPhrase["405"] = "Method Not Allowed";
     reasonPhrase["501"] = "Not Implemented";
 
@@ -427,7 +428,7 @@ std::string HttpResponse::removeLastSlash(const std::string& path)
     return normalized;
 }
 
-void    HttpResponse::findPath()
+int HttpResponse::exactPath()
 {
     std::string requestPath = removeLastSlash(request.getUri().getPath());
     std::string locationPath;
@@ -439,14 +440,93 @@ void    HttpResponse::findPath()
             index = i;
     }
     if (index == -1)
-        throw errorResponseException("404");
+        return 0;
     loc = server.getLocations()[index];
+    return 1;
+}
+
+void    HttpResponse::pathExists(const std::string& path)
+{
+    struct stat s;
+    if (stat(path.c_str(), &s) == 0)
+        return ;
+    throw errorResponseException("404");
+}
+
+int HttpResponse::indexExist(std::string& path)
+{
+    struct stat s;
+    if (path[path.length() - 1] != '/')
+        path += '/';
+    path.append("index.html");
+    if (stat(path.c_str(), &s) == 0)
+        return 1;
+    return 0;
+}
+
+int HttpResponse::isDirectory(const std::string& path)
+{
+    struct stat s;
+
+    if (stat(path.c_str(), &s) == 0)
+    {
+        if (S_ISDIR(s.st_mode))
+            return 1;
+        else if (S_ISREG(s.st_mode))
+            return 0;
+    }
+    else
+        throw errorResponseException("404");
+    return 0;
+}
+
+void HttpResponse::longestMatch()
+{
+    const std::string requestPath = removeLastSlash(request.getUri().getPath());
+    const std::vector<LocationConfig>& locations = server.getLocations();
+    int bestIndex = -1;
+    size_t bestLen = 0;
+
+    for (size_t i = 0; i < locations.size(); i++)
+    {
+        std::string locationPath = removeLastSlash(locations[i].getPath());
+        if (requestPath.compare(0, locationPath.length(), locationPath) != 0)
+            continue;
+        if (!(locationPath == "/"
+            || requestPath.length() == locationPath.length()
+            || requestPath[locationPath.length()] == '/'))
+            continue;
+        if (locationPath.length() > bestLen)
+        {
+            bestLen = locationPath.length();
+            bestIndex = static_cast<int>(i);
+        }
+    }
+    if (bestIndex == -1)
+        throw errorResponseException("404");
+    loc = locations[bestIndex];
+}
+
+void    HttpResponse::findPath()
+{
+    if (exactPath())
+        redirectionCheck();
+    else
+    {
+        longestMatch();
+        redirectionCheck();
+        std::string path = loc.getRoot() + request.getUri().getPath();
+        if (isDirectory(path))
+            directory = path;
+        else
+            file = path;
+    }
 }
 
 void    HttpResponse::redirectionCheck()
 {
     const std::map<int, std::string>& redirections = loc.getRedirections();
-    if (!(redirections.empty()))
+    if (loc.isRedirection())//!redirection.empty
     {
         std::map<int, std::string>::const_iterator it = redirections.begin();
         addHeader("Location", it->second);
@@ -456,9 +536,58 @@ void    HttpResponse::redirectionCheck()
     }
 }
 
+std::string getSimpleHTMLDirectoryListing(const std::string& pathString) {
+    DIR* dir;
+    struct dirent* ent;
+    std::stringstream html;
+
+    if ((dir = opendir(pathString.c_str())) != NULL) {
+        html << "<!DOCTYPE HTML>\n<html lang=\"en\">\n<head>\n"
+             << "<meta charset=\"utf-8\">\n"
+             << "<title>Directory listing for " << pathString << "</title>\n"
+             << "</head>\n<body>\n"
+             << "<h1>Directory listing for " << pathString << "</h1>\n"
+             << "<hr>\n<ul>\n";
+
+        while ((ent = readdir(dir)) != NULL) {
+            std::string name = ent->d_name;
+
+            if (name == ".") continue;
+
+
+            std::string fullPath = pathString + "/" + name;
+            if (isDirectory(fullPath)) {
+                name += "/";
+            }
+
+            html << "<li><a href=\"" << name << "\">" << name << "</a></li>\n";
+        }
+        closedir(dir);
+
+        html << "</ul>\n<hr>\n</body>\n</html>";
+    } else {
+        return "<html><body><h1>Directory Not Found</h1></body></html>";
+    }
+
+    return html.str();
+}
+
+
 void     HttpResponse::GETMethod()
 {
-    
+    if (directory != "")
+    {
+        if (indexExist(directory))
+            body = readFile(directory);
+        else
+            generateDirectoryListing(directory);
+    }
+    else if (file != "")
+        body = readFile(file);
+    else
+    {
+        
+    }
 }
 
 void     HttpResponse::HEADMethod()
@@ -499,8 +628,7 @@ void    HttpResponse::responseHandler()
         if (request.getStatusCode() != "200")
             throw errorResponseException(request.getStatusCode());
         findPath();
-        redirectionCheck();
-        methodsHandler();
+        // methodsHandler();
     }
     catch (errorResponseException& e)
     {

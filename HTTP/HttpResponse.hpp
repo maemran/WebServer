@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/17 03:39:50 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/19 03:35:38 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,15 @@
 #include <sstream>
 #include <iostream>
 #include <ctime>
+#include <dirent.h> 
+#include <sys/stat.h>
 
 class   HttpResponse
 {
     private:
         std::string response;
+        std::string directory;
+        std::string file;
         std::string body;
         std::string statusCode;
         std::vector<std::string>    headers;
@@ -38,6 +42,11 @@ class   HttpResponse
         int serverIndex;
 
         void    findPath();
+        int     exactPath();
+        void    longestMatch();
+        int     isDirectory(const std::string& path);
+        void    pathExists(const std::string& path);
+        int     indexExist(std::string& path);
         void    findErrorPage();
         void    createResponse();
         void    redirectionCheck();
@@ -49,6 +58,7 @@ class   HttpResponse
         void    HEADMethod();
         void    GETMethod();
         void    contentTypeSelector(const std::string& file);
+        void    generateDirectoryListing(const std::string& path);
         void    generateDefaultPage(const std::string& statusCode, const std::string&  ReasonPhrase);
         std::map<int, std::string>    chosePagePos();
         std::string removeLastSlash(const std::string& path);
