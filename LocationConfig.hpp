@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:19:51 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/17 02:10:59 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/20 01:06:06 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class LocationConfig
 		size_t getMaxBodySize() const;
 		bool	isRedirection() const;
 		const std::string&	getRedirectUrl() const;
+		const std::vector<std::string>&	getIndexFiles() const;
 		
 		void	setPath(const std::string& path);
 		void	setRoot(const std::string& root);
@@ -56,6 +57,7 @@ class LocationConfig
 		void	addAllowedMethod(const std::string& method);
 		void	addErrorPage(int code, const std::string& page);
 		void	addRedirection(int code, const std::string& url);
+		void	addIndexFile(const std::string& path);
 		void	setMaxBodySize(size_t size);
 };
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/19 15:29:24 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/20 02:03:40 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
     this->request = request;
     this->config = config;
     this->serverIndex = serverIndex;
+    indexFound = false;
     server = config.getServers()[serverIndex];
     statusCode = "200";
     reasonPhrase["200"] = "OK";
@@ -54,6 +55,7 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
     reasonPhrase["302"] = "Moved Temporarily";
     reasonPhrase["400"] = "Bad Request";
     reasonPhrase["404"] = "Not Found";
+    reasonPhrase["403"] = "Forbidden";
     reasonPhrase["405"] = "Method Not Allowed";
     reasonPhrase["501"] = "Not Implemented";
 
@@ -269,61 +271,6 @@ std::string readFile(const std::string& path)
     return content;
 }
 
-// function create auto index
-//  | Request | Location used | Root used | Final path |
-//  | ------- | ------------- | --------- | ---------- |
-//  | `/old`  | `/old`        | ignored   | redirect   |
-//  | `/new`  | `/new`        | `/www`    | `/www/new` |
-
-// function find most match path
- 
-// function generate default error page                     DONE
-// read files function                                      DONE
-// router to change all paths with root                     DONE
-// function combine all response element                    DONE
-
-
-
-
-// Connection: close        close tcp connection after each response
-// 301 
-// HTTP/1.1 301 Moved Permanently
-// Date: Sun, 15 Mar 2026 12:30:00 GMT
-// Server: MyWebServer/1.0
-// Location: https://example.com/new-page
-// Content-Type: text/html
-// Content-Length: 178
-// Connection: close
-
-// <html>
-// <head>
-// <title>301 Moved Permanently</title>
-// </head>
-// <body>
-// <h1>Moved Permanently</h1>
-// <p>The document has moved <a href="https://example.com/new-page">here</a>.</p>
-// </body>
-// </html>
-
-// error_page 502 /errors/502.html; and (root var;)     عادي الباث لو مابلش ب (/)     ""Not important""
-
-// if the location is 
-// location /mo {} and the request is GET /mo/ HTTP/1.0  the /mo and th /mo/ is the same path
-// and if the location is location /mo/ {} and the request is GET /mo HTTP/1.0  the /mo/ and th /mo  is the same path
-
-
-//request /mo/icons
-//locations /    /mo  /mo/iocons 
-
-//request /mo
-// Locations /  /mo  /mo/icons
-
-//request /mo/icons/icons.html
-// Locations /  /mo  /mo/icons
-
-//request /mo/hello
-// 
-
 int ft_itos(std::string str)
 {
     std::stringstream ss(str);
@@ -358,6 +305,8 @@ std::string HttpResponse::getCurrentDate()
 
 void    HttpResponse::createResponse()
 {
+    if (request.getMethod() != "HEAD")
+        addHeader("Content-Length", ft_itos(body.size()));
     addHeader("Server", "WebServer/1.0");
     addHeader("Date", getCurrentDate());
     addHeader("Connection", "close");
@@ -368,7 +317,8 @@ void    HttpResponse::createResponse()
             response += headers[i] + "\r\n";
         response += "\r\n";
     }
-    response += body;
+    if (request.getMethod() != "HEAD")
+        response += body;
 }
 
 void    HttpResponse::contentTypeSelector(const std::string& file)
@@ -420,7 +370,8 @@ void HttpResponse::errorPageResponse()
     if (request.getStatusCode() != "200")
         statusCode = request.getStatusCode();
     findErrorPage();
-    addHeader("Content-Length", ft_itos(body.size()));
+    if (request.getMethod() == "HEAD")
+        addHeader("Content-Length", ft_itos(body.size()));
 }
 
 std::string HttpResponse::removeLastSlash(const std::string& path)
@@ -532,15 +483,16 @@ void    HttpResponse::findPath()
 void    HttpResponse::redirectionCheck()
 {
     const std::map<int, std::string>& redirections = loc.getRedirections();
-    if (!(redirections.empty()))//!redirection.empty
+    if (!(redirections.empty()))
     {
         std::map<int, std::string>::const_iterator it = redirections.begin();
         addHeader("Location", it->second);
         generateDefaultPage(ft_itos(it->first), reasonPhrase[ft_itos(it->first)]);
-        addHeader("Content-Length", ft_itos(body.size()));
+        // addHeader("Content-Length", ft_itos(body.size()));
         throw redirectResponseException(ft_itos(it->first));
     }
 }
+
 void    HttpResponse::generateDirectoryListing(const std::string& path)
 {
 	DIR* dir;
@@ -548,8 +500,6 @@ void    HttpResponse::generateDirectoryListing(const std::string& path)
     std::stringstream html;
 
 	dir = opendir(path.c_str());
-	if (dir == NULL)
-		throw errorResponseException("404");
 	html << "<!DOCTYPE HTML>\n<html lang=\"en\">\n<head>\n"
              << "<meta charset=\"utf-8\">\n"
              << "<title>Directory listing for " << path << "</title>\n"
@@ -566,9 +516,51 @@ void    HttpResponse::generateDirectoryListing(const std::string& path)
             name += "/";
         html << "<li><a href=\"" << name << "\">" << name << "</a></li>\n";
     }
-	html << "</ul>\n<hr>\n</body>\n</html>"; 
+	html << "</ul>\n<hr>\n</body>\n</html>";
+    addHeader("Content-Type", "text/html");
     closedir(dir);
 	body = html.str();
+}
+
+void    HttpResponse::choseIndexFile()
+{
+    router r(loc);
+    struct stat s;
+    std::string temp = r.getRoutedPath();
+    const std::vector<std::string>& index = loc.getIndexFiles();
+    for (int i = 0; i < (int)index.size(); i++)
+    {
+        std::string path;
+        if (r.getRoutedPath()[r.getRoutedPath().length() - 1] != '/')
+            temp += "/";
+        path = temp + index[i]; 
+        if (stat(path.c_str(), &s) == 0)
+        {
+            body = readFile(path);
+            contentTypeSelector(path);
+            indexFound = true;
+            // addHeader("Content-Length", ft_itos(body.size()));
+            return;
+        }
+    }
+}
+
+void    HttpResponse::GETWithExactPath()
+{
+    router r(loc);
+    pathExists(r.getRoutedPath());
+    if (!(loc.getIndexFiles().empty()))
+    {
+        choseIndexFile();
+        if (indexFound)
+            return;
+    }
+    if (loc.getAutoindex() && !indexFound)// true if it on
+    {
+        generateDirectoryListing(r.getRoutedPath());
+        return;
+    }
+        throw errorResponseException("403");
 }
 
 void     HttpResponse::GETMethod()
@@ -581,21 +573,25 @@ void     HttpResponse::GETMethod()
             if (indexPath[indexPath.length() - 1] != '/')
                 indexPath += '/';
             body = readFile(indexPath + "index.html");
+            addHeader("Content-Type", "text/html");
         }
         else
             generateDirectoryListing(directory);
     }
     else if (file != "")
-        body = readFile(file);
-    else
     {
-        
+        contentTypeSelector(file);
+        body = readFile(file);
     }
+    else
+        GETWithExactPath();
 }
 
 void     HttpResponse::HEADMethod()
 {
-    
+    GETMethod();
+    addHeader("Content-Length", ft_itos(body.size()));
+    body = "";
 }
 
 void     HttpResponse::POSTMethod()

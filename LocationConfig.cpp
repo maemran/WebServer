@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConfig.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 07:09:20 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/19 14:51:16 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/20 01:10:06 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ LocationConfig& LocationConfig::operator=(const LocationConfig& other)
         redirections = other.redirections;
         allowed_methods = other.allowed_methods;
         max_body_size = other.max_body_size;
+        indexFiles = other.indexFiles;
+        has_redirect = other.has_redirect;
     }
     return *this;
 }
@@ -90,6 +92,11 @@ const std::string& LocationConfig::getRedirectUrl() const
     return emptyString;
 }
 
+const std::vector<std::string>& LocationConfig::getIndexFiles() const
+{
+    return indexFiles;
+}
+
 void LocationConfig::setPath(const std::string& path)
 {
     this->path = path;
@@ -128,4 +135,9 @@ void LocationConfig::addRedirection(int code, const std::string& url)
 void LocationConfig::setMaxBodySize(size_t size)
 {
     max_body_size = size;
+}
+
+void	LocationConfig::addIndexFile(const std::string& path)
+{
+    indexFiles.push_back(path);
 }

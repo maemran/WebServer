@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/19 15:04:59 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/20 01:22:13 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class   HttpResponse
         ServerConfig server;
         LocationConfig loc;
         int serverIndex;
+        bool indexFound;
 
         void    findPath();
         int     exactPath();
@@ -57,6 +58,8 @@ class   HttpResponse
         void    POSTMethod();
         void    HEADMethod();
         void    GETMethod();
+        void    GETWithExactPath();
+        void    choseIndexFile();
         void    contentTypeSelector(const std::string& file);
         void    generateDirectoryListing(const std::string& path);
         void    generateDefaultPage(const std::string& statusCode, const std::string&  ReasonPhrase);

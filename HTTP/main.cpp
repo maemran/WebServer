@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/19 15:31:28 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/20 02:07:17 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,13 @@ int main(void)
     LocationConfig serverOneRoot;
     serverOneRoot.setPath("/images");
     serverOneRoot.setRoot("../webroot");
-    serverOneRoot.setIndex("index.html");
+    // serverOneRoot.addIndexFile("index.html");
+    serverOneRoot.addIndexFile("image.stxt");
     // serverOneRoot.addRedirection(302, "/new");
     serverOneRoot.setAutoindex(false);
     serverOneRoot.setMaxBodySize(1024 * 1024);
     serverOneRoot.addAllowedMethod("GET");
-    serverOneRoot.addAllowedMethod("POST");
+    serverOneRoot.addAllowedMethod("HEAD");
     serverOneRoot.addErrorPage(404, "error_pages/404.html");
 
     LocationConfig serverOneApi;
@@ -113,7 +114,7 @@ int main(void)
     (void)config;
 
     std::string request =
-        "GET /images/icons/hello/dsd HTTP/1.0\r\n" // ///var/
+        "HEAD /images/\r\n" // ///var/
         // "Host: localhost:7070\r\n"
         "User-Agent: Mozilla/5.0;\r\n";
         // "Content-Type: text/plain;\r\n"
