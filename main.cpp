@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 14:42:10 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/25 10:56:10 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/03/25 17:36:08 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,41 +67,67 @@ void testLocation(const LocationConfig& loc)
 
     std::cout << "       Autoindex: "
               << (loc.getAutoindex() ? "ON" : "OFF") << "\n";
-    
-            //   std::cout << "DEBUG: hasRedirect = " << loc.hasRedirect() << std::endl;
-      const std::vector<std::string>& methods = loc.getMethods();
-        const std::map<int, std::string>& errors = loc.getErrorPages();
 
-        if (!errors.empty())
-        {
-            std::cout << "       Error Pages:\n";
-            for (std::map<int, std::string>::const_iterator it = errors.begin();
-                it != errors.end(); ++it)
-            {
-                std::cout << "         " << it->first
-                        << " -> " << it->second << "\n";
-            }
-        }
-    if (!methods.empty())
+    const std::map<int, std::string>& errors = loc.getErrorPages();
+    std::cout << "       Error Pages:\n";
+    if (errors.empty())
+        std::cout << "         None\n";
+    else
     {
-        std::cout << "       Methods: ";
-        for (size_t i = 0; i < methods.size(); i++)
-            std::cout << methods[i] << " ";
-        std::cout << "\n";
+        for (std::map<int, std::string>::const_iterator it = errors.begin();
+            it != errors.end(); ++it)
+        {
+            std::cout << "         " << it->first
+                      << " -> " << it->second << "\n";
+        }
     }
 
-    const std::map<std::string, std::string>& cgi = loc.getCgiMap();
-
-        if (!cgi.empty())
+    const std::map<int, std::string>& redirections = loc.getRedirections();
+    std::cout << "       Redirections:\n";
+    if (redirections.empty())
+        std::cout << "         None\n";
+    else
+    {
+        for (std::map<int, std::string>::const_iterator it = redirections.begin();
+            it != redirections.end(); ++it)
         {
-            std::cout << "       CGI:\n";
-            for (std::map<std::string, std::string>::const_iterator it = cgi.begin();
-                it != cgi.end(); ++it)
-            {
-                std::cout << "         " << it->first
-                        << " -> " << it->second << "\n";
-            }
+            std::cout << "         " << it->first
+                      << " -> " << it->second << "\n";
         }
+    }
+
+    const std::vector<std::string>& methods = loc.getMethods();
+    std::cout << "       Allowed Methods: ";
+    if (methods.empty())
+        std::cout << "None";
+    else
+    {
+        for (size_t i = 0; i < methods.size(); i++)
+            std::cout << methods[i] << " ";
+    }
+    std::cout << "\n";
+
+    std::cout << "       Client Max Body Size: "
+              << loc.getMaxBodySize() << " bytes\n";
+
+    std::cout << "       Has Redirect: "
+              << (loc.hasRedirect() ? "YES" : "NO") << "\n";
+    std::cout << "       Redirect Code: " << loc.getRedirectCode() << "\n";
+    std::cout << "       Redirect URL: " << loc.getRedirectUrl() << "\n";
+
+    const std::map<std::string, std::string>& cgi = loc.getCgiMap();
+    std::cout << "       CGI:\n";
+    if (cgi.empty())
+        std::cout << "         None\n";
+    else
+    {
+        for (std::map<std::string, std::string>::const_iterator it = cgi.begin();
+            it != cgi.end(); ++it)
+        {
+            std::cout << "         " << it->first
+                      << " -> " << it->second << "\n";
+        }
+    }
 }
 
 /* ===================================== */
@@ -110,7 +136,7 @@ void testLocation(const LocationConfig& loc)
 
 void testServer(ServerConfig& srv, int i)
 {
-    std::cout << "\n=========== SERVER " << i << " ===========\n";
+    std::cout << "\n=========== ServerConfig " << i << " ===========\n";
 
     std::cout << "IP: " << srv.getListenIp() << "\n";
     std::cout << "Port: " << srv.getListenPort() << "\n";
@@ -126,13 +152,91 @@ void testServer(ServerConfig& srv, int i)
 
     std::cout << "Autoindex: "
               << (srv.getAutoindex() ? "ON" : "OFF") << "\n";
+
+    const std::vector<std::string>& methods = srv.getMethods();
+    std::cout << "Allowed Methods: ";
+    if (methods.empty())
+        std::cout << "None";
+    else
+    {
+        for (size_t j = 0; j < methods.size(); j++)
+            std::cout << methods[j] << " ";
+    }
+    std::cout << "\n";
+
+    const std::map<int, std::string>& errors = srv.getErrorPages();
+    std::cout << "Error Pages:\n";
+    if (errors.empty())
+        std::cout << "  None\n";
+    else
+    {
+        for (std::map<int, std::string>::const_iterator it = errors.begin();
+            it != errors.end(); ++it)
+        {
+            std::cout << "  " << it->first << " -> " << it->second << "\n";
+        }
+    }
+
     std::cout << "Client Max Body Size: "
           << srv.getMaxBodySize() << " bytes\n";
 
     const std::vector<LocationConfig>& locs = srv.getLocations();
 
+    std::cout << "Locations: " << locs.size() << "\n";
+    if (locs.empty())
+        std::cout << "  None\n";
+
     for (size_t j = 0; j < locs.size(); j++)
+	{
+		std::cout << "============================" <<std::endl;
+		std::cout << "==========Lcation===========" <<std::endl;
+		std::cout << "============================" <<std::endl;
         testLocation(locs[j]);
+	}
+}
+
+/* ===================================== */
+/*             PRINT HTTP               */
+/* ===================================== */
+
+void testHttp(const HttpConfig& http)
+{
+    std::cout << "\n=========== HttpConfig ===========\n";
+
+    std::cout << "Root: " << http.getRoot();
+    if (!http.getRoot().empty())
+        std::cout << (pathExists(http.getRoot()) ? " ✅" : " ❌");
+    std::cout << "\n";
+
+    std::cout << "Index: ";
+    printIndexFiles(http.getIndexFiles());
+    std::cout << "\n";
+
+    std::cout << "Autoindex: "
+              << (http.getAutoindex() ? "ON" : "OFF") << "\n";
+    std::cout << "Client Max Body Size: "
+              << http.getMaxBodySize() << " bytes\n";
+
+    const std::vector<std::string>& methods = http.getMethods();
+    if (!methods.empty())
+    {
+        std::cout << "Methods: ";
+        for (size_t i = 0; i < methods.size(); i++)
+            std::cout << methods[i] << " ";
+        std::cout << "\n";
+    }
+
+    const std::map<int, std::string>& errors = http.getErrorPages();
+    if (!errors.empty())
+    {
+        std::cout << "Error Pages:\n";
+        for (std::map<int, std::string>::const_iterator it = errors.begin();
+            it != errors.end(); ++it)
+        {
+            std::cout << "  " << it->first
+                      << " -> " << it->second << "\n";
+        }
+    }
 }
 
 /* ===================================== */
@@ -184,6 +288,8 @@ int main(int argc, char** argv)
         std::cout << "🎉 Config VALID\n";
 
         /* ---------- TEST OUTPUT ---------- */
+
+        testHttp(http);
 
         std::vector<ServerConfig>& servers = http.getServers();
 

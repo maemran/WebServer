@@ -1,0 +1,23 @@
+check validation of directory in location <(location /mohammad)> /mohammad is valid in my directory or not ?
+it must be valid & and check if the <(error_page path)> also valid in the directory
+
+
+2- check if the IP add have 3 dots between 4 nums ->        127.0.0.1 (true)
+															127. (flase)
+
+3- the IP must be just a numbers ->  listen d; (false)
+									 listen localhost; (false)
+									 listne 127.0.0.1; (true) 
+									 
+4- getRedirectUrl() this attribute is empty inside the Loaction class
+
+5- https://new-page.html  dont handle the "https" is wrong
+
+6 - index index.html/ test.py; it is a wrong case "it must be mo slash before or after the index file"
+
+7- error_page 80 /errors/404.html; (false)  the smallest error page is 100 and the larger one is 599     
+	100 <= error_page <= 599
+
+8- client_max_body_size 200000; con come inide any block, Loaction and Server block
+
+9 - and the error_page also can come inside the all blocks
