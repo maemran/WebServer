@@ -21,7 +21,7 @@ class ServerConfig
     	std::string listen_ip;
     	int listen_port;
 		std::string root;
-    	std::string index;
+    	std::vector<std::string> indexFiles;
 		bool autoindex;
 		std::map<int , std::string> error_pages;
    		std::vector<std::string> allowed_methods;
@@ -37,7 +37,6 @@ class ServerConfig
 		const std::string&	getListenIp() const;
 		 int	getListenPort() const;
 		const std::string&	getRoot() const;
-		const std::string&	getIndex() const;
 		 bool	getAutoindex() const;
 		const std::vector<std::string>&	getMethods() const;
 		const std::map<int, std::string>&	getErrorPages() const;
@@ -49,13 +48,15 @@ class ServerConfig
 		void	setListenIp(const std::string& ip);
 		void	setListenPort(int port);
 		void	setRoot(const std::string& root);
-		void	setIndex(const std::string& index);
 		void	setAutoindex(bool autoindex);
 		void	addAllowedMethod(const std::string& method);
 		void	addErrorPage(int code, const std::string& page);
 		void	setMaxBodySize(size_t size);
 		void	addLocation(const LocationConfig& location);
 		void 	resolveInheritance() ;
+		void addIndexFile(const std::string& file);
+		const std::vector<std::string>& getIndexFiles() const;
+		
 };
 
 #endif

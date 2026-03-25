@@ -6,17 +6,9 @@
 /*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:20:40 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/02/23 11:54:56 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/03/24 14:51:21 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-// Responsibilities:
-
-// Parse server block
-
-// Parse location block
-
-// Fill ServerConfig struct
 
 #ifndef CONFIGPARSER_HPP
 #define CONFIGPARSER_HPP
@@ -41,13 +33,13 @@ private:
     void expect(TokenType type, const std::string& message);
     std::string expectWord(const std::string& message);
 
-    // Parsing blocks
+
     ServerConfig parseServer();
     LocationConfig parseLocation();
 
-    // Directive parsing helpers
     void parseServerDirective(ServerConfig& server);
     void parseLocationDirective(LocationConfig& location);
+    size_t parseSize(const std::string& value);
 
 public:
     ConfigParser(const std::vector<Token>& tokens);

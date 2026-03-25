@@ -22,7 +22,6 @@ HttpConfig& HttpConfig::operator=(const HttpConfig& other)
     if (this != &other)
     {
         root = other.root;
-        index = other.index;
         autoindex = other.autoindex;
         client_max_body_size = other.client_max_body_size;
         error_pages = other.error_pages;
@@ -41,10 +40,6 @@ void HttpConfig::setRoot(const std::string& r)
     root = r;
 }
 
-void HttpConfig::setIndex(const std::string& i)
-{
-    index = i;
-}
 
 void HttpConfig::setAutoindex(bool value)
 {
@@ -80,10 +75,6 @@ const std::string& HttpConfig::getRoot() const
     return root;
 }
 
-const std::string& HttpConfig::getIndex() const
-{
-    return index;
-}
 
 bool HttpConfig::getAutoindex() const
 {
@@ -117,4 +108,14 @@ std::vector<ServerConfig>&
 HttpConfig::getServers()
 {
     return servers;
+}
+
+void HttpConfig::addIndexFile(const std::string& file)
+{
+    indexFiles.push_back(file);
+}
+
+const std::vector<std::string>& HttpConfig::getIndexFiles() const
+{
+    return indexFiles;
 }

@@ -6,7 +6,7 @@
 /*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 14:42:10 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/02/23 14:44:29 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/03/25 10:56:10 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,22 @@ bool pathExists(const std::string& path)
 }
 
 /* ===================================== */
+/*           PRINT INDEX FILES           */
+/* ===================================== */
+
+void printIndexFiles(const std::vector<std::string>& indexFiles)
+{
+    if (indexFiles.empty())
+    {
+        std::cout << "None";
+        return;
+    }
+
+    for (size_t i = 0; i < indexFiles.size(); i++)
+        std::cout << indexFiles[i] << " ";
+}
+
+/* ===================================== */
 /*           PRINT LOCATION              */
 /* ===================================== */
 
@@ -45,12 +61,27 @@ void testLocation(const LocationConfig& loc)
 
     std::cout << "\n";
 
-    std::cout << "       Index: " << loc.getIndex() << "\n";
+    std::cout << "       Index: ";
+    printIndexFiles(loc.getIndexFiles());
+    std::cout << "\n";
 
     std::cout << "       Autoindex: "
               << (loc.getAutoindex() ? "ON" : "OFF") << "\n";
+    
+            //   std::cout << "DEBUG: hasRedirect = " << loc.hasRedirect() << std::endl;
+      const std::vector<std::string>& methods = loc.getMethods();
+        const std::map<int, std::string>& errors = loc.getErrorPages();
 
-    const std::vector<std::string>& methods = loc.getMethods();
+        if (!errors.empty())
+        {
+            std::cout << "       Error Pages:\n";
+            for (std::map<int, std::string>::const_iterator it = errors.begin();
+                it != errors.end(); ++it)
+            {
+                std::cout << "         " << it->first
+                        << " -> " << it->second << "\n";
+            }
+        }
     if (!methods.empty())
     {
         std::cout << "       Methods: ";
@@ -58,6 +89,19 @@ void testLocation(const LocationConfig& loc)
             std::cout << methods[i] << " ";
         std::cout << "\n";
     }
+
+    const std::map<std::string, std::string>& cgi = loc.getCgiMap();
+
+        if (!cgi.empty())
+        {
+            std::cout << "       CGI:\n";
+            for (std::map<std::string, std::string>::const_iterator it = cgi.begin();
+                it != cgi.end(); ++it)
+            {
+                std::cout << "         " << it->first
+                        << " -> " << it->second << "\n";
+            }
+        }
 }
 
 /* ===================================== */
@@ -76,13 +120,16 @@ void testServer(ServerConfig& srv, int i)
         std::cout << (pathExists(srv.getRoot()) ? " ✅" : " ❌");
     std::cout << "\n";
 
-    std::cout << "Index: " << srv.getIndex() << "\n";
+    std::cout << "Index: ";
+    printIndexFiles(srv.getIndexFiles());
+    std::cout << "\n";
 
     std::cout << "Autoindex: "
               << (srv.getAutoindex() ? "ON" : "OFF") << "\n";
+    std::cout << "Client Max Body Size: "
+          << srv.getMaxBodySize() << " bytes\n";
 
-    const std::vector<LocationConfig>& locs =
-        srv.getLocations();
+    const std::vector<LocationConfig>& locs = srv.getLocations();
 
     for (size_t j = 0; j < locs.size(); j++)
         testLocation(locs[j]);
@@ -103,6 +150,7 @@ int main(int argc, char** argv)
         std::cout << "📂 Reading config: " << filename << "\n";
 
         /* ---------- Read file ---------- */
+
         std::ifstream file(filename.c_str());
         if (!file.is_open())
             throw std::runtime_error("Cannot open config file");
@@ -112,33 +160,32 @@ int main(int argc, char** argv)
         std::string content = buffer.str();
 
         /* ---------- Lexer ---------- */
+
         std::cout << "🔍 Tokenizing...\n";
         ConfigLexer lexer(content);
         std::vector<Token> tokens = lexer.tokenize();
 
-        std::cout << "   Tokens: " << tokens.size() << "\n";
+        std::cout << "Tokens: " << tokens.size() << "\n";
 
         /* ---------- Parser ---------- */
+
         std::cout << "🧠 Parsing...\n";
         ConfigParser parser(tokens);
         HttpConfig http = parser.parse();
 
         /* ---------- Validator ---------- */
+
+            
         std::cout << "✅ Validating...\n";
         ConfigValidator validator;
         validator.validate(http);
 
+        
         std::cout << "🎉 Config VALID\n";
 
-        /* ---------- Inheritance ---------- */
-        std::vector<ServerConfig>& servers =
-            http.getServers();
+        /* ---------- TEST OUTPUT ---------- */
 
-        for (size_t i = 0; i < servers.size(); i++)
-            servers[i].resolveInheritance();
-
-        /* ---------- Partner 3 Tests ---------- */
-        std::cout << "\n🧪 Partner 3 CONFIG TESTS\n";
+        std::vector<ServerConfig>& servers = http.getServers();
 
         for (size_t i = 0; i < servers.size(); i++)
             testServer(servers[i], i + 1);

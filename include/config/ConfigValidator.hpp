@@ -6,7 +6,7 @@
 /*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:43:39 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/02/23 11:55:25 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/03/24 14:08:13 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,13 +42,16 @@ private:
     void checkRootExists(const std::string& root);
     void checkMethods(const std::vector<std::string>& methods);
     void checkClientMaxBodySize(size_t size);
-    void applyInheritance(HttpConfig& http);
+    void checkIndexFiles(const std::vector<std::string>& indexFiles);
+    
 
 public:
     ConfigValidator();
     ~ConfigValidator();
 
     void validate(HttpConfig& http);
+     void applyInheritance(HttpConfig& http);
+     
 };
 
 #endif

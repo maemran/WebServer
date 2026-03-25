@@ -6,7 +6,7 @@
 /*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:45 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/04 15:36:48 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/03/25 11:25:55 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include <stdexcept>
 #include <sstream>
 #include <cstdlib>
+#include <iostream>
+#include <cstdio>
 
 /* ============================= */
 /*        Constructor            */
@@ -87,6 +89,7 @@ void ConfigParser::expect(TokenType type, const std::string& msg)
 /* ============================= */
 /*          Entry Point          */
 /* ============================= */
+
 HttpConfig ConfigParser::parse()
 {
     HttpConfig http;
@@ -111,24 +114,31 @@ HttpConfig ConfigParser::parse()
             expect(TOKEN_SEMICOLON, "Missing ';'");
         }
 
-        else if (word == "index")
+       else if (word == "index")
         {
-            http.setIndex(expectWord("Expected index"));
+            if (!check(TOKEN_WORD))
+                throw std::runtime_error("index directive requires at least one file");
+
+            while (check(TOKEN_WORD))
+                http.addIndexFile(advance().value);
+
             expect(TOKEN_SEMICOLON, "Missing ';'");
         }
-
         else if (word == "autoindex")
         {
-            std::string val = expectWord("Expected on/off");
+            std::string val = expectWord("Expected 'on' or 'off'");
+
+            if (val != "on" && val != "off")
+                throw std::runtime_error("Invalid autoindex value: " + val);
+
             http.setAutoindex(val == "on");
+
             expect(TOKEN_SEMICOLON, "Missing ';'");
         }
-
         else if (word == "client_max_body_size")
         {
-            http.setMaxBodySize(
-                std::atoi(expectWord("Expected size").c_str())
-            );
+            std::string sizeStr = expectWord("Expected size");
+            http.setMaxBodySize(parseSize(sizeStr));
             expect(TOKEN_SEMICOLON, "Missing ';'");
         }
 
@@ -141,6 +151,7 @@ HttpConfig ConfigParser::parse()
     expect(TOKEN_RBRACE, "Missing '}' after http");
     return http;
 }
+
 /* ============================= */
 /*         Server Block          */
 /* ============================= */
@@ -164,20 +175,43 @@ void ConfigParser::parseServerDirective(ServerConfig& server)
 
     if (dir == "listen")
     {
-        std::string val = expectWord("Expected port");
+        std::string val = expectWord("Expected listen value");
 
         size_t colon = val.find(':');
+
         if (colon != std::string::npos)
         {
+            // IP:PORT
             server.setListenIp(val.substr(0, colon));
             server.setListenPort(std::atoi(val.substr(colon + 1).c_str()));
         }
         else
-            server.setListenPort(std::atoi(val.c_str()));
+        {
+            // Check if it's a number (PORT)
+            bool isNumber = true;
+            for (size_t i = 0; i < val.length(); i++)
+            {
+                if (!isdigit(val[i]))
+                {
+                    isNumber = false;
+                    break;
+                }
+            }
 
+            if (isNumber)
+            {
+                // PORT only
+                server.setListenPort(std::atoi(val.c_str()));
+            }
+            else
+            {
+                // IP only → default port
+                server.setListenIp(val);
+                server.setListenPort(80); // or 8080 (your choice)
+            }
+        }
         expect(TOKEN_SEMICOLON, "Missing ';'");
     }
-
     else if (dir == "root")
     {
         server.setRoot(expectWord("Expected root path"));
@@ -186,7 +220,9 @@ void ConfigParser::parseServerDirective(ServerConfig& server)
 
     else if (dir == "index")
     {
-        server.setIndex(expectWord("Expected index"));
+        while (check(TOKEN_WORD))
+            server.addIndexFile(advance().value);
+
         expect(TOKEN_SEMICOLON, "Missing ';'");
     }
 
@@ -205,7 +241,9 @@ void ConfigParser::parseServerDirective(ServerConfig& server)
     }
 
     else if (dir == "location")
+    {
         server.addLocation(parseLocation());
+    }
 
     else
         throw std::runtime_error("Unknown server directive: " + dir);
@@ -241,20 +279,35 @@ void ConfigParser::parseLocationDirective(LocationConfig& loc)
 
     else if (dir == "index")
     {
-        loc.setIndex(expectWord("Expected index"));
+        if (!check(TOKEN_WORD))
+            throw std::runtime_error("index directive requires at least one file");
+
+        while (check(TOKEN_WORD))
+            loc.addIndexFile(advance().value);
+
         expect(TOKEN_SEMICOLON, "Missing ';'");
     }
-
+    
     else if (dir == "autoindex")
     {
-        loc.setAutoindex(expectWord("Expected on/off") == "on");
+        std::string val = expectWord("Expected 'on' or 'off'");
+
+        if (val != "on" && val != "off")
+            throw std::runtime_error("Invalid autoindex value: " + val);
+
+    loc.setAutoindex(val == "on");
+
         expect(TOKEN_SEMICOLON, "Missing ';'");
-    }
+}
 
     else if (dir == "allowed_methods")
     {
+        if (!check(TOKEN_WORD))
+            throw std::runtime_error("allowed methods directive requires method");
+
         while (check(TOKEN_WORD))
             loc.addAllowedMethod(advance().value);
+
         expect(TOKEN_SEMICOLON, "Missing ';'");
     }
 
@@ -262,16 +315,83 @@ void ConfigParser::parseLocationDirective(LocationConfig& loc)
     {
         int code = std::atoi(expectWord("Expected code").c_str());
         std::string url = expectWord("Expected url");
-        loc.setRedirect(code, url);
+        
+    
+        if (url.empty() || (url[0] != '/' &&
+                url.find("http://") != 0 &&
+                    url.find("https://") != 0))
+        {
+            throw std::runtime_error(
+            "Invalid redirect URL: must start with '/' or http:// or https://");
+        }
+       
+        if (code / 100 == 3) {
+            loc.setRedirect(code, url);
+        }
+        else
+            throw std::runtime_error("Invalid redirect status code");
+        
+        
+        
         expect(TOKEN_SEMICOLON, "Missing ';'");
+        }
+
+        else if (dir == "error_page")
+        {
+            int code = std::atoi(expectWord("Expected error code").c_str());
+            std::string path = expectWord("Expected error page path");
+
+            loc.addErrorPage(code, path);
+
+            expect(TOKEN_SEMICOLON, "Missing ';'");
+        }
+        else if (dir == "cgi")
+        {
+            std::string ext = expectWord("Expected CGI extension");
+            std::string path = expectWord("Expected CGI executable");
+
+            if (ext[0] != '.')
+                throw std::runtime_error("CGI extension must start with '.'");
+
+            loc.addCgi(ext, path);
+
+            expect(TOKEN_SEMICOLON, "Missing ';'");
+        }
+        
+        else
+            throw std::runtime_error("Unknown location directive: " + dir);
+}
+
+size_t ConfigParser::parseSize(const std::string& value)
+{
+    if (value.empty())
+        throw std::runtime_error("Invalid client_max_body_size");
+
+    size_t multiplier = 1;
+    std::string numberPart = value;
+
+    char last = value[value.size() - 1];
+
+    if (last == 'K' || last == 'k')
+    {
+        multiplier = 1024;
+        numberPart = value.substr(0, value.size() - 1);
+    }
+    else if (last == 'M' || last == 'm')
+    {
+        multiplier = 1024 * 1024;
+        numberPart = value.substr(0, value.size() - 1);
+    }
+    else if (last == 'G' || last == 'g')
+    {
+        multiplier = 1024 * 1024 * 1024;
+        numberPart = value.substr(0, value.size() - 1);
     }
 
-    // else if (dir == "upload_path")
-    // {
-    //     loc.setUploadPath(expectWord("Expected path"));
-    //     expect(TOKEN_SEMICOLON, "Missing ';'");
-    // }
+    size_t number = std::atoi(numberPart.c_str());
 
-    else
-        throw std::runtime_error("Unknown location directive: " + dir);
+    if (number == 0)
+        throw std::runtime_error("Invalid size format");
+
+    return number * multiplier;
 }

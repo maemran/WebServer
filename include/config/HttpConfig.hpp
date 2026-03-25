@@ -14,12 +14,14 @@
 #define HTTPCONFIG_HPP
 
 #include "ServerConfig.hpp"
+#include <vector>
+#include <string>
 
 class HttpConfig
 {
 	private:
     	std::string root;
-    	std::string index;
+    	 std::vector<std::string> indexFiles;
 		bool autoindex;
 		size_t client_max_body_size;
 		std::map<int , std::string> error_pages;
@@ -33,7 +35,6 @@ class HttpConfig
 		~HttpConfig();
 
 		const std::string&	getRoot() const;
-		const std::string&	getIndex() const;
 		 bool	getAutoindex() const;
 		 size_t getMaxBodySize() const;
 		const std::map<int, std::string>&	getErrorPages() const;
@@ -41,15 +42,14 @@ class HttpConfig
 		const std::vector<ServerConfig>& getServers() const;
 		std::vector<ServerConfig>& getServers() ;
 
-		
-
 		void	setRoot(const std::string& root);
-		void	setIndex(const std::string& index);
 		void	setAutoindex(bool autoindex);
 		void	setMaxBodySize(size_t size);
 		void	addErrorPage(int code, const std::string& page);
 		void	addAllowedMethod(const std::string& method);
 		void	addServer(const ServerConfig& server);
+		void addIndexFile(const std::string& file);
+    	const std::vector<std::string>& getIndexFiles() const;
 };
 
 #endif
