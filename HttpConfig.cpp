@@ -105,5 +105,3 @@ void HttpConfig::addServer(const ServerConfig& server)
 {
     servers.push_back(server);
 }
-
-

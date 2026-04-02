@@ -127,4 +127,3 @@ void ServerConfig::addLocation(const LocationConfig& location)
 {
     locations.push_back(location);
 }
-
