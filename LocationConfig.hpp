@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConfig.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:19:51 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/24 00:19:06 by asaadeh          ###   ########.fr       */
+/*   Updated: 2026/03/20 01:06:06 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,39 +19,46 @@
 
 class LocationConfig
 {
-    private:
-        std::string path;
-        std::string root;
-        std::string index;
-        bool autoindex;
-        std::map<int , std::string> error_pages;
-        std::map<int , std::string> redirections;
-           std::vector<std::string> allowed_methods;
-        size_t max_body_size;
+	private:
+    	std::string path;
+    	std::string root;
+    	std::string index;
+		std::vector<std::string>	indexFiles;
+		bool autoindex;
+		std::map<int , std::string> error_pages;
+		std::map<int , std::string> redirections;
+   		std::vector<std::string> allowed_methods;
+		size_t max_body_size;
+		std::string redirect_url;
+		bool has_redirect;
 
-    public:
-        LocationConfig();
-        LocationConfig(const LocationConfig& other);
-        LocationConfig&	operator=(const LocationConfig& other);
-        ~LocationConfig();
+	public:
+		LocationConfig();
+		LocationConfig(const LocationConfig& other);
+		LocationConfig&	operator=(const LocationConfig& other);
+		~LocationConfig();
 
-        // const std::string&	getPath() const;
-        // const std::string&	getRoot() const;
-        // const std::string&	getIndex() const;
-        // bool	getAutoindex() const;
-        // const std::vector<std::string>&	getMethods() const;
-        // const std::map<int, std::string>&	getErrorPages() const;
-        // const std::map<int, std::string>&	getRedirections() const;
-        // size_t getMaxBodySize() const;
-        
-        // void	setPath(const std::string& path);
-        // void	setRoot(const std::string& root);
-        // void	setIndex(const std::string& index);
-        // void	setAutoindex(bool autoindex);
-        // void	addAllowedMethod(const std::string& method);
-        // void	addErrorPage(int code, const std::string& page);
-        // void	addRedirection(int code, const std::string& url);
-        // void	setMaxBodySize(size_t size);
+		const std::string&	getPath() const;
+		const std::string&	getRoot() const;
+		const std::string&	getIndex() const;
+		bool	getAutoindex() const;
+		const std::vector<std::string>&	getMethods() const;
+		const std::map<int, std::string>&	getErrorPages() const;
+		const std::map<int, std::string>&	getRedirections() const;
+		size_t getMaxBodySize() const;
+		bool	isRedirection() const;
+		const std::string&	getRedirectUrl() const;
+		const std::vector<std::string>&	getIndexFiles() const;
+		
+		void	setPath(const std::string& path);
+		void	setRoot(const std::string& root);
+		void	setIndex(const std::string& index);
+		void	setAutoindex(bool autoindex);
+		void	addAllowedMethod(const std::string& method);
+		void	addErrorPage(int code, const std::string& page);
+		void	addRedirection(int code, const std::string& url);
+		void	addIndexFile(const std::string& path);
+		void	setMaxBodySize(size_t size);
 };
 
 #endif
