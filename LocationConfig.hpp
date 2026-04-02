@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConfig.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:19:51 by maemran           #+#    #+#             */
-/*   Updated: 2026/02/23 11:48:26 by maemran          ###   ########.fr       */
+/*   Updated: 2026/03/20 01:06:06 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,14 @@ class LocationConfig
     	std::string path;
     	std::string root;
     	std::string index;
+		std::vector<std::string>	indexFiles;
 		bool autoindex;
 		std::map<int , std::string> error_pages;
 		std::map<int , std::string> redirections;
    		std::vector<std::string> allowed_methods;
 		size_t max_body_size;
+		std::string redirect_url;
+		bool has_redirect;
 
 	public:
 		LocationConfig();
@@ -36,13 +39,16 @@ class LocationConfig
 		~LocationConfig();
 
 		const std::string&	getPath() const;
-		const std::string&	getPath() const;
+		const std::string&	getRoot() const;
 		const std::string&	getIndex() const;
-		const bool	getAutoindex() const;
+		bool	getAutoindex() const;
 		const std::vector<std::string>&	getMethods() const;
 		const std::map<int, std::string>&	getErrorPages() const;
 		const std::map<int, std::string>&	getRedirections() const;
-		const size_t getMaxBodySize() const;
+		size_t getMaxBodySize() const;
+		bool	isRedirection() const;
+		const std::string&	getRedirectUrl() const;
+		const std::vector<std::string>&	getIndexFiles() const;
 		
 		void	setPath(const std::string& path);
 		void	setRoot(const std::string& root);
@@ -51,6 +57,7 @@ class LocationConfig
 		void	addAllowedMethod(const std::string& method);
 		void	addErrorPage(int code, const std::string& page);
 		void	addRedirection(int code, const std::string& url);
+		void	addIndexFile(const std::string& path);
 		void	setMaxBodySize(size_t size);
 };
 
