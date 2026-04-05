@@ -142,6 +142,14 @@ HttpConfig ConfigParser::parse()
             expect(TOKEN_SEMICOLON, "Missing ';'");
         }
 
+        else if (word == "error_page")
+        {
+            int code = std::atoi(expectWord("Expected error code").c_str());
+            std::string path = expectWord("Expected error page path");
+            http.addErrorPage(code, path);
+            expect(TOKEN_SEMICOLON, "Missing ';'");
+        }
+
         else
         {
             throw std::runtime_error("Unknown directive in http: " + word);
@@ -232,6 +240,13 @@ void ConfigParser::parseServerDirective(ServerConfig& server)
         expect(TOKEN_SEMICOLON, "Missing ';'");
     }
 
+    else if (dir == "client_max_body_size")
+    {
+        std::string sizeStr = expectWord("Expected size");
+        server.setMaxBodySize(parseSize(sizeStr));
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+
     else if (dir == "error_page")
     {
         int code = std::atoi(expectWord("Expected code").c_str());
@@ -300,6 +315,13 @@ void ConfigParser::parseLocationDirective(LocationConfig& loc)
         expect(TOKEN_SEMICOLON, "Missing ';'");
 }
 
+    else if (dir == "client_max_body_size")
+    {
+        std::string sizeStr = expectWord("Expected size");
+        loc.setMaxBodySize(parseSize(sizeStr));
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+
     else if (dir == "allowed_methods")
     {
         if (!check(TOKEN_WORD))
@@ -317,12 +339,10 @@ void ConfigParser::parseLocationDirective(LocationConfig& loc)
         std::string url = expectWord("Expected url");
         
     
-        if (url.empty() || (url[0] != '/' &&
-                url.find("http://") != 0 &&
-                    url.find("https://") != 0))
+        if (url.empty() || (url[0] != '/' && url.find("http://") != 0))
         {
             throw std::runtime_error(
-            "Invalid redirect URL: must start with '/' or http:// or https://");
+            "Invalid redirect URL: must start with '/' or http:// ");
         }
        
         if (code / 100 == 3) {

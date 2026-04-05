@@ -24,7 +24,7 @@ ServerConfig::ServerConfig(const ServerConfig& other)
       listen_port(other.listen_port),
       root(other.root),
       autoindex(other.autoindex),
-      error_pages(other.error_pages),
+      error_page(other.error_page),
       allowed_methods(other.allowed_methods),
       client_max_body_size(other.client_max_body_size),
       locations(other.locations)
@@ -39,7 +39,7 @@ ServerConfig& ServerConfig::operator=(const ServerConfig& other)
         listen_port = other.listen_port;
         root = other.root;
         autoindex = other.autoindex;
-        error_pages = other.error_pages;
+        error_page = other.error_page;
         allowed_methods = other.allowed_methods;
         client_max_body_size = other.client_max_body_size;
         locations = other.locations;
@@ -56,7 +56,7 @@ int ServerConfig::getListenPort() const { return listen_port; }
 const std::string& ServerConfig::getRoot() const { return root; }
 bool ServerConfig::getAutoindex() const { return autoindex; }
 const std::vector<std::string>& ServerConfig::getMethods() const { return allowed_methods; }
-const std::map<int, std::string>& ServerConfig::getErrorPages() const { return error_pages; }
+const std::map<int, std::string>& ServerConfig::getErrorPages() const { return error_page; }
 size_t ServerConfig::getMaxBodySize() const { return client_max_body_size; }
 const std::vector<LocationConfig>& ServerConfig::getLocations() const { return locations; }
 std::vector<LocationConfig>& ServerConfig::getLocations() {return this->locations;}
@@ -66,7 +66,7 @@ void ServerConfig::setListenPort(int port) { listen_port = port; }
 void ServerConfig::setRoot(const std::string& r) { root = r; }
 void ServerConfig::setAutoindex(bool a) { autoindex = a; }
 void ServerConfig::addAllowedMethod(const std::string& method) { allowed_methods.push_back(method); }
-void ServerConfig::addErrorPage(int code, const std::string& page) { error_pages[code] = page; }
+void ServerConfig::addErrorPage(int code, const std::string& page) { error_page[code] = page; }
 void ServerConfig::setMaxBodySize(size_t size) { client_max_body_size = size; }
 void ServerConfig::addLocation(const LocationConfig& location) { locations.push_back(location); }
 void ServerConfig::addIndexFile(const std::string& file){indexFiles.push_back(file);}

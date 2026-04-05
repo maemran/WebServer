@@ -7,14 +7,14 @@ SRC_DIR = src/config
 INC_DIR = include/config
 OBJ_DIR = obj
 
-# Files
+
 SRCS = main.cpp \
        $(SRC_DIR)/ConfigLexer.cpp \
        $(SRC_DIR)/ConfigParser.cpp \
        $(SRC_DIR)/ConfigValidator.cpp \
        $(SRC_DIR)/HttpConfig.cpp \
        $(SRC_DIR)/LocationConfig.cpp \
-       $(SRC_DIR)/ServerConfig.cpp
+       $(SRC_DIR)/ServerConfig.cpp \
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 

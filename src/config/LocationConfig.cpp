@@ -29,11 +29,14 @@ LocationConfig::LocationConfig(const LocationConfig& other)
       root(other.root),
       indexFiles(other.indexFiles),
       autoindex(other.autoindex),
-      error_pages(other.error_pages),
+      error_page(other.error_page),
       redirections(other.redirections),
       allowed_methods(other.allowed_methods),
       client_max_body_size(other.client_max_body_size),
-        cgi_map(other.cgi_map)
+      redirect_code(other.redirect_code),
+      redirect_url(other.redirect_url),
+      has_redirect(other.has_redirect),
+      cgi_map(other.cgi_map)
 {}
 
 // Assignment operator
@@ -45,7 +48,7 @@ LocationConfig& LocationConfig::operator=(const LocationConfig& other)
         root = other.root;
         indexFiles = other.indexFiles;
         autoindex = other.autoindex;
-        error_pages = other.error_pages;
+        error_page = other.error_page;
         redirections = other.redirections;
         allowed_methods = other.allowed_methods;
         client_max_body_size = other.client_max_body_size;
@@ -66,7 +69,7 @@ const std::string& LocationConfig::getPath() const { return path; }
 const std::string& LocationConfig::getRoot() const { return root; }
 bool LocationConfig::getAutoindex() const { return autoindex; }
 const std::vector<std::string>& LocationConfig::getMethods() const { return allowed_methods; }
-const std::map<int, std::string>& LocationConfig::getErrorPages() const { return error_pages; }
+const std::map<int, std::string>& LocationConfig::getErrorPages() const { return error_page; }
 const std::map<int, std::string>& LocationConfig::getRedirections() const { return redirections; }
 size_t LocationConfig::getMaxBodySize() const { return client_max_body_size; }
 void LocationConfig::setRedirect(int code, const std::string& url)
@@ -81,7 +84,7 @@ void LocationConfig::setPath(const std::string& p) { path = p; }
 void LocationConfig::setRoot(const std::string& r) { root = r; }
 void LocationConfig::setAutoindex(bool a) { autoindex = a; }
 void LocationConfig::addAllowedMethod(const std::string& method) { allowed_methods.push_back(method); }
-void LocationConfig::addErrorPage(int code, const std::string& page) { error_pages[code] = page; }
+void LocationConfig::addErrorPage(int code, const std::string& page) { error_page[code] = page; }
 void LocationConfig::addRedirection(int code, const std::string& url) { redirections[code] = url; }
 void LocationConfig::setMaxBodySize(size_t size) { client_max_body_size = size; }
 

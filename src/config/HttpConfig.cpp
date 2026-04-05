@@ -24,7 +24,7 @@ HttpConfig& HttpConfig::operator=(const HttpConfig& other)
         root = other.root;
         autoindex = other.autoindex;
         client_max_body_size = other.client_max_body_size;
-        error_pages = other.error_pages;
+        error_page = other.error_page;
         allowed_methods = other.allowed_methods;
         servers = other.servers;
     }
@@ -53,7 +53,7 @@ void HttpConfig::setMaxBodySize(size_t size)
 
 void HttpConfig::addErrorPage(int code, const std::string& page)
 {
-    error_pages[code] = page;
+    error_page[code] = page;
 }
 
 void HttpConfig::addAllowedMethod(const std::string& method)
@@ -89,7 +89,7 @@ size_t HttpConfig::getMaxBodySize() const
 const std::map<int, std::string>&
 HttpConfig::getErrorPages() const
 {
-    return error_pages;
+    return error_page;
 }
 
 const std::vector<std::string>&

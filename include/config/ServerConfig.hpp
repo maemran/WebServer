@@ -23,7 +23,7 @@ class ServerConfig
 		std::string root;
     	std::vector<std::string> indexFiles;
 		bool autoindex;
-		std::map<int , std::string> error_pages;
+		std::map<int , std::string> error_page;
    		std::vector<std::string> allowed_methods;
 		size_t client_max_body_size;
     	std::vector<LocationConfig> locations;

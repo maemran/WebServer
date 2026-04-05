@@ -26,6 +26,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <vector>
+#include <map>
+#include <string>
 
 #include "HttpConfig.hpp"
 #include "ServerConfig.hpp"
@@ -43,7 +45,10 @@ private:
     void checkMethods(const std::vector<std::string>& methods);
     void checkClientMaxBodySize(size_t size);
     void checkIndexFiles(const std::vector<std::string>& indexFiles);
-    
+    void checkErrorPages(const std::map<int, std::string>& errors,
+                         const std::string& root);
+    bool isValidIP(const std::string& ip);
+    void checkListenIp(const std::string& ip);
 
 public:
     ConfigValidator();

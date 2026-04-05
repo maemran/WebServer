@@ -13,6 +13,9 @@
 #include "config/ConfigValidator.hpp"
 #include <sys/stat.h>
 #include <cstdio>
+#include <sstream>
+#include <cctype>
+#include <cstdlib>
 
 /* ========================================= */
 /*              CONSTRUCTOR                  */
@@ -48,6 +51,9 @@ void ConfigValidator::validateServer(const ServerConfig& server)
 {
     int port = server.getListenPort();
     checkPortRange(port);
+    
+    // Validate listen IP address
+    checkListenIp(server.getListenIp());
 
     if (server.getRoot().empty())
         throw std::runtime_error("Server missing root directive");
@@ -56,7 +62,8 @@ void ConfigValidator::validateServer(const ServerConfig& server)
     checkIndexFiles(server.getIndexFiles());
 
     checkClientMaxBodySize(server.getMaxBodySize());
-
+    /* ---------- ERROR PAGES VALIDATION ---------- */
+    checkErrorPages(server.getErrorPages(), server.getRoot());
     const std::vector<LocationConfig>& locations =
         server.getLocations();
 
@@ -93,29 +100,47 @@ void ConfigValidator::validateLocation(const LocationConfig& location)
     checkIndexFiles(location.getIndexFiles());
     /* ---------- RETURN (REDIRECT) VALIDATION ---------- */
 
-    
-    // if (location.hasRedirect())
-    // {
-    //     // int code = location.getRedirectCode();
-    //     // std::string url = location.getRedirectUrl();
+    /* ---------- ERROR PAGES VALIDATION ---------- */
+    checkErrorPages(location.getErrorPages(), location.getRoot());
 
-    //     // Check redirect status code
-    //     // printf("-------------%d\n", code);
-    //     // if (code / 100 != 3) {
-    //     //     printf("-------------%d\n", code);
-    //     //     throw std::runtime_error("Invalid redirect status code");
-    //     // }
+}
 
-    //     // Check redirect URL
-    //     // if (url.empty() ||
-    //     //     (url[0] != '/' &&
-    //     //      url.find("http://") != 0 &&
-    //     //      url.find("https://") != 0))
-    //     // {
-    //     //     throw std::runtime_error(
-    //     //         "Invalid redirect URL: must start with '/' or http:// or https://");
-    //     // }
-    // }
+/* ========================================= */
+/*             ERROR PAGE CHECKS             */
+/* ========================================= */
+
+void ConfigValidator::checkErrorPages(const std::map<int, std::string>& errors,
+                                     const std::string& root)
+{
+    struct stat info;
+
+    for (std::map<int, std::string>::const_iterator it = errors.begin();
+         it != errors.end(); ++it)
+    {
+        int code = it->first;
+        const std::string& path = it->second;
+
+        if (code < 100 || code > 599)
+        {
+            std::ostringstream oss;
+            oss << code;
+            throw std::runtime_error("Invalid error_page code: " + oss.str());
+        }
+
+        if (path.empty() || path[0] != '/')
+            throw std::runtime_error("error_page path must start with '/': " + path);
+
+        std::string full = root;
+        if (!full.empty() && full[full.size() - 1] == '/')
+            full.resize(full.size() - 1);
+        full += path; // path begins with '/'
+
+        if (stat(full.c_str(), &info) != 0)
+            throw std::runtime_error("Error page file does not exist: " + full);
+
+        if (!S_ISREG(info.st_mode))
+            throw std::runtime_error("Error page is not a regular file: " + full);
+    }
 }
 /* ========================================= */
 /*               CHECKERS                    */
@@ -185,11 +210,78 @@ void ConfigValidator::checkIndexFiles(const std::vector<std::string>& indexFiles
 {
     for (size_t i = 0; i < indexFiles.size(); i++)
     {
-        if (!indexFiles[i].empty() && indexFiles[i][0] == '/')
-        {
-            throw std::runtime_error("Index file must NOT start with '/'");
-        }
+        const std::string& file = indexFiles[i];
+        
+        // Check if empty
+        if (file.empty())
+            throw std::runtime_error("Index file cannot be empty");
+        
+        // Check if starts with '/'
+        if (file[0] == '/')
+            throw std::runtime_error("Index file must NOT start with '/': " + file);
+        
+        // Check if ends with '/'
+        if (file[file.length() - 1] == '/')
+            throw std::runtime_error("Index file must NOT end with '/': " + file);
     }
+}
+
+/* ========================================= */
+/*             IP ADDRESS VALIDATION         */
+/* ========================================= */
+
+bool ConfigValidator::isValidIP(const std::string& ip)
+{
+    // Count dots
+    int dotCount = 0;
+    for (size_t i = 0; i < ip.length(); i++)
+    {
+        if (ip[i] == '.')
+            dotCount++;
+    }
+    
+    // Must have exactly 3 dots for IPv4
+    if (dotCount != 3)
+        return false;
+    
+    // Split by dots
+    std::stringstream ss(ip);
+    std::string octet;
+    int octetCount = 0;
+    
+    while (std::getline(ss, octet, '.'))
+    {
+        octetCount++;
+        
+        // Check if octet is empty
+        if (octet.empty())
+            return false;
+        
+        // Check if all characters are digits
+        for (size_t i = 0; i < octet.length(); i++)
+        {
+            if (!isdigit(octet[i]))
+                return false;
+        }
+        
+        // Convert to integer and check range (0-255)
+        int value = std::atoi(octet.c_str());
+        if (value < 0 || value > 255)
+            return false;
+    }
+    
+    // Must have exactly 4 octets
+    if (octetCount != 4)
+        return false;
+    
+    return true;
+}
+
+void ConfigValidator::checkListenIp(const std::string& ip)
+{
+    if (!isValidIP(ip))
+        throw std::runtime_error("Invalid IP address format: " + ip + 
+                                ". Must be valid IPv4 (e.g., 127.0.0.1)");
 }
 
 /* ========================================= */

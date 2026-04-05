@@ -24,7 +24,7 @@ class HttpConfig
     	 std::vector<std::string> indexFiles;
 		bool autoindex;
 		size_t client_max_body_size;
-		std::map<int , std::string> error_pages;
+		std::map<int , std::string> error_page;
 		std::vector<std::string> allowed_methods;
     	std::vector<ServerConfig> servers;
 	
