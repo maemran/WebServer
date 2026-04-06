@@ -6,14 +6,15 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/20 02:03:40 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/06 23:15:39 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
-#include <algorithm>
 
 HttpResponse::HttpResponse() {}
+
+int HttpResponse::fileNum = 1;
 
 HttpResponse::HttpResponse(const HttpResponse& other)
 {
@@ -48,15 +49,20 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
     this->config = config;
     this->serverIndex = serverIndex;
     indexFound = false;
+    uploadedFiles.push_back("../webroot/images/1");// convert it to static
     server = config.getServers()[serverIndex];
     statusCode = "200";
     reasonPhrase["200"] = "OK";
+    reasonPhrase["201"] = "Created";
+    reasonPhrase["204"] = "No Content";
     reasonPhrase["301"] = "Moved Permanently";
     reasonPhrase["302"] = "Moved Temporarily";
     reasonPhrase["400"] = "Bad Request";
     reasonPhrase["404"] = "Not Found";
     reasonPhrase["403"] = "Forbidden";
     reasonPhrase["405"] = "Method Not Allowed";
+    reasonPhrase["411"] = "Length Required";
+    reasonPhrase["413"] = "Content Too Large";
     reasonPhrase["501"] = "Not Implemented";
 
     extensionTypes[".aac"] = "audio/aac";
@@ -271,7 +277,7 @@ std::string readFile(const std::string& path)
     return content;
 }
 
-int ft_itos(std::string str)
+int ft_stoi(std::string str)
 {
     std::stringstream ss(str);
     int num;
@@ -352,7 +358,7 @@ std::map<int, std::string>    HttpResponse::chosePagePos()
 void    HttpResponse::findErrorPage()
 {
     std::map<int, std::string>  errorPage = chosePagePos();
-    std::map<int, std::string>::const_iterator it = errorPage.find(ft_itos(statusCode));
+    std::map<int, std::string>::const_iterator it = errorPage.find(ft_stoi(statusCode));
     if (it == errorPage.end())
     {
         generateDefaultPage(statusCode, reasonPhrase[statusCode]);
@@ -594,14 +600,113 @@ void     HttpResponse::HEADMethod()
     body = "";
 }
 
+void    HttpResponse::contentLengthValidation()
+{
+    std::map<std::string, std::string>::const_iterator it = request.getHeaders().find("content-length");
+    if (it == request.getHeaders().end())
+        throw errorResponseException("411");
+}
+
+void    HttpResponse::entityBodySizeCheck()
+{
+    std::map<std::string, std::string>::const_iterator it = request.getHeaders().find("content-length");
+    int contentLength = ft_stoi(it->second);
+    if ((int)request.getEntityBody().size() < contentLength)
+        throw errorResponseException("400");
+}
+
+void    HttpResponse::POSTMethodChecks()
+{
+    std::string filePath = loc.getRoot();
+    if (filePath[filePath.length() - 1] != '/')
+        filePath += '/';
+    filePath += request.getUri().getPath();
+    contentLengthValidation();
+    entityBodySizeCheck();
+    if (loc.getMaxBodySize() < request.getEntityBody().size())
+        throw errorResponseException("413");
+    if (file != "" || !isDirectory(filePath))
+        throw errorResponseException("405");
+}
+
+std::string HttpResponse::contentTypeToExtension()
+{
+    std::map<std::string, std::string>::const_iterator headerIt = request.getHeaders().find("content-type");
+    if (headerIt == request.getHeaders().end())
+        return "";
+    std::string contentType = headerIt->second;
+    for (std::map<std::string, std::string>::const_iterator it = extensionTypes.begin();
+        it != extensionTypes.end(); ++it)
+    {
+        if (it->second == contentType)
+            return it->first;
+    }
+    return "";
+}
+
 void     HttpResponse::POSTMethod()
 {
+    POSTMethodChecks();
+    std::string extension = contentTypeToExtension();
+    std::string uploadPath = loc.getRoot();
+    std::string uploadedFile = request.getUri().getPath();
+    std::string fileName = ft_itos(fileNum) + extension;
     
+    if (uploadPath[uploadPath.length() - 1] != '/')
+        uploadPath += '/';
+    if (uploadedFile[uploadedFile.length() - 1] != '/')
+        uploadedFile += '/';
+    std::string fullPath = uploadPath + uploadedFile + fileName;
+    std::ofstream outFile(fullPath.c_str(), std::ios::out | std::ios::trunc);
+    if (!outFile.is_open())
+        throw errorResponseException("403");
+    outFile << request.getEntityBody();
+    outFile.close();
+    uploadedFiles.push_back(fullPath);
+    contentTypeSelector(fullPath);
+    body = readFile(fullPath);
+    addHeader("Location", (uploadedFile + fileName));
+    statusCode = "201";
+    fileNum++;
+}
+
+void    HttpResponse::DELMethodChecks()
+{
+    int flag = -1;
+    std::string deletedPath = loc.getRoot();
+    if (deletedPath[deletedPath.length() - 1] != '/')
+        deletedPath += '/';
+    deletedPath += request.getUri().getPath();
+    if (directory != "" || isDirectory(deletedPath))
+        throw errorResponseException("403");
+    for (int i = 0; i < (int)uploadedFiles.size(); i++)
+    {
+        if (uploadedFiles[i] == file || uploadedFiles[i] == deletedPath)
+            flag = i;
+    }
+    if (flag == -1)
+        throw errorResponseException("403");
 }
 
 void     HttpResponse::DELMethod()
 {
+    DELMethodChecks();
+    std::string deletedPath = loc.getRoot();
+    if (deletedPath[deletedPath.length() - 1] != '/')
+        deletedPath += '/';
+    deletedPath += request.getUri().getPath();
     
+    if (std::remove(deletedPath.c_str()) != 0)
+        throw errorResponseException("403");
+    for (std::vector<std::string>::iterator it = uploadedFiles.begin(); it != uploadedFiles.end();)
+    {
+        if (*it == deletedPath || *it == file)
+            it = uploadedFiles.erase(it);
+        else
+            ++it;
+    }
+    statusCode = "204";
+    fileNum--;
 }
 
 void    HttpResponse::methodsHandler()
