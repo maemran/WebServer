@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/20 02:07:17 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/06 23:15:08 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,10 @@ int main(void)
     serverOneRoot.setAutoindex(false);
     serverOneRoot.setMaxBodySize(1024 * 1024);
     serverOneRoot.addAllowedMethod("GET");
+    serverOneRoot.addAllowedMethod("POST");
     serverOneRoot.addAllowedMethod("HEAD");
+    serverOneRoot.addAllowedMethod("DELETE");
+    serverOneRoot.setMaxBodySize(6);
     serverOneRoot.addErrorPage(404, "error_pages/404.html");
 
     LocationConfig serverOneApi;
@@ -114,14 +117,14 @@ int main(void)
     (void)config;
 
     std::string request =
-        "HEAD /images/\r\n" // ///var/
+        "POST /images/ HTTP/1.0\r\n" // ///var/
         // "Host: localhost:7070\r\n"
-        "User-Agent: Mozilla/5.0;\r\n";
-        // "Content-Type: text/plain;\r\n"
-        // "Content-Length: 27\r\n"
+        "User-Agent: Mozilla/5.0\r\n"
+        "Content-Type: text/htddml\r\n"
+        // "Content-Length: 8\r\n"
         // "Connection: close\r\n"
-        // "\r\n"
-        // "ooooooooo\no"
+        "\r\n"
+        "mohammad";
 
     HttpRequest obj;
     obj.requestHandler(request);

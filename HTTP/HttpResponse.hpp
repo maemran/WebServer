@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/20 01:22:13 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/06 22:24:00 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include "router.hpp"
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 #include <ctime>
 #include <dirent.h> 
 #include <sys/stat.h>
@@ -33,6 +34,7 @@ class   HttpResponse
         std::string body;
         std::string statusCode;
         std::vector<std::string>    headers;
+        std::vector<std::string>    uploadedFiles;
         std::map<std::string, std::string>  reasonPhrase;
         std::map<std::string, std::string>  extensionTypes;
         HttpRequest request;
@@ -40,6 +42,7 @@ class   HttpResponse
         ServerConfig server;
         LocationConfig loc;
         int serverIndex;
+        static int fileNum;
         bool indexFound;
 
         void    findPath();
@@ -60,6 +63,11 @@ class   HttpResponse
         void    GETMethod();
         void    GETWithExactPath();
         void    choseIndexFile();
+        void    contentLengthValidation();
+        void    entityBodySizeCheck();
+        void    POSTMethodChecks();
+        void    DELMethodChecks();
+        std::string contentTypeToExtension();
         void    contentTypeSelector(const std::string& file);
         void    generateDirectoryListing(const std::string& path);
         void    generateDefaultPage(const std::string& statusCode, const std::string&  ReasonPhrase);
@@ -88,7 +96,6 @@ class   HttpResponse
         void    setServerIndex(int index);
         void    setBody(const std::string& body);
         void    setStatusCode(const std::string& statusCode);
-        void    setReasonPhrase(const std::string& reasonPhrase);
         void    addHeader(const std::string& key, const std::string& value);
         
         
