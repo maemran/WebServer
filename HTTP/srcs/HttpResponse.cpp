@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/06 23:15:39 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/09 21:10:29 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -489,7 +489,7 @@ void    HttpResponse::findPath()
 void    HttpResponse::redirectionCheck()
 {
     const std::map<int, std::string>& redirections = loc.getRedirections();
-    if (!(redirections.empty()))
+    if (loc.hasRedirect())
     {
         std::map<int, std::string>::const_iterator it = redirections.begin();
         addHeader("Location", it->second);

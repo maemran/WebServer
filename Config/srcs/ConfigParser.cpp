@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:45 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/25 11:25:55 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/09 20:19:37 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "config/ConfigParser.hpp"
+#include "ConfigParser.hpp"
 #include <stdexcept>
 #include <sstream>
 #include <cstdlib>

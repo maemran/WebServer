@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigLexer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:13 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/02/23 14:47:33 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/09 20:19:35 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "config/ConfigLexer.hpp"
+#include "ConfigLexer.hpp"
 #include <cctype>  
 
 ConfigLexer::ConfigLexer(const std::string& input)

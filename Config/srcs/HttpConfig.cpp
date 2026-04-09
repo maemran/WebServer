@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   HttpConfig.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/04 15:18:49 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/04 15:45:02 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/09 20:19:38 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "config/HttpConfig.hpp"
+#include "HttpConfig.hpp"
 
 HttpConfig::HttpConfig() : autoindex(false), client_max_body_size(0) {}
 HttpConfig::~HttpConfig() {}

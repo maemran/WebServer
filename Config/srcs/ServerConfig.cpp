@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConfig.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/04 15:19:06 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/04 15:19:07 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/09 20:19:38 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "config/ServerConfig.hpp"
+#include "ServerConfig.hpp"
 
 // Default constructor
 ServerConfig::ServerConfig()

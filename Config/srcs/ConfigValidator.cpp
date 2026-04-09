@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigValidator.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:56 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/24 16:43:16 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/09 20:19:37 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "config/ConfigValidator.hpp"
+#include "ConfigValidator.hpp"
 #include <sys/stat.h>
 #include <cstdio>
 #include <sstream>

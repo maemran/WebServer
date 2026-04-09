@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConfig.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/04 15:18:54 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/25 11:07:27 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/09 20:35:41 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "config/LocationConfig.hpp"
+#include "LocationConfig.hpp"
 
 // Default constructor
 LocationConfig::LocationConfig()
@@ -93,10 +93,11 @@ void LocationConfig::addIndexFile(const std::string& file)
     indexFiles.push_back(file);
 }
 
-std::vector<std::string> LocationConfig::getIndexFiles() const
+const std::vector<std::string>& LocationConfig::getIndexFiles() const
 {
     return indexFiles;
 }
+
 bool LocationConfig::hasRedirect() const
 {
     return has_redirect;

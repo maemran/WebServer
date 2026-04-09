@@ -6,7 +6,7 @@
 /*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:19:51 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/09 19:14:35 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/09 20:35:57 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,9 @@ class LocationConfig
 		void	addAllowedMethod(const std::string& method);
 		void	addErrorPage(int code, const std::string& page);
 		void	addRedirection(int code, const std::string& url);
-		void	addIndexFile(const std::string& path);
 		void	setMaxBodySize(size_t size);
-		void setRedirect(int code, const std::string& url);
-		void addIndexFile(const std::string& file);
-		std::vector<std::string> getIndexFiles() const;
+		void 	setRedirect(int code, const std::string& url);
+		void	addIndexFile(const std::string& file);
 		void addCgi(const std::string& ext, const std::string& path);
 		const std::map<std::string, std::string>& getCgiMap() const;
 

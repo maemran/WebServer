@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/06 22:24:00 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/09 20:19:43 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <string>
 #include <fstream>
 #include "HttpRequest.hpp"
-#include "../HttpConfig.hpp"
+#include "../../Config/include/HttpConfig.hpp"
 #include "router.hpp"
 #include <sstream>
 #include <iostream>
