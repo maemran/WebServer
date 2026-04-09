@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConfig.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/23 11:21:11 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/02/23 14:40:03 by saabo-sh         ###   ########.fr       */
+/*   Created: 2026/02/23 11:37:33 by maemran           #+#    #+#             */
+/*   Updated: 2026/04/09 19:13:15 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,13 @@ class ServerConfig
 		~ServerConfig();
 
 		const std::string&	getListenIp() const;
-		 int	getListenPort() const;
+		int	getListenPort() const;
 		const std::string&	getRoot() const;
-		 bool	getAutoindex() const;
+		const std::string&	getIndex() const;
+		bool	getAutoindex() const;
 		const std::vector<std::string>&	getMethods() const;
 		const std::map<int, std::string>&	getErrorPages() const;
-		 size_t getMaxBodySize() const;
+		size_t getMaxBodySize() const;
 		const std::vector<LocationConfig>& getLocations() const;
 		std::vector<LocationConfig>& getLocations();
 		std::vector<ServerConfig>& getServers();
@@ -54,8 +55,8 @@ class ServerConfig
 		void	setMaxBodySize(size_t size);
 		void	addLocation(const LocationConfig& location);
 		void 	resolveInheritance() ;
-		void addIndexFile(const std::string& file);
-		const std::vector<std::string>& getIndexFiles() const;
+		void 	addIndexFile(const std::string& file);
+		const 	std::vector<std::string>& getIndexFiles() const;
 		
 };
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpConfig.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/23 14:41:32 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/04 15:39:03 by saabo-sh         ###   ########.fr       */
+/*   Created: 2026/02/23 11:44:40 by maemran           #+#    #+#             */
+/*   Updated: 2026/04/09 19:04:16 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ class HttpConfig
 {
 	private:
     	std::string root;
-    	 std::vector<std::string> indexFiles;
+    	std::vector<std::string> indexFiles;
 		bool autoindex;
 		size_t client_max_body_size;
 		std::map<int , std::string> error_page;
@@ -35,8 +35,10 @@ class HttpConfig
 		~HttpConfig();
 
 		const std::string&	getRoot() const;
-		 bool	getAutoindex() const;
-		 size_t getMaxBodySize() const;
+		const std::string&	getIndex() const;
+		bool	getAutoindex() const;
+		size_t getMaxBodySize() const;
+
 		const std::map<int, std::string>&	getErrorPages() const;
 		const std::vector<std::string>&	getMethods() const;
 		const std::vector<ServerConfig>& getServers() const;

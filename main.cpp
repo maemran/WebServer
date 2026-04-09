@@ -6,7 +6,7 @@
 /*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 14:42:10 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/25 17:36:08 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/09 19:13:33 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,3 +304,21 @@ int main(int argc, char** argv)
 
     return 0;
 }
+//#include "serversocket.hpp"
+//#include "HttpConfig.hpp"
+//#include "iostream"
+//int main()
+//{
+//    try
+//    {
+//        HttpConfig config;
+//        ServerSocket server(config);
+
+//        server.start();
+//        server.run();
+//    }
+//    catch(const std::exception& e)
+//    {
+//        std::cerr << e.what() << '\n';
+//    }
+//}
