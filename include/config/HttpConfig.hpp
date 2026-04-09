@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpConfig.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:44:40 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/11 19:53:39 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/09 19:04:16 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,17 @@
 #define HTTPCONFIG_HPP
 
 #include "ServerConfig.hpp"
+#include <vector>
+#include <string>
 
 class HttpConfig
 {
 	private:
     	std::string root;
-    	std::string index;
+    	std::vector<std::string> indexFiles;
 		bool autoindex;
-		size_t max_body_size;
-		std::map<int , std::string> error_pages;
+		size_t client_max_body_size;
+		std::map<int , std::string> error_page;
 		std::vector<std::string> allowed_methods;
     	std::vector<ServerConfig> servers;
 	
@@ -36,17 +38,20 @@ class HttpConfig
 		const std::string&	getIndex() const;
 		bool	getAutoindex() const;
 		size_t getMaxBodySize() const;
+
 		const std::map<int, std::string>&	getErrorPages() const;
 		const std::vector<std::string>&	getMethods() const;
 		const std::vector<ServerConfig>& getServers() const;
+		std::vector<ServerConfig>& getServers() ;
 
 		void	setRoot(const std::string& root);
-		void	setIndex(const std::string& index);
 		void	setAutoindex(bool autoindex);
 		void	setMaxBodySize(size_t size);
 		void	addErrorPage(int code, const std::string& page);
 		void	addAllowedMethod(const std::string& method);
 		void	addServer(const ServerConfig& server);
+		void addIndexFile(const std::string& file);
+    	const std::vector<std::string>& getIndexFiles() const;
 };
 
 #endif

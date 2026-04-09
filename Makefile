@@ -1,24 +1,73 @@
+# Compiler
 CXX = c++
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -Iinclude
 
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+# Directories
+SRC_DIR = src/config
+INC_DIR = include/config
+OBJ_DIR = obj
 
-SRC = main.cpp serversocket.cpp HttpConfig.cpp ServerConfig.cpp connection.cpp
 
-NAME = socket
+SRCS = main.cpp \
+       $(SRC_DIR)/ConfigLexer.cpp \
+       $(SRC_DIR)/ConfigParser.cpp \
+       $(SRC_DIR)/ConfigValidator.cpp \
+       $(SRC_DIR)/HttpConfig.cpp \
+       $(SRC_DIR)/LocationConfig.cpp \
+       $(SRC_DIR)/ServerConfig.cpp \
 
-OBJ = $(SRC:.cpp=.o)
+OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 
+# Target executable
+NAME = webserve
+
+# Default target
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME)
-	
+# Create object directory if it doesn't exist
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Link
+$(NAME): $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+
+# Clean object files
 clean:
-	rm -rf $(OBJ)
+	rm -rf $(OBJ_DIR)
 
+# Clean object files + executable
 fclean: clean
-	rm -rf $(NAME)
+	rm -f $(NAME)
 
-re : fclean all
+# Rebuild everything
+re: fclean all
 
 .PHONY: all clean fclean re
+#=======
+#CXX = c++
+
+#CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+
+#SRC = main.cpp serversocket.cpp HttpConfig.cpp ServerConfig.cpp connection.cpp
+
+#NAME = socket
+
+#OBJ = $(SRC:.cpp=.o)
+
+#all: $(NAME)
+
+#$(NAME): $(OBJ)
+#	$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME)
+	
+#clean:
+#	rm -rf $(OBJ)
+
+#fclean: clean
+#	rm -rf $(NAME)
+
+#re : fclean all
+
+#.PHONY: all clean fclean re
+#>>>>>>> main

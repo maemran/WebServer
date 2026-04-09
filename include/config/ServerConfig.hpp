@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConfig.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:37:33 by maemran           #+#    #+#             */
-/*   Updated: 2026/03/11 19:53:44 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/09 19:13:15 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,11 @@ class ServerConfig
     	std::string listen_ip;
     	int listen_port;
 		std::string root;
-    	std::string index;
+    	std::vector<std::string> indexFiles;
 		bool autoindex;
-		std::map<int , std::string> error_pages;
+		std::map<int , std::string> error_page;
    		std::vector<std::string> allowed_methods;
-		size_t max_body_size;
+		size_t client_max_body_size;
     	std::vector<LocationConfig> locations;
 		
 	public:
@@ -43,16 +43,21 @@ class ServerConfig
 		const std::map<int, std::string>&	getErrorPages() const;
 		size_t getMaxBodySize() const;
 		const std::vector<LocationConfig>& getLocations() const;
+		std::vector<LocationConfig>& getLocations();
+		std::vector<ServerConfig>& getServers();
 
 		void	setListenIp(const std::string& ip);
 		void	setListenPort(int port);
 		void	setRoot(const std::string& root);
-		void	setIndex(const std::string& index);
 		void	setAutoindex(bool autoindex);
 		void	addAllowedMethod(const std::string& method);
 		void	addErrorPage(int code, const std::string& page);
 		void	setMaxBodySize(size_t size);
 		void	addLocation(const LocationConfig& location);
+		void 	resolveInheritance() ;
+		void 	addIndexFile(const std::string& file);
+		const 	std::vector<std::string>& getIndexFiles() const;
+		
 };
 
 #endif
