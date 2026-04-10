@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:45 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/04/09 20:19:37 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/10 11:36:21 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,9 @@
 #include <iostream>
 #include <cstdio>
 
-/* ============================= */
-/*        Constructor            */
-/* ============================= */
-
 ConfigParser::ConfigParser(const std::vector<Token>& tokens)
     : _tokens(tokens), _pos(0)
 {}
-
-/* ============================= */
-/*        Core Helpers           */
-/* ============================= */
 
 bool ConfigParser::isAtEnd() const
 {
@@ -85,10 +77,6 @@ void ConfigParser::expect(TokenType type, const std::string& msg)
         throw std::runtime_error(msg);
     advance();
 }
-
-/* ============================= */
-/*          Entry Point          */
-/* ============================= */
 
 HttpConfig ConfigParser::parse()
 {
@@ -160,10 +148,6 @@ HttpConfig ConfigParser::parse()
     return http;
 }
 
-/* ============================= */
-/*         Server Block          */
-/* ============================= */
-
 ServerConfig ConfigParser::parseServer()
 {
     ServerConfig server;
@@ -189,13 +173,11 @@ void ConfigParser::parseServerDirective(ServerConfig& server)
 
         if (colon != std::string::npos)
         {
-            // IP:PORT
             server.setListenIp(val.substr(0, colon));
             server.setListenPort(std::atoi(val.substr(colon + 1).c_str()));
         }
         else
         {
-            // Check if it's a number (PORT)
             bool isNumber = true;
             for (size_t i = 0; i < val.length(); i++)
             {
@@ -208,14 +190,12 @@ void ConfigParser::parseServerDirective(ServerConfig& server)
 
             if (isNumber)
             {
-                // PORT only
                 server.setListenPort(std::atoi(val.c_str()));
             }
             else
             {
-                // IP only → default port
                 server.setListenIp(val);
-                server.setListenPort(80); // or 8080 (your choice)
+                server.setListenPort(80);
             }
         }
         expect(TOKEN_SEMICOLON, "Missing ';'");
@@ -263,10 +243,6 @@ void ConfigParser::parseServerDirective(ServerConfig& server)
     else
         throw std::runtime_error("Unknown server directive: " + dir);
 }
-
-/* ============================= */
-/*       Location Block          */
-/* ============================= */
 
 LocationConfig ConfigParser::parseLocation()
 {

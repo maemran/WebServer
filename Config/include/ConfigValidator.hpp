@@ -3,21 +3,12 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigValidator.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:43:39 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/24 14:08:13 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/10 11:43:06 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-// Check:
-// port range
-// duplicate ports
-// missing root
-// invalid methods
-// empty location path
-// client_max_body_size
-//upload rules
 
 #ifndef CONFIGVALIDATOR_HPP
 #define CONFIGVALIDATOR_HPP

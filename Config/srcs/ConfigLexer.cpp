@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigLexer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:13 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/04/09 20:19:35 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/10 11:35:37 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,16 @@
 ConfigLexer::ConfigLexer(const std::string& input)
     : _input(input), _pos(0), _line(1) {}
 
-/* Check whitespace */
 bool ConfigLexer::isSpace(char c) const
 {
     return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
 }
 
-/* Check special characters */
 bool ConfigLexer::isSpecial(char c) const
 {
     return (c == '{' || c == '}' || c == ';');
 }
 
-/* Skip spaces and count lines */
 void ConfigLexer::skipSpace()
 {
     while (_pos < _input.size() && isSpace(_input[_pos]))
@@ -39,7 +36,6 @@ void ConfigLexer::skipSpace()
     }
 }
 
-/* Read word token */
 std::string ConfigLexer::readWord()
 {
     std::string word;
@@ -54,7 +50,6 @@ std::string ConfigLexer::readWord()
     return word;
 }
 
-/* Main tokenize function */
 std::vector<Token> ConfigLexer::tokenize()
 {
     std::vector<Token> tokens;
@@ -68,7 +63,6 @@ std::vector<Token> ConfigLexer::tokenize()
 
         char c = _input[_pos];
 
-        // ⭐ HANDLE COMMENTS SAFELY
         if (_input[_pos] == '#')
         {
             while (_pos < _input.size() && _input[_pos] != '\n')
@@ -82,7 +76,6 @@ std::vector<Token> ConfigLexer::tokenize()
 
             continue;
         }
-        // Special tokens
         if (c == '{')
         {
             tokens.push_back(Token(TOKEN_LBRACE, "{", _line));
@@ -104,7 +97,7 @@ std::vector<Token> ConfigLexer::tokenize()
             if (!word.empty())
                 tokens.push_back(Token(TOKEN_WORD, word, _line));
             else
-                _pos++;   // prevent infinite loop
+                _pos++;
         }
     }
 

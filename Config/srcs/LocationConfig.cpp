@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConfig.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/04 15:18:54 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/04/09 20:35:41 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/10 11:37:28 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ LocationConfig::LocationConfig()
       has_redirect(false)
 {}
 
-// Copy constructor
 LocationConfig::LocationConfig(const LocationConfig& other)
     : path(other.path),
       root(other.root),
@@ -39,7 +38,6 @@ LocationConfig::LocationConfig(const LocationConfig& other)
       cgi_map(other.cgi_map)
 {}
 
-// Assignment operator
 LocationConfig& LocationConfig::operator=(const LocationConfig& other)
 {
     if (this != &other)
@@ -61,11 +59,12 @@ LocationConfig& LocationConfig::operator=(const LocationConfig& other)
     return *this;
 }
 
-// Destructor
 LocationConfig::~LocationConfig() {}
+const std::string& LocationConfig::getPath() const
+{ 
+    return path;
+}
 
-// Getters
-const std::string& LocationConfig::getPath() const { return path; }
 const std::string& LocationConfig::getRoot() const { return root; }
 bool LocationConfig::getAutoindex() const { return autoindex; }
 const std::vector<std::string>& LocationConfig::getMethods() const { return allowed_methods; }
@@ -79,7 +78,6 @@ void LocationConfig::setRedirect(int code, const std::string& url)
     has_redirect = true;
 }
 
-// Setters
 void LocationConfig::setPath(const std::string& p) { path = p; }
 void LocationConfig::setRoot(const std::string& r) { root = r; }
 void LocationConfig::setAutoindex(bool a) { autoindex = a; }

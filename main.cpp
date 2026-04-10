@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/09 21:07:06 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/10 10:53:50 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,11 @@ int main(int argc, char **argv)
     HttpConfig config = prepareHttpConfig(filename);
 
     std::string request =
-        "GET /images/ HTTP/1.0\r\n" // ///var/
+        "DELETE /images/1 HTTP/1.0\r\n" // ///var/
         // "Host: localhost:7070\r\n"
         "User-Agent: Mozilla/5.0\r\n"
         "Content-Type: text/htddml\r\n"
-        // "Content-Length: 8\r\n"
+        "Content-Length: 8\r\n"
         // "Connection: close\r\n"
         "\r\n"
         "mohammad";

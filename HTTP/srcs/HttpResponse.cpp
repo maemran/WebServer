@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/09 21:10:29 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/10 10:57:58 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
     this->config = config;
     this->serverIndex = serverIndex;
     indexFound = false;
-    uploadedFiles.push_back("../webroot/images/1");// convert it to static
+    uploadedFiles.push_back("./webroot/images/1");// convert it to static
     server = config.getServers()[serverIndex];
     statusCode = "200";
     reasonPhrase["200"] = "OK";
@@ -488,14 +488,12 @@ void    HttpResponse::findPath()
 
 void    HttpResponse::redirectionCheck()
 {
-    const std::map<int, std::string>& redirections = loc.getRedirections();
     if (loc.hasRedirect())
     {
-        std::map<int, std::string>::const_iterator it = redirections.begin();
-        addHeader("Location", it->second);
-        generateDefaultPage(ft_itos(it->first), reasonPhrase[ft_itos(it->first)]);
+        addHeader("Location", loc.getRedirectUrl());
+        generateDefaultPage(ft_itos(loc.getRedirectCode()), reasonPhrase[ft_itos(loc.getRedirectCode())]);
         // addHeader("Content-Length", ft_itos(body.size()));
-        throw redirectResponseException(ft_itos(it->first));
+        throw redirectResponseException(ft_itos(loc.getRedirectCode()));
     }
 }
 

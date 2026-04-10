@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigValidator.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:56 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/04/09 20:19:37 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/10 11:36:25 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,8 @@
 #include <cctype>
 #include <cstdlib>
 
-/* ========================================= */
-/*              CONSTRUCTOR                  */
-/* ========================================= */
-
 ConfigValidator::ConfigValidator() {}
 ConfigValidator::~ConfigValidator() {}
-
-/* ========================================= */
-/*              PUBLIC ENTRY                 */
-/* ========================================= */
 
 void ConfigValidator::validate(HttpConfig& http)
 {
@@ -35,7 +27,6 @@ void ConfigValidator::validate(HttpConfig& http)
     if (servers.empty())
         throw std::runtime_error("No servers defined");
 
-    // 🔥 Apply inheritance ONCE
     applyInheritance(http);
     checkIndexFiles(http.getIndexFiles());
     checkDuplicatePorts(servers);
@@ -44,15 +35,11 @@ void ConfigValidator::validate(HttpConfig& http)
         validateServer(servers[i]);
 }
 
-/* ========================================= */
-/*              SERVER VALIDATION            */
-/* ========================================= */
 void ConfigValidator::validateServer(const ServerConfig& server)
 {
     int port = server.getListenPort();
     checkPortRange(port);
     
-    // Validate listen IP address
     checkListenIp(server.getListenIp());
 
     if (server.getRoot().empty())
@@ -62,7 +49,6 @@ void ConfigValidator::validateServer(const ServerConfig& server)
     checkIndexFiles(server.getIndexFiles());
 
     checkClientMaxBodySize(server.getMaxBodySize());
-    /* ---------- ERROR PAGES VALIDATION ---------- */
     checkErrorPages(server.getErrorPages(), server.getRoot());
     const std::vector<LocationConfig>& locations =
         server.getLocations();
@@ -73,41 +59,24 @@ void ConfigValidator::validateServer(const ServerConfig& server)
         
 }
 
-/* ========================================= */
-/*             LOCATION VALIDATION           */
-/* ========================================= */
-
 void ConfigValidator::validateLocation(const LocationConfig& location)
 {
-    /* ---------- PATH VALIDATION ---------- */
-
     if (location.getPath().empty())
         throw std::runtime_error("Location path is empty");
 
     if (location.getPath()[0] != '/')
         throw std::runtime_error("Location path must start with '/'");
 
-    /* ---------- ROOT VALIDATION ---------- */
-
     if (location.getRoot().empty())
         throw std::runtime_error("Location has no root defined");
     
     checkRootExists(location.getRoot());
 
-    /* ---------- METHODS VALIDATION ---------- */
-
     checkMethods(location.getMethods());
     checkIndexFiles(location.getIndexFiles());
-    /* ---------- RETURN (REDIRECT) VALIDATION ---------- */
-
-    /* ---------- ERROR PAGES VALIDATION ---------- */
     checkErrorPages(location.getErrorPages(), location.getRoot());
 
 }
-
-/* ========================================= */
-/*             ERROR PAGE CHECKS             */
-/* ========================================= */
 
 void ConfigValidator::checkErrorPages(const std::map<int, std::string>& errors,
                                      const std::string& root)
@@ -133,7 +102,7 @@ void ConfigValidator::checkErrorPages(const std::map<int, std::string>& errors,
         std::string full = root;
         if (!full.empty() && full[full.size() - 1] == '/')
             full.resize(full.size() - 1);
-        full += path; // path begins with '/'
+        full += path;
 
         if (stat(full.c_str(), &info) != 0)
             throw std::runtime_error("Error page file does not exist: " + full);
@@ -142,10 +111,6 @@ void ConfigValidator::checkErrorPages(const std::map<int, std::string>& errors,
             throw std::runtime_error("Error page is not a regular file: " + full);
     }
 }
-/* ========================================= */
-/*               CHECKERS                    */
-/* ========================================= */
-
 void ConfigValidator::checkPortRange(int port)
 {
     if (port <= 0 || port > 65535)
@@ -212,27 +177,19 @@ void ConfigValidator::checkIndexFiles(const std::vector<std::string>& indexFiles
     {
         const std::string& file = indexFiles[i];
         
-        // Check if empty
         if (file.empty())
             throw std::runtime_error("Index file cannot be empty");
         
-        // Check if starts with '/'
         if (file[0] == '/')
             throw std::runtime_error("Index file must NOT start with '/': " + file);
         
-        // Check if ends with '/'
         if (file[file.length() - 1] == '/')
             throw std::runtime_error("Index file must NOT end with '/': " + file);
     }
 }
 
-/* ========================================= */
-/*             IP ADDRESS VALIDATION         */
-/* ========================================= */
-
 bool ConfigValidator::isValidIP(const std::string& ip)
 {
-    // Count dots
     int dotCount = 0;
     for (size_t i = 0; i < ip.length(); i++)
     {
@@ -240,11 +197,9 @@ bool ConfigValidator::isValidIP(const std::string& ip)
             dotCount++;
     }
     
-    // Must have exactly 3 dots for IPv4
     if (dotCount != 3)
         return false;
     
-    // Split by dots
     std::stringstream ss(ip);
     std::string octet;
     int octetCount = 0;
@@ -253,24 +208,20 @@ bool ConfigValidator::isValidIP(const std::string& ip)
     {
         octetCount++;
         
-        // Check if octet is empty
         if (octet.empty())
             return false;
         
-        // Check if all characters are digits
         for (size_t i = 0; i < octet.length(); i++)
         {
             if (!isdigit(octet[i]))
                 return false;
         }
         
-        // Convert to integer and check range (0-255)
         int value = std::atoi(octet.c_str());
         if (value < 0 || value > 255)
             return false;
     }
     
-    // Must have exactly 4 octets
     if (octetCount != 4)
         return false;
     
@@ -284,9 +235,6 @@ void ConfigValidator::checkListenIp(const std::string& ip)
                                 ". Must be valid IPv4 (e.g., 127.0.0.1)");
 }
 
-/* ========================================= */
-/*             INHERITANCE LOGIC             */
-/* ========================================= */
 void ConfigValidator::applyInheritance(HttpConfig& http)
 {
     std::vector<ServerConfig>& servers = http.getServers();
@@ -294,8 +242,6 @@ void ConfigValidator::applyInheritance(HttpConfig& http)
     for (size_t i = 0; i < servers.size(); i++)
     {
         ServerConfig& server = servers[i];
-
-        /* ---------- SERVER inherits from HTTP ---------- */
 
         if (server.getRoot().empty())
             server.setRoot(http.getRoot());
@@ -319,8 +265,6 @@ void ConfigValidator::applyInheritance(HttpConfig& http)
             if (srvErrors.find(it->first) == srvErrors.end())
                 server.addErrorPage(it->first, it->second);
         }
-
-        /* ---------- LOCATION inherits from SERVER ---------- */
 
         std::vector<LocationConfig>& locations = server.getLocations();
 

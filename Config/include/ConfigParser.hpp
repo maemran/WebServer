@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:20:40 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/03/24 14:51:21 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/10 11:34:57 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ private:
     std::vector<Token> _tokens;
     size_t _pos;
 
-    // Core helpers
     bool isAtEnd() const;
     const Token& peek() const;
     const Token& previous() const;
