@@ -10,11 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/http/Session.hpp"
+#include "Session.hpp"
 #include <sstream>
 #include <cstdlib>
 #include <ctime>
-#include <iomanip>
 
 /* ===================================== */
 /*        Session Implementation         */
@@ -143,7 +142,7 @@ SessionManager& SessionManager::getInstance()
 
 SessionManager::SessionManager() : defaultTimeoutMinutes(30)
 {
-    srand(time(NULL));
+    srand(static_cast<unsigned int>(time(NULL)));
 }
 
 SessionManager::~SessionManager() {}
@@ -176,8 +175,8 @@ Session& SessionManager::getSession(const std::string& sessionId)
 
 bool SessionManager::hasSession(const std::string& sessionId) const
 {
-    return (sessions.find(sessionId) != sessions.end() &&
-            !sessions.at(sessionId).isExpired());
+    std::map<std::string, Session>::const_iterator it = sessions.find(sessionId);
+    return (it != sessions.end() && !it->second.isExpired());
 }
 
 void SessionManager::removeSession(const std::string& sessionId)

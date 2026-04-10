@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/http/Cookie.hpp"
+#include "Cookie.hpp"
 #include <sstream>
 #include <ctime>
 
@@ -97,8 +97,9 @@ std::string Cookie::toSetCookieHeader() const
     {
         char buffer[100];
         struct tm* timeinfo = gmtime(&expires);
-        strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", timeinfo);
-        ss << "; Expires=" << buffer;
+        if (timeinfo != NULL &&
+            strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", timeinfo) > 0)
+            ss << "; Expires=" << buffer;
     }
     else if (maxAge >= 0)
     {
@@ -135,6 +136,8 @@ std::map<std::string, std::string> Cookie::parseCookieHeader(const std::string& 
         size_t start = pair.find_first_not_of(" \t");
         if (start != std::string::npos)
             pair = pair.substr(start);
+        else
+            continue;
         
         // Trim trailing whitespace
         size_t end = pair.find_last_not_of(" \t");
@@ -147,8 +150,17 @@ std::map<std::string, std::string> Cookie::parseCookieHeader(const std::string& 
         {
             std::string name = pair.substr(0, eqPos);
             std::string value = pair.substr(eqPos + 1);
-            
-            // Trim spaces around name and value
+
+            size_t nameStart = name.find_first_not_of(" \t");
+            size_t nameEnd = name.find_last_not_of(" \t");
+            size_t valueStart = value.find_first_not_of(" \t");
+            size_t valueEnd = value.find_last_not_of(" \t");
+
+            if (nameStart != std::string::npos && nameEnd != std::string::npos)
+                name = name.substr(nameStart, nameEnd - nameStart + 1);
+            if (valueStart != std::string::npos && valueEnd != std::string::npos)
+                value = value.substr(valueStart, valueEnd - valueStart + 1);
+
             if (!name.empty() && !value.empty())
                 cookies[name] = value;
         }
