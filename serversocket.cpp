@@ -28,6 +28,7 @@
 
 ServerSocket::ServerSocket(const HttpConfig& config)
 {
+    this->config = config;//important
     servers = config.getServers();
     serverFds.resize(servers.size(), -1);
 }
@@ -180,39 +181,96 @@ void ServerSocket::handleServerEvent(int epollFd, int serverFd)
     }
 }
 
-void ServerSocket::handleClientEvent(int epollFd, int clientFd)
+void ServerSocket::closeConnection(int epollFd, int clientFd)
 {
+    epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, 0);
+    close(clientFd);
+    removeConnection(clientFd);
+}
+
+void ServerSocket::handleReading(int epollFd, Connection* conn)
+{
+    int clientFd = conn->getClientFd();
     char buffer[4096];
     int bytes = recv(clientFd, buffer, sizeof(buffer), 0);
 
     if (bytes <= 0)
     {
-        epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, 0);
-        close(clientFd);
-        removeConnection(clientFd);
+        closeConnection(epollFd, clientFd);
         return;
     }
 
-    Connection* conn = getConnectionByFd(clientFd);
-    if (conn)
+    conn->append(buffer, bytes);
+
+    if (!conn->isRequestComplete())
+        return;
+
+    std::string request = conn->extractRequest();
+    conn->consumeRequest();
+    std::cout << "FULL REQUEST:\n" << request << std::endl;
+
+    std::string responseStr;
+    try
     {
-        std::cout << "Handling request from " << conn->getClientIp() 
-                  << ":" << conn->getClientPort() 
-                  << " (server[" << conn->getServerIndex() << "])" << std::endl;
+        HttpRequest httpRequest;
+        httpRequest.requestHandler(request);
+
+        HttpResponse httpResponse(httpRequest, config, conn->getServerIndex());
+        httpResponse.responseHandler();
+
+        responseStr = httpResponse.getResponse();
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error handling request: " << e.what() << std::endl;
+        responseStr =
+            "HTTP/1.0 500 Internal Server Error\r\n"
+            "Content-Length: 21\r\n"
+            "Content-Type: text/plain\r\n"
+            "\r\n"
+            "Internal Server Error";
     }
 
-    const char* response =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Length: 13\r\n"
-        "Content-Type: text/plain\r\n"
-        "\r\n"
-        "Hello, world!";
+    conn->setResponse(responseStr);
+    conn->setState(SENDING);
 
-    send(clientFd, response, strlen(response), 0);
+    struct epoll_event ev;
+    ev.events = EPOLLOUT;
+    ev.data.fd = clientFd;
+    epoll_ctl(epollFd, EPOLL_CTL_MOD, clientFd, &ev);
+}
 
-    epoll_ctl(epollFd, EPOLL_CTL_DEL, clientFd, 0);
-    close(clientFd);
-    removeConnection(clientFd);
+void ServerSocket::handleSending(int epollFd, Connection* conn)
+{
+    int clientFd = conn->getClientFd();
+    std::string& wb = conn->getWriteBuffer();
+    size_t& sent = conn->getBytesSent();
+
+    int bytes = send(clientFd, wb.c_str() + sent, wb.size() - sent, 0);
+    if (bytes > 0)
+        sent += bytes;
+
+    if (sent >= wb.size())
+    {
+        conn->setState(DONE);
+        closeConnection(epollFd, clientFd);
+    }
+    else if (bytes < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+    {
+        closeConnection(epollFd, clientFd);
+    }
+}
+
+void ServerSocket::handleClientEvent(int epollFd, int clientFd)
+{
+    Connection* conn = getConnectionByFd(clientFd);
+    if (!conn)
+        return;
+
+    if (conn->getState() == READING)
+        handleReading(epollFd, conn);
+    else if (conn->getState() == SENDING)
+        handleSending(epollFd, conn);
 }
 
 Connection* ServerSocket::getConnectionByFd(int fd)

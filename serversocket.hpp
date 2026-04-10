@@ -5,11 +5,14 @@
 #include "ServerConfig.hpp"
 #include "HttpConfig.hpp"
 #include "connection.hpp"
+#include "HTTP/HttpRequest.hpp"
+#include "HTTP/HttpResponse.hpp"
 class ServerSocket
 {
     private:
         std::vector<int> serverFds;
         std::vector<ServerConfig> servers;
+        HttpConfig config;
         std :: string acceptedIp;
         int acceptedport;
 
@@ -28,6 +31,9 @@ class ServerSocket
         void  registerServerSockets(int epollFd);
         void  handleServerEvent(int epollFd, int serverFd);
         void  handleClientEvent(int epollFd, int clientFd);
+        void  handleReading(int epollFd, Connection* conn);
+        void  handleSending(int epollFd, Connection* conn);
+        void  closeConnection(int epollFd, int clientFd);
         bool  isServerFd(int fd);
         std :: string getAcceptedIp(std :: string acceptedIp);
         int getAcceptedPort(int acceptedPort);
