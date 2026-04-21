@@ -4,7 +4,7 @@ NAME = webserve
 OBJ_DIR = obj
 
 SRCS = \
-       mainsssss.cpp \
+       main.cpp \
        Config/srcs/ConfigLexer.cpp \
        Config/srcs/ConfigParser.cpp \
        Config/srcs/ConfigValidator.cpp \
