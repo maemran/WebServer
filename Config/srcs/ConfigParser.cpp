@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:45 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/04/10 11:36:21 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/21 18:04:54 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,36 @@
 #include <cstdlib>
 #include <iostream>
 #include <cstdio>
+
+namespace
+{
+    size_t countTopLevelHttpBlocks(const std::vector<Token>& tokens)
+    {
+        size_t depth = 0;
+        size_t httpCount = 0;
+
+        for (size_t i = 0; i < tokens.size(); ++i)
+        {
+            if (tokens[i].type == TOKEN_LBRACE)
+                ++depth;
+            else if (tokens[i].type == TOKEN_RBRACE)
+            {
+                if (depth > 0)
+                    --depth;
+            }
+            else if (depth == 0 &&
+                     tokens[i].type == TOKEN_WORD &&
+                     tokens[i].value == "http" &&
+                     i + 1 < tokens.size() &&
+                     tokens[i + 1].type == TOKEN_LBRACE)
+            {
+                ++httpCount;
+            }
+        }
+
+        return httpCount;
+    }
+}
 
 ConfigParser::ConfigParser(const std::vector<Token>& tokens)
     : _tokens(tokens), _pos(0)
@@ -82,6 +112,9 @@ HttpConfig ConfigParser::parse()
 {
     HttpConfig http;
 
+    if (countTopLevelHttpBlocks(_tokens) > 1)
+        throw std::runtime_error("Only one http block is allowed in config file");
+
     if (expectWord("Expected 'http'") != "http")
         throw std::runtime_error("Config must start with http");
 
@@ -145,8 +178,17 @@ HttpConfig ConfigParser::parse()
     }
 
     expect(TOKEN_RBRACE, "Missing '}' after http");
+
+    if (!isAtEnd())
+    {
+        if (check(TOKEN_WORD) && peek().value == "http")
+            throw std::runtime_error("Only one http block is allowed in config file");
+        throw std::runtime_error("Unexpected content after http block");
+    }
+
     return http;
 }
+
 
 ServerConfig ConfigParser::parseServer()
 {
