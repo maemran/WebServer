@@ -14,6 +14,7 @@
 #include <vector>
 #include <algorithm>
 
+
 static std::string toUpperUnderscore(const std::string& value)
 {
 	std::string out = value;
@@ -26,7 +27,6 @@ static std::string toUpperUnderscore(const std::string& value)
 	}
 	return out;
 }
-
 static std::string toLowerString(const std::string& value)
 {
 	std::string out = value;
@@ -49,43 +49,6 @@ static std::string getHeaderValue(const std::map<std::string, std::string>& head
 			return it->second;
 	}
 	return "";
-}
-
-static std::string getReasonPhrase(const std::string& status)
-{
-	if (status == "200")
-		return "OK";
-	if (status == "201")
-		return "Created";
-	if (status == "204")
-		return "No Content";
-	if (status == "301")
-		return "Moved Permanently";
-	if (status == "302")
-		return "Found";
-	if (status == "303")
-		return "See Other";
-	if (status == "400")
-		return "Bad Request";
-	if (status == "403")
-		return "Forbidden";
-	if (status == "404")
-		return "Not Found";
-	if (status == "405")
-		return "Method Not Allowed";
-	if (status == "413")
-		return "Content Too Large";
-	if (status == "500")
-		return "Internal Server Error";
-	if (status == "501")
-		return "Not Implemented";
-	if (status == "502")
-		return "Bad Gateway";
-	if (status == "504")
-		return "Gateway Timeout";
-	if (status == "505")
-		return "HTTP Version Not Supported";
-	return "Unknown";
 }
 
 static std::string getDirectoryName(const std::string& path)

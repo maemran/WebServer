@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/10 10:57:58 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/22 17:12:06 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -723,6 +723,15 @@ void    HttpResponse::methodsHandler()
         DELMethod();
 }
 
+void	HttpResponse::CGIHandler()
+{
+	redirectionCheck();
+	/*
+	.
+	.
+	*/
+}
+
 void    HttpResponse::responseHandler()
 {
     try
@@ -730,6 +739,8 @@ void    HttpResponse::responseHandler()
         if (request.getStatusCode() != "200")
             throw errorResponseException(request.getStatusCode());
         findPath();
+		if (!(loc.getCgiMap().empty()))
+			CGIHandler();
         methodsHandler();
     }
     catch (errorResponseException& e)

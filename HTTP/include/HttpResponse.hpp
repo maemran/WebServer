@@ -6,7 +6,7 @@
 /*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/09 20:19:43 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/22 17:10:29 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ class   HttpResponse
         void    entityBodySizeCheck();
         void    POSTMethodChecks();
         void    DELMethodChecks();
+		void	CGIHandler();
         std::string contentTypeToExtension();
         void    contentTypeSelector(const std::string& file);
         void    generateDirectoryListing(const std::string& path);
