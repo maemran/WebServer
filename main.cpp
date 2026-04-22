@@ -6,7 +6,7 @@
 /*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/22 20:50:28 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/22 21:02:36 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "ConfigLexer.hpp"
 #include "ConfigParser.hpp"
 #include "ConfigValidator.hpp"
+#include "serversocket.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -55,27 +56,36 @@ static HttpConfig prepareHttpConfig(const std::string& path)
 //505   HTTP Version Not Supported
 int main(int argc, char **argv)
 {
-	std::string filename = "config.conf";
-    if (argc == 2)
-        filename = argv[1];
-    HttpConfig config = prepareHttpConfig(filename);
+	try {
+		std::string filename = "config.conf";
+    	if (argc == 2)
+    	    filename = argv[1];
+    	HttpConfig config = prepareHttpConfig(filename);
+		ServerSocket server(config);
+    	server.start();
+    	server.run();
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
 
-    std::string request =
-        "GET /images/test.py?name=mohammad HTTP/1.0\r\n" // ///var/
-        // "Host: localhost:7070\r\n"
-        "User-Agent: Mozilla/5.0\r\n"
-        "Content-Type: text/html\r\n"
-        "Content-Length: 8\r\n"
-        // "Connection: close\r\n"
-        "\r\n"
-        "mohammad";
-	std::cout << "hello" <<std::endl;
-    HttpRequest obj;
-    obj.requestHandler(request);
-    HttpResponse resp(obj, config, 0);
-    std::cout << "===============================" << std::endl;
-    std::cout << "===> HTTP Response Handler <===" << std::endl;
-    std::cout << "===============================" << std::endl;
-    resp.responseHandler();
+    //std::string request =
+    //    "GET /images/test.py?name=mohammad HTTP/1.0\r\n" // ///var/
+    //    // "Host: localhost:7070\r\n"
+    //    "User-Agent: Mozilla/5.0\r\n"
+    //    "Content-Type: text/html\r\n"
+    //    "Content-Length: 8\r\n"
+    //    // "Connection: close\r\n"
+    //    "\r\n"
+    //    "mohammad";
+	//std::cout << "hello" <<std::endl;
+    //HttpRequest obj;
+    //obj.requestHandler(request);
+    //HttpResponse resp(obj, config, 0);
+    //std::cout << "===============================" << std::endl;
+    //std::cout << "===> HTTP Response Handler <===" << std::endl;
+    //std::cout << "===============================" << std::endl;
+    //resp.responseHandler();
     //std::cout << request << std::endl;
 }

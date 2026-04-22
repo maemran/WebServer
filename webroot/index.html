@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyBlog – Home</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo-wrap">
+      <div class="logo-icon">MB</div>
+      <span class="logo-text">MyBlog</span>
+    </a>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="blog/post1.html">Blog</a>
+      <a href="forms/contact_form.html">Contact</a>
+      <a href="forms/upload_form.html">Upload</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-eyebrow">Welcome to MyBlog</p>
+    <h1>Ideas Worth<br>Writing About</h1>
+    <p>Thoughts on web development, design, and building things that matter for the modern web.</p>
+    <a href="blog/post1.html" class="btn">Read the Blog</a>
+    <img src="images/background.jpg" alt="Blog hero image" class="hero-img">
+  </section>
+
+  <!-- LATEST POSTS -->
+  <div class="container">
+    <span class="section-title">Latest Posts</span>
+    <div class="cards-grid">
+
+      <a href="blog/post1.html" class="post-card">
+        <span class="tag tag-webdev">Web Dev</span>
+        <h2>Getting Started with Web Development</h2>
+        <p class="meta">April 20, 2025 &nbsp;·&nbsp; 4 min read</p>
+        <p style="font-size:0.95rem; color:#555; margin-top:.75rem;">
+          HTML, CSS, and JavaScript — the trio behind every great website. Start here and build your foundation.
+        </p>
+      </a>
+
+      <a href="blog/post2.html" class="post-card">
+        <span class="tag tag-css">CSS</span>
+        <h2>CSS Tips Every Developer Should Know</h2>
+        <p class="meta">April 22, 2025 &nbsp;·&nbsp; 5 min read</p>
+        <p style="font-size:0.95rem; color:#555; margin-top:.75rem;">
+          Flexbox, Grid, and custom properties will change how you think about layout and design systems.
+        </p>
+      </a>
+
+      <div class="post-card" style="border-top-color: var(--teal); background: #F0FAFA;">
+        <span class="tag" style="background:var(--teal); color:#fff;">Coming Soon</span>
+        <h2 style="color:var(--teal);">JavaScript Patterns for 2025</h2>
+        <p class="meta">May 2025</p>
+        <p style="font-size:0.95rem; color:#555; margin-top:.75rem;">
+          Modern JS patterns, async strategies, and what to know about the evolving language.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- COLOR PALETTE STRIP -->
+    <div style="display:flex; height:8px; margin-top:3rem; border:1px solid var(--border);">
+      <div style="flex:1; background:var(--red);"></div>
+      <div style="flex:1; background:var(--orange);"></div>
+      <div style="flex:1; background:var(--yellow);"></div>
+      <div style="flex:1; background:var(--lime);"></div>
+      <div style="flex:1; background:var(--teal);"></div>
+      <div style="flex:1; background:var(--blue);"></div>
+      <div style="flex:1; background:var(--navy);"></div>
+      <div style="flex:1; background:var(--purple);"></div>
+      <div style="flex:1; background:var(--maroon);"></div>
+    </div>
+
+    <!-- ABOUT STRIP -->
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:var(--border); border:1px solid var(--border); margin-top:3rem;">
+      <div style="background:var(--navy); color:#fff; padding:2rem; text-align:center;">
+        <div style="font-family:'Syne',sans-serif; font-size:2.5rem; font-weight:800; color:var(--yellow);">12</div>
+        <div style="font-family:'Syne',sans-serif; font-size:0.8rem; letter-spacing:.1em; text-transform:uppercase; color:#AABBDD; margin-top:.25rem;">Articles</div>
+      </div>
+      <div style="background:var(--red); color:#fff; padding:2rem; text-align:center;">
+        <div style="font-family:'Syne',sans-serif; font-size:2.5rem; font-weight:800; color:var(--yellow);">3</div>
+        <div style="font-family:'Syne',sans-serif; font-size:0.8rem; letter-spacing:.1em; text-transform:uppercase; color:#FFD0D0; margin-top:.25rem;">Topics</div>
+      </div>
+      <div style="background:var(--blue); color:#fff; padding:2rem; text-align:center;">
+        <div style="font-family:'Syne',sans-serif; font-size:2.5rem; font-weight:800; color:var(--yellow);">∞</div>
+        <div style="font-family:'Syne',sans-serif; font-size:0.8rem; letter-spacing:.1em; text-transform:uppercase; color:#AACCFF; margin-top:.25rem;">Curiosity</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 MyBlog &nbsp;·&nbsp; Built with HTML, CSS &amp; curiosity &nbsp;·&nbsp; <a href="forms/contact_form.html">Contact Us</a></p>
+  </footer>
+
+</body>
+</html>

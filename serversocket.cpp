@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serversocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 01:30:51 by asaadeh           #+#    #+#             */
-/*   Updated: 2026/03/13 02:37:34 by asaadeh          ###   ########.fr       */
+/*   Updated: 2026/04/22 21:06:04 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ void ServerSocket::start()
         std::memset(&address, 0, sizeof(address));
         address.sin_family = AF_INET;
         address.sin_addr.s_addr = inet_addr(servers[i].getListenIp().c_str());
+		std::cout << servers[i].getListenIp().c_str() << std::endl;
+		std::cout << servers[i].getListenPort() << std::endl;
         address.sin_port = htons(servers[i].getListenPort());
 
         if (bind(serverFds[i], (sockaddr*)&address, sizeof(address)) < 0)

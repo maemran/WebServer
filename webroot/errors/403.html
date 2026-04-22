@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 – Forbidden</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="../index.html" class="logo-wrap">
+      <div class="logo-icon">MB</div>
+      <span class="logo-text">MyBlog</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../blog/post1.html">Blog</a>
+      <a href="../forms/contact_form.html">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="error-page error-403">
+
+      <!-- Decorative color bar -->
+      <div style="display:flex; height:10px; max-width:400px; margin:0 auto 2.5rem;">
+        <div style="flex:1; background:var(--red);"></div>
+        <div style="flex:1; background:var(--maroon);"></div>
+        <div style="flex:1; background:var(--red);"></div>
+        <div style="flex:1; background:var(--maroon);"></div>
+      </div>
+
+      <div class="error-code">403</div>
+
+      <div style="height:6px; width:80px; margin:1rem auto 1.5rem; background:var(--red);"></div>
+
+      <h1>Access Forbidden</h1>
+      <p>
+        You don't have permission to view this page. If you believe this is an error,
+        please contact the site administrator.
+      </p>
+
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        <a href="../index.html" class="btn">← Back to Home</a>
+        <a href="../forms/contact_form.html" class="btn btn-secondary">Contact Admin</a>
+      </div>
+
+      <!-- Warning box -->
+      <div style="margin-top:3rem; max-width:420px; margin-inline:auto; background:#FFF0F0; border:2px solid var(--red); padding:1.25rem; text-align:left;">
+        <p style="font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem; color:var(--red); margin-bottom:.5rem; letter-spacing:.05em; text-transform:uppercase;">Access Denied</p>
+        <p style="font-size:.95rem; color:var(--maroon);">
+          This incident may be logged. Repeated unauthorized access attempts
+          may result in your IP being blocked.
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 MyBlog &nbsp;·&nbsp; <a href="../index.html">Home</a></p>
+  </footer>
+
+</body>
+</html>

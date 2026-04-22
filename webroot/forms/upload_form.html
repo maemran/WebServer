@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload File – MyBlog</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="../index.html" class="logo-wrap">
+      <div class="logo-icon">MB</div>
+      <span class="logo-text">MyBlog</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../blog/post1.html">Blog</a>
+      <a href="../forms/contact_form.html">Contact</a>
+      <a href="../forms/upload_form.html" class="active">Upload</a>
+    </nav>
+  </header>
+
+  <main class="narrow">
+
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span>›</span>
+      Upload
+    </div>
+
+    <div class="page-title-block">
+      <h1>Upload a File</h1>
+      <p>Share images, documents, or archives with the team.</p>
+    </div>
+
+    <!-- Accepted formats -->
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:2rem;">
+      <span class="tag tag-webdev">JPG</span>
+      <span class="tag tag-css">PNG</span>
+      <span class="tag" style="background:var(--red); color:#fff;">PDF</span>
+      <span class="tag" style="background:var(--purple); color:#fff;">ZIP</span>
+      <span class="tag" style="background:var(--teal); color:#fff;">Max 10 MB</span>
+    </div>
+
+    <form action="/cgi-bin/upload.py" method="POST" enctype="multipart/form-data" class="form-wrapper">
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem;">
+        <div class="field">
+          <label for="uploader">Your Name</label>
+          <input type="text" id="uploader" name="uploader" placeholder="Jane Doe" required>
+        </div>
+        <div class="field">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="jane@example.com">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="description">File Description</label>
+        <input type="text" id="description" name="description" placeholder="Brief description of the file…">
+      </div>
+
+      <!-- Drop zone -->
+      <div class="drop-zone" id="dropZone">
+        <svg width="48" height="48" fill="none" stroke="var(--blue)" stroke-width="1.5" viewBox="0 0 24 24">
+          <path d="M12 16V4m0 0L8 8m4-4 4 4"/>
+          <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"/>
+        </svg>
+        <p>Drag &amp; drop your file here</p>
+        <p style="font-size:.85rem; color:var(--muted); margin-top:.25rem;">
+          or <label for="fileInput" class="link">click to browse</label>
+        </p>
+        <input type="file" id="fileInput" name="file" accept=".jpg,.jpeg,.png,.pdf,.zip" required>
+        <div id="fileInfo" style="display:none; margin-top:1rem; padding:.75rem 1rem; background:var(--navy); color:#fff; font-family:'Syne',sans-serif; font-size:.85rem;"></div>
+      </div>
+
+      <!-- Progress bar (visual only) -->
+      <div id="progressWrap" style="display:none; margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; font-family:'Syne',sans-serif; font-size:.8rem; color:var(--muted); margin-bottom:4px;">
+          <span>Uploading…</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div style="background:var(--border); height:8px; border:1px solid var(--border);">
+          <div id="progressBar" style="background:var(--green); height:100%; width:0; transition:width .3s;"></div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn" id="uploadBtn">Upload File →</button>
+
+    </form>
+
+  </main>
+
+  <footer>
+    <p>© 2025 MyBlog &nbsp;·&nbsp; <a href="../index.html">Home</a> &nbsp;·&nbsp; <a href="../forms/contact_form.html">Contact</a></p>
+  </footer>
+
+  <script>
+    const input    = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const dropZone = document.getElementById('dropZone');
+
+    function showFileInfo(file) {
+      fileInfo.style.display = 'block';
+      const kb = (file.size / 1024).toFixed(1);
+      fileInfo.innerHTML = '📎 <strong>' + file.name + '</strong> &nbsp;·&nbsp; ' + kb + ' KB';
+    }
+
+    input.addEventListener('change', () => {
+      if (input.files[0]) showFileInfo(input.files[0]);
+    });
+
+    dropZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropZone.style.background = '#E0EAFF';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.style.background = '';
+    });
+
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.style.background = '';
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        input.files = e.dataTransfer.files;
+        showFileInfo(file);
+      }
+    });
+  </script>
+
+</body>
+</html>

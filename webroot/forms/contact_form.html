@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us – MyBlog</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="../index.html" class="logo-wrap">
+      <div class="logo-icon">MB</div>
+      <span class="logo-text">MyBlog</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../blog/post1.html">Blog</a>
+      <a href="../forms/contact_form.html" class="active">Contact</a>
+      <a href="../forms/upload_form.html">Upload</a>
+    </nav>
+  </header>
+
+  <main class="narrow">
+
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span>›</span>
+      Contact
+    </div>
+
+    <div class="page-title-block">
+      <h1>Get in Touch</h1>
+      <p>We read every message and reply within 24 hours.</p>
+    </div>
+
+    <!-- Contact info strip -->
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:2rem;">
+      <div style="background:var(--red); color:#fff; padding:1.25rem; text-align:center;">
+        <div style="font-size:1.4rem; margin-bottom:.25rem;">✉</div>
+        <div style="font-family:'Syne',sans-serif; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; opacity:.85;">Email</div>
+        <div style="font-family:'Syne',sans-serif; font-size:.85rem; font-weight:700; margin-top:.2rem;">hello@myblog.io</div>
+      </div>
+      <div style="background:var(--blue); color:#fff; padding:1.25rem; text-align:center;">
+        <div style="font-size:1.4rem; margin-bottom:.25rem;">📍</div>
+        <div style="font-family:'Syne',sans-serif; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; opacity:.85;">Location</div>
+        <div style="font-family:'Syne',sans-serif; font-size:.85rem; font-weight:700; margin-top:.2rem;">The Internet</div>
+      </div>
+      <div style="background:var(--green); color:#fff; padding:1.25rem; text-align:center;">
+        <div style="font-size:1.4rem; margin-bottom:.25rem;">⏱</div>
+        <div style="font-family:'Syne',sans-serif; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; opacity:.85;">Response</div>
+        <div style="font-family:'Syne',sans-serif; font-size:.85rem; font-weight:700; margin-top:.2rem;">Within 24hrs</div>
+      </div>
+    </div>
+
+    <form action="/cgi-bin/contact.py" method="POST" class="form-wrapper" id="contactForm">
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem;">
+        <div class="field">
+          <label for="fname">First Name</label>
+          <input type="text" id="fname" name="fname" placeholder="Jane" required>
+        </div>
+        <div class="field">
+          <label for="lname">Last Name</label>
+          <input type="text" id="lname" name="lname" placeholder="Doe" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="jane@example.com" required>
+      </div>
+
+      <div class="field">
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" name="subject" placeholder="What's on your mind?">
+      </div>
+
+      <div class="field">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="6" placeholder="Write your message here…" required></textarea>
+      </div>
+
+      <!-- Topic checkboxes -->
+      <div class="field">
+        <label>Topic (optional)</label>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:6px;">
+          <label style="display:flex; align-items:center; gap:6px; font-family:'Syne',sans-serif; font-size:.85rem; text-transform:none; letter-spacing:0; color:var(--ink); cursor:pointer;">
+            <input type="checkbox" name="topic" value="webdev" style="width:auto; accent-color:var(--blue);"> Web Dev
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-family:'Syne',sans-serif; font-size:.85rem; text-transform:none; letter-spacing:0; color:var(--ink); cursor:pointer;">
+            <input type="checkbox" name="topic" value="css" style="width:auto; accent-color:var(--orange);"> CSS
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-family:'Syne',sans-serif; font-size:.85rem; text-transform:none; letter-spacing:0; color:var(--ink); cursor:pointer;">
+            <input type="checkbox" name="topic" value="collab" style="width:auto; accent-color:var(--green);"> Collaboration
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-family:'Syne',sans-serif; font-size:.85rem; text-transform:none; letter-spacing:0; color:var(--ink); cursor:pointer;">
+            <input type="checkbox" name="topic" value="other" style="width:auto; accent-color:var(--purple);"> Other
+          </label>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:.5rem;">
+        <button type="submit" class="btn">Send Message →</button>
+        <span id="charCount" style="font-family:'Syne',sans-serif; font-size:.8rem; color:var(--muted);">0 / 500</span>
+      </div>
+
+    </form>
+
+  </main>
+
+  <footer>
+    <p>© 2025 MyBlog &nbsp;·&nbsp; <a href="../index.html">Home</a> &nbsp;·&nbsp; <a href="../blog/post1.html">Blog</a></p>
+  </footer>
+
+  <script>
+    const msg = document.getElementById('message');
+    const counter = document.getElementById('charCount');
+    msg.addEventListener('input', () => {
+      const n = msg.value.length;
+      counter.textContent = n + ' / 500';
+      counter.style.color = n > 450 ? 'var(--red)' : 'var(--muted)';
+    });
+  </script>
+
+</body>
+</html>

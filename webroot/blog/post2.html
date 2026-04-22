@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Tips & Tricks – MyBlog</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="../index.html" class="logo-wrap">
+      <div class="logo-icon">MB</div>
+      <span class="logo-text">MyBlog</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../blog/post1.html" class="active">Blog</a>
+      <a href="../forms/contact_form.html">Contact</a>
+      <a href="../forms/upload_form.html">Upload</a>
+    </nav>
+  </header>
+
+  <main class="narrow">
+
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span>›</span>
+      <a href="../blog/post1.html">Blog</a>
+      <span>›</span>
+      CSS Tips
+    </div>
+
+    <div class="article-header">
+      <span class="tag tag-css">CSS</span>
+      <h1 class="article-title">CSS Tips Every Developer Should Know</h1>
+      <p class="meta">April 22, 2025 &nbsp;·&nbsp; 5 min read &nbsp;·&nbsp; By <strong>The Editor</strong></p>
+    </div>
+
+    <img src="../images/background.jpg" alt="Article hero" class="article-hero">
+
+    <article>
+      <p>
+        CSS can feel unpredictable — until the right mental model clicks. A few core concepts
+        unlock 90% of real-world layout challenges and make the rest much more approachable.
+      </p>
+
+      <h2>Embrace Flexbox</h2>
+      <p>
+        Flexbox is your best tool for one-dimensional layouts: rows or columns.
+        Use it for navigation bars, card rows, centering content, and any component
+        where items flow in a single direction.
+      </p>
+
+      <!-- Live demo block -->
+      <div style="background:var(--navy); padding:1.5rem; margin:1.5rem 0;">
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <div style="background:var(--red);    color:#fff; padding:12px 20px; font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem;">Item A</div>
+          <div style="background:var(--orange); color:#fff; padding:12px 20px; font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem;">Item B</div>
+          <div style="background:var(--yellow); color:var(--navy); padding:12px 20px; font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem;">Item C</div>
+          <div style="background:var(--lime);   color:var(--navy); padding:12px 20px; font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem;">Item D</div>
+        </div>
+        <p style="font-family:'Syne',sans-serif; font-size:.75rem; color:#AABBDD; margin-top:.75rem; letter-spacing:.05em;">↑ Flexbox row with gap</p>
+      </div>
+
+      <h2>Master CSS Grid</h2>
+      <p>
+        Grid handles two-dimensional layouts. Page scaffolding, dashboards, image galleries —
+        anything where you need both rows and columns. <code>grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))</code>
+        is one of the most powerful single lines in CSS.
+      </p>
+
+      <h2>Custom Properties Are a Game-Changer</h2>
+      <p>
+        CSS variables let you define design tokens once and reuse them everywhere.
+        Change your brand color in one place; the whole site updates instantly.
+        Combine them with <code>:root</code> for a simple but powerful design system.
+      </p>
+
+      <blockquote>
+        Define your palette in <code>:root</code>, reference it everywhere. Refactoring becomes trivial.
+      </blockquote>
+
+      <h2>Write Mobile-First</h2>
+      <p>
+        Base styles target small screens. Layer complexity upward with <code>min-width</code>
+        media queries. It keeps your stylesheet lean, predictable, and easier to debug.
+      </p>
+
+      <h2>Color Tips</h2>
+      <!-- Color demo strip -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px,1fr)); gap:4px; margin:1.5rem 0;">
+        <div style="background:var(--red);    color:#fff; padding:1rem; text-align:center; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700;">red</div>
+        <div style="background:var(--orange); color:#fff; padding:1rem; text-align:center; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700;">orange</div>
+        <div style="background:var(--yellow); color:var(--navy); padding:1rem; text-align:center; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700;">yellow</div>
+        <div style="background:var(--green);  color:#fff; padding:1rem; text-align:center; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700;">green</div>
+        <div style="background:var(--teal);   color:#fff; padding:1rem; text-align:center; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700;">teal</div>
+        <div style="background:var(--blue);   color:#fff; padding:1rem; text-align:center; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700;">blue</div>
+        <div style="background:var(--navy);   color:#fff; padding:1rem; text-align:center; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700;">navy</div>
+        <div style="background:var(--purple); color:#fff; padding:1rem; text-align:center; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700;">purple</div>
+        <div style="background:var(--maroon); color:#fff; padding:1rem; text-align:center; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700;">maroon</div>
+      </div>
+      <p>
+        HTML named colors are a surprisingly complete palette. Master a handful of named colors
+        and you'll never need a color picker for quick projects.
+      </p>
+    </article>
+
+    <div class="post-nav">
+      <a href="post1.html">← Web Dev Intro</a>
+      <span></span>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>© 2025 MyBlog &nbsp;·&nbsp; <a href="../forms/contact_form.html">Contact</a></p>
+  </footer>
+
+</body>
+</html>

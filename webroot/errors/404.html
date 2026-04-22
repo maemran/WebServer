@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 – Page Not Found</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="../index.html" class="logo-wrap">
+      <div class="logo-icon">MB</div>
+      <span class="logo-text">MyBlog</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../blog/post1.html">Blog</a>
+      <a href="../forms/contact_form.html">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="error-page error-404">
+
+      <!-- Decorative color bar -->
+      <div style="display:flex; height:10px; max-width:400px; margin:0 auto 2.5rem;">
+        <div style="flex:1; background:var(--blue);"></div>
+        <div style="flex:1; background:var(--navy);"></div>
+        <div style="flex:1; background:var(--blue);"></div>
+        <div style="flex:1; background:var(--navy);"></div>
+      </div>
+
+      <div class="error-code">404</div>
+
+      <div class="error-stripe"></div>
+
+      <h1>Page Not Found</h1>
+      <p>
+        The page you're looking for doesn't exist, has moved, or was never here to begin with.
+        Check the URL or head back home.
+      </p>
+
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        <a href="../index.html" class="btn">← Back to Home</a>
+        <a href="../blog/post1.html" class="btn btn-secondary">Read the Blog</a>
+      </div>
+
+      <!-- Suggested links -->
+      <div style="margin-top:3rem; padding:1.5rem; border:2px solid var(--border); max-width:400px; margin-inline:auto; text-align:left;">
+        <p style="font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; color:var(--navy); margin-bottom:1rem;">Maybe you were looking for:</p>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:.6rem;">
+          <li><a href="../blog/post1.html" style="color:var(--blue); font-family:'Syne',sans-serif; font-size:.9rem; font-weight:600; text-decoration:none;">→ Getting Started with Web Dev</a></li>
+          <li><a href="../blog/post2.html" style="color:var(--blue); font-family:'Syne',sans-serif; font-size:.9rem; font-weight:600; text-decoration:none;">→ CSS Tips Every Developer Should Know</a></li>
+          <li><a href="../forms/contact_form.html" style="color:var(--blue); font-family:'Syne',sans-serif; font-size:.9rem; font-weight:600; text-decoration:none;">→ Contact Us</a></li>
+        </ul>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 MyBlog &nbsp;·&nbsp; <a href="../index.html">Home</a></p>
+  </footer>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I. -IConfig/include -IHTTP/include
-NAME = webserve
+NAME = webserv
 OBJ_DIR = obj
 
 SRCS = \
@@ -18,7 +18,7 @@ SRCS = \
        cgi/CgiHandler.cpp \
        cookies/Cookie.cpp \
        cookies/Session.cpp \
-       connection.cpp 
+       connection.cpp \
        serversocket.cpp
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))

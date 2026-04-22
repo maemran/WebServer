@@ -5,8 +5,8 @@
 #include "ServerConfig.hpp"
 #include "HttpConfig.hpp"
 #include "connection.hpp"
-#include "HTTP/HttpRequest.hpp"
-#include "HTTP/HttpResponse.hpp"
+#include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
 class ServerSocket
 {
     private:

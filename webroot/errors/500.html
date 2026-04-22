@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>500 – Server Error</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="../index.html" class="logo-wrap">
+      <div class="logo-icon">MB</div>
+      <span class="logo-text">MyBlog</span>
+    </a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../blog/post1.html">Blog</a>
+      <a href="../forms/contact_form.html">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="error-page error-500">
+
+      <!-- Decorative color bar -->
+      <div style="display:flex; height:10px; max-width:400px; margin:0 auto 2.5rem;">
+        <div style="flex:1; background:var(--orange);"></div>
+        <div style="flex:1; background:var(--yellow);"></div>
+        <div style="flex:1; background:var(--orange);"></div>
+        <div style="flex:1; background:var(--yellow);"></div>
+      </div>
+
+      <div class="error-code">500</div>
+
+      <div style="height:6px; width:80px; margin:1rem auto 1.5rem; background:var(--orange);"></div>
+
+      <h1>Internal Server Error</h1>
+      <p>
+        Something went wrong on our end. We've been automatically notified
+        and our team is working on a fix. Please try again in a few minutes.
+      </p>
+
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        <a href="javascript:location.reload()" class="btn">Try Again</a>
+        <a href="../index.html" class="btn btn-secondary">← Back to Home</a>
+      </div>
+
+      <!-- Status box -->
+      <div style="margin-top:3rem; max-width:420px; margin-inline:auto; background:#FFF8E6; border:2px solid var(--orange); padding:1.25rem; text-align:left;">
+        <p style="font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem; color:var(--orange); margin-bottom:.75rem; letter-spacing:.05em; text-transform:uppercase;">What Happened?</p>
+        <ul style="font-size:.95rem; color:#5C3A00; list-style:none; display:flex; flex-direction:column; gap:.5rem;">
+          <li>⚙ The server encountered an unexpected condition</li>
+          <li>⏱ This is usually temporary</li>
+          <li>🔄 Refreshing the page may resolve the issue</li>
+          <li>📬 If the problem persists, <a href="../forms/contact_form.html" style="color:var(--orange); font-weight:700;">contact us</a></li>
+        </ul>
+      </div>
+
+      <!-- Auto-refresh countdown -->
+      <p style="margin-top:2rem; font-family:'Syne',sans-serif; font-size:.85rem; color:var(--muted);">
+        Auto-refreshing in <span id="countdown" style="color:var(--orange); font-weight:700;">30</span>s
+      </p>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 MyBlog &nbsp;·&nbsp; <a href="../index.html">Home</a></p>
+  </footer>
+
+  <script>
+    let n = 30;
+    const el = document.getElementById('countdown');
+    const timer = setInterval(() => {
+      n--;
+      el.textContent = n;
+      if (n <= 0) { clearInterval(timer); location.reload(); }
+    }, 1000);
+  </script>
+
+</body>
+</html>
