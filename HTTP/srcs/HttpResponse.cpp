@@ -3,14 +3,85 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/22 17:12:06 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/22 17:47:40 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
+#include "../../cgi/CgiHandler.hpp"
+#include "../../cookies/Cookie.hpp"
+#include "../../cookies/Session.hpp"
+
+static std::string toLowerAscii(const std::string& value)
+{
+    std::string lower = value;
+
+    for (size_t i = 0; i < lower.length(); i++)
+    {
+        if (lower[i] >= 'A' && lower[i] <= 'Z')
+            lower[i] += 'a' - 'A';
+    }
+    return lower;
+}
+
+static bool hasResponseHeader(const std::vector<std::string>& headers, const std::string& key)
+{
+    const std::string wanted = toLowerAscii(key);
+
+    for (size_t i = 0; i < headers.size(); i++)
+    {
+        size_t colonPos = headers[i].find(':');
+        std::string headerKey = headers[i];
+
+        if (colonPos != std::string::npos)
+            headerKey = headers[i].substr(0, colonPos);
+        if (toLowerAscii(headerKey) == wanted)
+            return true;
+    }
+    return false;
+}
+
+static std::string getFileExtension(const std::string& path)
+{
+    size_t slashPos = path.find_last_of('/');
+    size_t dotPos = path.find_last_of('.');
+
+    if (dotPos == std::string::npos)
+        return "";
+    if (slashPos != std::string::npos && dotPos < slashPos)
+        return "";
+    return path.substr(dotPos);
+}
+
+static bool isRegularFilePath(const std::string& path)
+{
+    struct stat info;
+
+    if (stat(path.c_str(), &info) != 0)
+        return false;
+    return S_ISREG(info.st_mode);
+}
+
+static std::string getIndexScriptPath(const std::string& basePath,
+    const std::vector<std::string>& indexFiles)
+{
+    std::string candidateBase = basePath;
+
+    if (candidateBase.empty())
+        return "";
+    if (candidateBase[candidateBase.length() - 1] != '/')
+        candidateBase += '/';
+    for (size_t i = 0; i < indexFiles.size(); i++)
+    {
+        std::string candidate = candidateBase + indexFiles[i];
+        if (isRegularFilePath(candidate))
+            return candidate;
+    }
+    return "";
+}
 
 HttpResponse::HttpResponse() {}
 
@@ -61,6 +132,10 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
     reasonPhrase["404"] = "Not Found";
     reasonPhrase["403"] = "Forbidden";
     reasonPhrase["405"] = "Method Not Allowed";
+    reasonPhrase["500"] = "Internal Server Error";
+    reasonPhrase["502"] = "Bad Gateway";
+    reasonPhrase["504"] = "Gateway Timeout";
+    reasonPhrase["505"] = "HTTP Version Not Supported";
     reasonPhrase["411"] = "Length Required";
     reasonPhrase["413"] = "Content Too Large";
     reasonPhrase["501"] = "Not Implemented";
@@ -202,6 +277,16 @@ const std::string& HttpResponse::getStatusCode() const
     return statusCode;
 }
 
+const std::string& HttpResponse::getReasonPhrase() const
+{
+    std::map<std::string, std::string>::const_iterator it = reasonPhrase.find(statusCode);
+    static const std::string empty = "";
+
+    if (it == reasonPhrase.end())
+        return empty;
+    return it->second;
+}
+
 const std::vector<std::string>& HttpResponse::getHeaders() const
 {
     return headers;
@@ -237,9 +322,19 @@ void  HttpResponse::setStatusCode(const std::string& statusCode)
     this->statusCode = statusCode;
 }
 
+void  HttpResponse::setReasonPhrase(const std::string& reasonPhrase)
+{
+    this->reasonPhrase[this->statusCode] = reasonPhrase;
+}
+
 void  HttpResponse::addHeader(const std::string& key, const std::string& value)
 {
     this->headers.push_back(key + ": " + value);
+}
+
+void  HttpResponse::addCookie(const Cookie& cookie)
+{
+    addHeader("Set-Cookie", cookie.toSetCookieHeader());
 }
 
 void    HttpResponse::generateDefaultPage(const std::string& statusCode, const std::string&  ReasonPhrase)
@@ -309,13 +404,49 @@ std::string HttpResponse::getCurrentDate()
     return std::string(buffer);
 }
 
+void    HttpResponse::sessionHandler()
+{
+    SessionManager& sessionManager = SessionManager::getInstance();
+    Session* session;
+    std::string sessionId = request.getCookie("session_id");
+    int visits;
+    bool createdNewSession = false;
+
+    sessionManager.clearExpiredSessions();
+    if (!sessionId.empty() && sessionManager.hasSession(sessionId))
+        session = &sessionManager.getSession(sessionId);
+    else
+    {
+        Session newSession = sessionManager.createSession();
+        Cookie sessionCookie("session_id", newSession.getSessionId());
+
+        sessionCookie.setPath("/");
+        sessionCookie.setHttpOnly(true);
+        sessionCookie.setSameSite(true);
+        addCookie(sessionCookie);
+        createdNewSession = true;
+        sessionId = newSession.getSessionId();
+        session = &sessionManager.getSession(sessionId);
+    }
+    visits = ft_stoi(session->get("visits", "0")) + 1;
+    session->set("visits", ft_itos(visits));
+    session->set("last_method", request.getMethod());
+    session->set("last_path", request.getUri().getPath());
+    addHeader("X-Session-Id", session->getSessionId());
+    addHeader("X-Session-Visits", session->get("visits"));
+    addHeader("X-Session-State", createdNewSession ? "new" : "existing");
+}
+
 void    HttpResponse::createResponse()
 {
-    if (request.getMethod() != "HEAD")
+    if (request.getMethod() != "HEAD" && !hasResponseHeader(headers, "Content-Length"))
         addHeader("Content-Length", ft_itos(body.size()));
-    addHeader("Server", "WebServer/1.0");
-    addHeader("Date", getCurrentDate());
-    addHeader("Connection", "close");
+    if (!hasResponseHeader(headers, "Server"))
+        addHeader("Server", "WebServer/1.0");
+    if (!hasResponseHeader(headers, "Date"))
+        addHeader("Date", getCurrentDate());
+    if (!hasResponseHeader(headers, "Connection"))
+        addHeader("Connection", "close");
     if (request.getVersionNum() != 0.9)
     {
         response = "HTTP/1.0 " + statusCode + " " + reasonPhrase[statusCode] + "\r\n";
@@ -723,25 +854,61 @@ void    HttpResponse::methodsHandler()
         DELMethod();
 }
 
-void	HttpResponse::CGIHandler()
+bool	HttpResponse::CGIHandler()
 {
-	redirectionCheck();
-	/*
-	.
-	.
-	*/
+    const std::map<std::string, std::string>& cgiMap = loc.getCgiMap();
+    std::string scriptPath;
+
+    if (cgiMap.empty())
+        return false;
+    redirectionCheck();
+    if (request.getMethod() == "POST")
+    {
+        POSTMethodChecks();
+    }
+    if (file != "")
+        scriptPath = file;
+    else if (directory != "")
+        scriptPath = getIndexScriptPath(directory, loc.getIndexFiles());
+    else
+    {
+        router r(loc);
+        scriptPath = getIndexScriptPath(r.getRoutedPath(), loc.getIndexFiles());
+    }
+    if (scriptPath.empty())
+        return false;
+
+    std::string extension = getFileExtension(scriptPath);
+    std::map<std::string, std::string>::const_iterator cgiIt = cgiMap.find(extension);
+    if (cgiIt == cgiMap.end())
+        return false;
+
+    pathExists(scriptPath);
+    CgiHandler cgi(scriptPath, cgiIt->second);
+    HttpResponse cgiResponse = cgi.execute(request);
+
+    statusCode = cgiResponse.getStatusCode();
+    if (!cgiResponse.getReasonPhrase().empty())
+        setReasonPhrase(cgiResponse.getReasonPhrase());
+    body = cgiResponse.getBody();
+    headers = cgiResponse.getHeaders();
+    return true;
 }
 
 void    HttpResponse::responseHandler()
 {
+    bool cgiHandled = false;
+
     try
     {
         if (request.getStatusCode() != "200")
             throw errorResponseException(request.getStatusCode());
         findPath();
 		if (!(loc.getCgiMap().empty()))
-			CGIHandler();
-        methodsHandler();
+			cgiHandled = CGIHandler();
+        if (!cgiHandled)
+            methodsHandler();
+        sessionHandler();
     }
     catch (errorResponseException& e)
     {

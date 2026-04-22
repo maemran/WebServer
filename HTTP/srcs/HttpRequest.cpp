@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
+#include "../../cookies/Cookie.hpp"
 #include <iostream>
 
 HttpRequest::HttpRequest()
@@ -27,6 +28,7 @@ HttpRequest::HttpRequest(const HttpRequest& other)
     this->uri = other.uri;
     this->httpVersion = other.httpVersion;
     this->headers = other.headers;
+    this->cookies = other.cookies;
     this->entityBody = other.entityBody;
     this->statusCode = other.statusCode;
     this->versionNum = other.versionNum;
@@ -41,6 +43,7 @@ HttpRequest&    HttpRequest::operator=(const HttpRequest& other)
         this->uri = other.uri;
         this->httpVersion = other.httpVersion;
         this->headers = other.headers;
+        this->cookies = other.cookies;
         this->entityBody = other.entityBody;
         this->statusCode = other.statusCode;
         this->versionNum = other.versionNum;
@@ -65,6 +68,11 @@ URI& HttpRequest::getUri()
     return this->uri;
 }
 
+const URI& HttpRequest::getUri() const
+{
+    return this->uri;
+}
+
 const std::string& HttpRequest::getHttpVersion() const
 {
     return this->httpVersion;
@@ -75,9 +83,23 @@ const std::map<std::string, std::string>& HttpRequest::getHeaders() const
     return this->headers;
 }
 
+const std::map<std::string, std::string>& HttpRequest::getCookies() const
+{
+    return this->cookies;
+}
+
 const std::string& HttpRequest::getEntityBody() const
 {
     return this->entityBody;
+}
+
+std::string HttpRequest::getCookie(const std::string& name) const
+{
+    std::map<std::string, std::string>::const_iterator it = cookies.find(name);
+
+    if (it == cookies.end())
+        return "";
+    return it->second;
 }
 
 std::string HttpRequest::getStatusCode() const
@@ -332,6 +354,17 @@ void    HttpRequest::requestParser(const std::string& request)
     this->requestLine = requestElements[0];
     requestLineParser();
     storingHeaders(requestElements);
+    parseCookies();
+}
+
+void    HttpRequest::parseCookies()
+{
+    std::map<std::string, std::string>::const_iterator it = headers.find("cookie");
+
+    cookies.clear();
+    if (it == headers.end())
+        return;
+    cookies = Cookie::parseCookieHeader(it->second);
 }
 
 void    HttpRequest::methodValidation()
@@ -405,6 +438,11 @@ void    HttpRequest::printClassAtributes()
     it != headers.end(); ++it)
     {
         std::cout << it->first << " : " << it->second << std::endl;
+    }
+    for (std::map<std::string, std::string>::const_iterator it = cookies.begin();
+    it != cookies.end(); ++it)
+    {
+        std::cout << "cookie[" << it->first << "] : " << it->second << std::endl;
     }
     std::cout << "Entity Bode: " << entityBody << std::endl;
 }

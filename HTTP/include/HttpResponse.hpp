@@ -25,6 +25,8 @@
 #include <dirent.h> 
 #include <sys/stat.h>
 
+class Cookie;
+
 class   HttpResponse
 {
     private:
@@ -56,6 +58,7 @@ class   HttpResponse
         void    redirectionCheck();
         void    printClassAtributes();
         void    errorPageResponse();
+        void    sessionHandler();
         void    methodsHandler();
         void    DELMethod();
         void    POSTMethod();
@@ -67,7 +70,7 @@ class   HttpResponse
         void    entityBodySizeCheck();
         void    POSTMethodChecks();
         void    DELMethodChecks();
-		void	CGIHandler();
+		bool	CGIHandler();
         std::string contentTypeToExtension();
         void    contentTypeSelector(const std::string& file);
         void    generateDirectoryListing(const std::string& path);
@@ -97,7 +100,9 @@ class   HttpResponse
         void    setServerIndex(int index);
         void    setBody(const std::string& body);
         void    setStatusCode(const std::string& statusCode);
+        void    setReasonPhrase(const std::string& reasonPhrase);
         void    addHeader(const std::string& key, const std::string& value);
+        void    addCookie(const Cookie& cookie);
         
         
         void responseHandler();

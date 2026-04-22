@@ -1,5 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   CgiHandler.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/04/22 17:26:21 by saabo-sh          #+#    #+#             */
+/*   Updated: 2026/04/22 17:44:07 by saabo-sh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include "../../include/cgi/CgiHandler.hpp"
+
+#include "CgiHandler.hpp"
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/select.h>
@@ -96,6 +108,43 @@ static std::map<std::string, std::string>::iterator findHeader(
 			return it;
 	}
 	return headers.end();
+}
+
+static std::string defaultReasonPhrase(const std::string& status)
+{
+	if (status == "200")
+		return "OK";
+	if (status == "201")
+		return "Created";
+	if (status == "204")
+		return "No Content";
+	if (status == "301")
+		return "Moved Permanently";
+	if (status == "302")
+		return "Found";
+	if (status == "400")
+		return "Bad Request";
+	if (status == "403")
+		return "Forbidden";
+	if (status == "404")
+		return "Not Found";
+	if (status == "405")
+		return "Method Not Allowed";
+	if (status == "411")
+		return "Length Required";
+	if (status == "413")
+		return "Content Too Large";
+	if (status == "500")
+		return "Internal Server Error";
+	if (status == "501")
+		return "Not Implemented";
+	if (status == "502")
+		return "Bad Gateway";
+	if (status == "504")
+		return "Gateway Timeout";
+	if (status == "505")
+		return "HTTP Version Not Supported";
+	return "";
 }
 
 static void setNonBlocking(int fd)
@@ -431,7 +480,7 @@ HttpResponse CgiHandler::parseCgiOutput(const std::string& output, int exit_stat
 		reason = "Found";
 	}
 	if (reason == "OK" && status_str != "200")
-		reason = getReasonPhrase(status_str);
+		reason = defaultReasonPhrase(status_str);
 	if (content_type_it == headers.end() && location_it == headers.end() && status_str != "204")
 		return makeErrorResponse("502", "Bad Gateway", "CGI: missing Content-Type header");
 
@@ -507,7 +556,7 @@ void CgiHandler::finalizeResponse(HttpResponse& resp) const
 	if (!hasHeader(resp.getHeaders(), "Connection"))
 		resp.addHeader("Connection", "close");
 
-	std::string raw = "HTTP/1.1 " + resp.getStatusCode() + " "
+	std::string raw = "HTTP/1.0 " + resp.getStatusCode() + " "
 		+ resp.getReasonPhrase() + "\r\n";
 	const std::vector<std::string>& headers = resp.getHeaders();
 	for (std::vector<std::string>::const_iterator it = headers.begin();

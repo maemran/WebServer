@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/22 16:56:42 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/22 18:53:18 by saabo-sh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,10 +61,10 @@ int main(int argc, char **argv)
     HttpConfig config = prepareHttpConfig(filename);
 
     std::string request =
-        "GET /bin-cgi/file.sh HTTP/1.0\r\n" // ///var/
+        "GET /images/test.py?name=mohammad HTTP/1.0\r\n" // ///var/
         // "Host: localhost:7070\r\n"
         "User-Agent: Mozilla/5.0\r\n"
-        "Content-Type: text/htddml\r\n"
+        "Content-Type: text/html\r\n"
         "Content-Length: 8\r\n"
         // "Connection: close\r\n"
         "\r\n"

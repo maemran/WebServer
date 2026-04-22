@@ -15,6 +15,9 @@ SRCS = \
        HTTP/srcs/HttpResponse.cpp \
        HTTP/srcs/router.cpp \
        HTTP/srcs/URI.cpp \
+       cgi/CgiHandler.cpp \
+       cookies/Cookie.cpp \
+       cookies/Session.cpp \
 #       connection.cpp 
 #       serversocket.cpp
 
