@@ -18,8 +18,8 @@ SRCS = \
        cgi/CgiHandler.cpp \
        cookies/Cookie.cpp \
        cookies/Session.cpp \
-#       connection.cpp 
-#       serversocket.cpp
+       connection.cpp 
+       serversocket.cpp
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
 

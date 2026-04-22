@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by [maemran](https://github.com/maemran), [asaadeh](https://github.com/AhmadSaadeh03), [saabo-sh](https://github.com/sarahayman22).*
+*This project has been created as part of the 42 curriculum by [maemra](https://github.com/maemran), [asaadeh](https://github.com/AhmadSaadeh03), [saabo-sh](https://github.com/sarahayman22).*
 
 ---
 

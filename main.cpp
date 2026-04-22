@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/22 18:53:18 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/22 20:50:28 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
         // "Connection: close\r\n"
         "\r\n"
         "mohammad";
-
+	std::cout << "hello" <<std::endl;
     HttpRequest obj;
     obj.requestHandler(request);
     HttpResponse resp(obj, config, 0);
