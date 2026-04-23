@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   router.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/15 02:48:40 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/09 20:19:44 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/23 16:57:43 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ROUTER_HPP
 #define ROUTER_HPP
 
-#include "../../Config/include/ServerConfig.hpp"
+#include "ServerConfig.hpp"
 
 class   router
 {

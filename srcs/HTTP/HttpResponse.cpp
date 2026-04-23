@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/22 17:47:40 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/23 17:01:52 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
-#include "../../cgi/CgiHandler.hpp"
-#include "../../cookies/Cookie.hpp"
-#include "../../cookies/Session.hpp"
+#include "CgiHandler.hpp"
+#include "Cookie.hpp"
+#include "Session.hpp"
 
 static std::string toLowerAscii(const std::string& value)
 {

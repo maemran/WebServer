@@ -1,25 +1,26 @@
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I. -IConfig/include -IHTTP/include
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I. -Iincludes/Config \
+        -Iincludes/CGI -Iincludes/cookies -Iincludes/HTTP -Iincludes/Socket
 NAME = webserv
 OBJ_DIR = obj
 
 SRCS = \
-       main.cpp \
-       Config/srcs/ConfigLexer.cpp \
-       Config/srcs/ConfigParser.cpp \
-       Config/srcs/ConfigValidator.cpp \
-       Config/srcs/HttpConfig.cpp \
-       Config/srcs/LocationConfig.cpp \
-       Config/srcs/ServerConfig.cpp \
-       HTTP/srcs/HttpRequest.cpp \
-       HTTP/srcs/HttpResponse.cpp \
-       HTTP/srcs/router.cpp \
-       HTTP/srcs/URI.cpp \
-       cgi/CgiHandler.cpp \
-       cookies/Cookie.cpp \
-       cookies/Session.cpp \
-       connection.cpp \
-       serversocket.cpp
+       srcs/main.cpp \
+       srcs/Config/ConfigLexer.cpp \
+       srcs/Config/ConfigParser.cpp \
+       srcs/Config/ConfigValidator.cpp \
+       srcs/Config/HttpConfig.cpp \
+       srcs/Config/LocationConfig.cpp \
+       srcs/Config/ServerConfig.cpp \
+       srcs/HTTP/HttpRequest.cpp \
+       srcs/HTTP/HttpResponse.cpp \
+       srcs/HTTP/router.cpp \
+       srcs/HTTP/URI.cpp \
+       srcs/CGI/CgiHandler.cpp \
+       srcs/cookies/Cookie.cpp \
+       srcs/cookies/Session.cpp \
+       srcs/Socket/connection.cpp \
+       srcs/Socket/serversocket.cpp
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
 

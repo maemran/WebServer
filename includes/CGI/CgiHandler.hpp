@@ -2,8 +2,8 @@
 #ifndef CGIHANDLER_HPP
 #define CGIHANDLER_HPP
 
-#include "../HTTP/include/HttpRequest.hpp"
-#include "../HTTP/include/HttpResponse.hpp"
+#include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
 #include <string>
 #include <map>
 #include <vector>
