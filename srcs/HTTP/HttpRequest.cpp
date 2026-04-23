@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/23 17:00:40 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/23 23:16:47 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -415,7 +415,7 @@ void    HttpRequest::requestHandler(std::string& request)
         requestParser(request);
         try {
             getUri().uriHandler();
-            std::cout << "------------------------------" << std::endl;
+            // std::cout << "------------------------------" << std::endl;
         }
         catch (URI::badURIException& e) {throw badRequestException("400");}
         requestValidate();

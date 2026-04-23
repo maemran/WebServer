@@ -27,6 +27,11 @@ private:
     std::string writeBuffer;   // response
     size_t bytesSent;
     State state;
+    bool headerParsed;
+    size_t expectedRequestSize;
+
+    void updateRequestTracking();
+    void resetRequestTracking();
 
 public:
     Connection(int fd, const std::string& cIp, int cPort,

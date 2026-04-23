@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:43:39 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/04/10 11:43:06 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/24 00:49:26 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ private:
     void checkDuplicatePorts(const std::vector<ServerConfig>& servers);
     void checkRootExists(const std::string& root);
     void checkMethods(const std::vector<std::string>& methods);
-    void checkClientMaxBodySize(size_t size);
     void checkIndexFiles(const std::vector<std::string>& indexFiles);
     void checkErrorPages(const std::map<int, std::string>& errors,
                          const std::string& root);

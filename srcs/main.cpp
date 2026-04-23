@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/22 21:02:36 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/23 23:03:55 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ static HttpConfig prepareHttpConfig(const std::string& path)
 
     ConfigParser parser(tokens);
     HttpConfig config = parser.parse();
-
     ConfigValidator validator;
     validator.validate(config);
 

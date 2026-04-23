@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:56 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/04/10 11:36:25 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/24 00:49:36 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ void ConfigValidator::validateServer(const ServerConfig& server)
     checkRootExists(server.getRoot());
     checkIndexFiles(server.getIndexFiles());
 
-    checkClientMaxBodySize(server.getMaxBodySize());
     checkErrorPages(server.getErrorPages(), server.getRoot());
     const std::vector<LocationConfig>& locations =
         server.getLocations();
@@ -159,16 +158,6 @@ void ConfigValidator::checkMethods(
                                      methods[i]);
         }
     }
-}
-
-void ConfigValidator::checkClientMaxBodySize(size_t size)
-{
-    if (size == 0)
-        return;
-
-    if (size > 100000000)
-        throw std::runtime_error(
-            "client_max_body_size too large");
 }
 
 void ConfigValidator::checkIndexFiles(const std::vector<std::string>& indexFiles)

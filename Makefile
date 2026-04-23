@@ -4,6 +4,12 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I. -Iincludes/Config \
 NAME = webserv
 OBJ_DIR = obj
 
+GREEN = \033[1;32m
+YELLOW = \033[1;33m
+BLUE = \033[1;34m
+RED = \033[1;31m
+RESET = \033[0m
+
 SRCS = \
        srcs/main.cpp \
        srcs/Config/ConfigLexer.cpp \
@@ -28,16 +34,21 @@ all: $(NAME)
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@printf "$(BLUE)Compiling$(RESET) %s\n" $<
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+	@printf "$(GREEN)Linking$(RESET) %s\n" $(NAME)
+	@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+	@printf "$(GREEN)Done$(RESET) %s\n" $(NAME)
 
 clean:
-	rm -rf $(OBJ_DIR)
+	@printf "$(YELLOW)Cleaning$(RESET) objects\n"
+	@rm -rf $(OBJ_DIR)
 
 fclean: clean
-	rm -f $(NAME)
+	@printf "$(YELLOW)Removing$(RESET) %s\n" $(NAME)
+	@rm -f $(NAME)
        
 re: fclean all
 

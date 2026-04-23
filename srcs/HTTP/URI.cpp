@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   URI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:52:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/09 20:19:41 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/23 18:17:42 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,5 +160,5 @@ void    URI::uriHandler()
     uriCheck();
     uriParser();
     uriValidate();
-    printClassAtributes();
+    // printClassAtributes();
 }

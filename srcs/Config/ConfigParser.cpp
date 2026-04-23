@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 11:52:45 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/04/21 18:04:54 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/23 23:05:23 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,6 @@ HttpConfig ConfigParser::parse()
             throw std::runtime_error("Only one http block is allowed in config file");
         throw std::runtime_error("Unexpected content after http block");
     }
-
     return http;
 }
 
@@ -197,7 +196,9 @@ ServerConfig ConfigParser::parseServer()
     expect(TOKEN_LBRACE, "Expected '{' after server");
 
     while (!check(TOKEN_RBRACE) && !isAtEnd())
+    {
         parseServerDirective(server);
+    }
 
     expect(TOKEN_RBRACE, "Missing '}' after server");
     return server;
@@ -281,7 +282,6 @@ void ConfigParser::parseServerDirective(ServerConfig& server)
     {
         server.addLocation(parseLocation());
     }
-
     else
         throw std::runtime_error("Unknown server directive: " + dir);
 }
@@ -331,7 +331,7 @@ void ConfigParser::parseLocationDirective(LocationConfig& loc)
     loc.setAutoindex(val == "on");
 
         expect(TOKEN_SEMICOLON, "Missing ';'");
-}
+    }
 
     else if (dir == "client_max_body_size")
     {
@@ -368,36 +368,29 @@ void ConfigParser::parseLocationDirective(LocationConfig& loc)
         }
         else
             throw std::runtime_error("Invalid redirect status code");
-        
-        
-        
         expect(TOKEN_SEMICOLON, "Missing ';'");
-        }
+    }
 
-        else if (dir == "error_page")
-        {
-            int code = std::atoi(expectWord("Expected error code").c_str());
-            std::string path = expectWord("Expected error page path");
-
-            loc.addErrorPage(code, path);
-
-            expect(TOKEN_SEMICOLON, "Missing ';'");
-        }
-        else if (dir == "cgi")
-        {
-            std::string ext = expectWord("Expected CGI extension");
-            std::string path = expectWord("Expected CGI executable");
-
-            if (ext[0] != '.')
-                throw std::runtime_error("CGI extension must start with '.'");
-
-            loc.addCgi(ext, path);
-
-            expect(TOKEN_SEMICOLON, "Missing ';'");
-        }
+    else if (dir == "error_page")
+    {
+        int code = std::atoi(expectWord("Expected error code").c_str());
+        std::string path = expectWord("Expected error page path");
         
-        else
-            throw std::runtime_error("Unknown location directive: " + dir);
+        loc.addErrorPage(code, path);
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+    else if (dir == "cgi")
+    {
+        std::string ext = expectWord("Expected CGI extension");
+        std::string path = expectWord("Expected CGI executable");
+        if (ext[0] != '.')
+            throw std::runtime_error("CGI extension must start with '.'");
+        loc.addCgi(ext, path);
+        expect(TOKEN_SEMICOLON, "Missing ';'");
+    }
+    
+    else
+        throw std::runtime_error("Unknown location directive: " + dir);
 }
 
 size_t ConfigParser::parseSize(const std::string& value)

@@ -6,11 +6,12 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/04 15:18:49 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/04/10 11:36:57 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/23 23:05:40 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpConfig.hpp"
+#include <iostream>
 
 HttpConfig::HttpConfig() : autoindex(false), client_max_body_size(0) {}
 HttpConfig::~HttpConfig() {}

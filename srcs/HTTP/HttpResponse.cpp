@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/23 17:01:52 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/24 01:06:16 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -754,7 +754,7 @@ void    HttpResponse::POSTMethodChecks()
     entityBodySizeCheck();
     if (loc.getMaxBodySize() < request.getEntityBody().size())
         throw errorResponseException("413");
-    if (file != "" || !isDirectory(filePath))
+    if ((file != "" || !isDirectory(filePath)) && loc.getCgiMap().empty())
         throw errorResponseException("405");
 }
 

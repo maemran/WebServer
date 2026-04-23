@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serversocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 01:30:51 by asaadeh           #+#    #+#             */
-/*   Updated: 2026/04/22 21:06:04 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/23 18:31:33 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,6 @@ void ServerSocket::start()
         std::memset(&address, 0, sizeof(address));
         address.sin_family = AF_INET;
         address.sin_addr.s_addr = inet_addr(servers[i].getListenIp().c_str());
-		std::cout << servers[i].getListenIp().c_str() << std::endl;
-		std::cout << servers[i].getListenPort() << std::endl;
         address.sin_port = htons(servers[i].getListenPort());
 
         if (bind(serverFds[i], (sockaddr*)&address, sizeof(address)) < 0)
@@ -209,7 +207,7 @@ void ServerSocket::handleReading(int epollFd, Connection* conn)
 
     std::string request = conn->extractRequest();
     conn->consumeRequest();
-    std::cout << "FULL REQUEST:\n" << request << std::endl;
+    // std::cout << "FULL REQUEST:\n" << request << std::endl;
 
     std::string responseStr;
     try
