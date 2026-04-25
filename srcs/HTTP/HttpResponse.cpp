@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/24 01:06:16 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/25 18:02:24 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -920,7 +920,7 @@ void    HttpResponse::responseHandler()
         statusCode = e.what();
     }
     createResponse();
-    printClassAtributes();
+    //printClassAtributes();
 }
 
 void    HttpResponse::printClassAtributes()
