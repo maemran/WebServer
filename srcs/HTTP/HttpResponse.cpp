@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/26 00:21:14 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/25 18:02:24 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,8 +204,6 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
     extensionTypes[".txt"] = "text/plain";
     extensionTypes[".vsd"] = "application/vnd.visio";
     extensionTypes[".wav"] = "audio/wav";
-    extensionTypes[".wmv"] = "video/x-ms-wmv";
-    extensionTypes[".wma"] = "audio/x-ms-wma";
     extensionTypes[".weba"] = "audio/webm";
     extensionTypes[".webm"] = "video/webm";
     extensionTypes[".webmanifest"] = "application/manifest+json";
@@ -252,11 +250,6 @@ HttpResponse::redirectResponseException::~redirectResponseException() throw() {}
 const std::string& HttpResponse::getResponse() const
 {
     return response;
-}
-
-const std::string& HttpResponse::getResponseBodyFilePath() const
-{
-    return responseBodyFilePath;
 }
 
 const HttpRequest& HttpResponse::getRequest() const
@@ -446,10 +439,7 @@ void    HttpResponse::sessionHandler()
 
 void    HttpResponse::createResponse()
 {
-    // FIX: skip auto Content-Length when serving a file — it was already set via
-    // stat() in GETMethod() and the body is not in memory to measure anyway.
-    if (request.getMethod() != "HEAD" && !hasResponseHeader(headers, "Content-Length")
-        && responseBodyFilePath.empty())
+    if (request.getMethod() != "HEAD" && !hasResponseHeader(headers, "Content-Length"))
         addHeader("Content-Length", ft_itos(body.size()));
     if (!hasResponseHeader(headers, "Server"))
         addHeader("Server", "WebServer/1.0");
@@ -464,9 +454,7 @@ void    HttpResponse::createResponse()
             response += headers[i] + "\r\n";
         response += "\r\n";
     }
-    // FIX: don't append body to response string when serving a file —
-    // the file is streamed separately by handleSending() chunk by chunk.
-    if (request.getMethod() != "HEAD" && responseBodyFilePath.empty())
+    if (request.getMethod() != "HEAD")
         response += body;
 }
 
@@ -728,17 +716,7 @@ void     HttpResponse::GETMethod()
     else if (file != "")
     {
         contentTypeSelector(file);
-        struct stat st;
-        if (stat(file.c_str(), &st) != 0)
-            throw errorResponseException("404");
-        // FIX: previously called readFile() which loaded the entire file into a
-        // std::string, blocking the event loop for large files and corrupting binary
-        // files (readFile used std::getline which mangles \n bytes in video/image data).
-        // Now we only stat() the file for its size, set Content-Length, and store the
-        // path. handleSending() opens the file and streams it in 64KB chunks.
-        addHeader("Content-Length", ft_itos(st.st_size));
-        if (request.getMethod() != "HEAD")
-            responseBodyFilePath = file;
+        body = readFile(file);
     }
     else
         GETWithExactPath();
@@ -942,7 +920,7 @@ void    HttpResponse::responseHandler()
         statusCode = e.what();
     }
     createResponse();
-    // printClassAtributes();
+    //printClassAtributes();
 }
 
 void    HttpResponse::printClassAtributes()

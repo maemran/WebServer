@@ -34,7 +34,6 @@ class   HttpResponse
         std::string directory;
         std::string file;
         std::string body;
-        std::string responseBodyFilePath;
         std::string statusCode;
         std::vector<std::string>    headers;
         std::vector<std::string>    uploadedFiles;
@@ -88,7 +87,6 @@ class   HttpResponse
         ~HttpResponse();
         
         const std::string& getResponse() const;
-        const std::string& getResponseBodyFilePath() const;
         const HttpRequest& getRequest() const;
         const HttpConfig& getConfig() const;
         const std::string& getBody() const;

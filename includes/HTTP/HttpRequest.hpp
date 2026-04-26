@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 05:40:32 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/26 00:25:12 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/22 20:48:06 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ class   HttpRequest
         std::map<std::string, std::string> headers;
         std::map<std::string, std::string> cookies;
         std::string entityBody;
-        std::string bodyFilePath;
         std::string statusCode;
         double  versionNum;
 		
@@ -58,7 +57,6 @@ class   HttpRequest
         const std::map<std::string, std::string>& getHeaders() const;
         const std::map<std::string, std::string>& getCookies() const;
         const std::string& getEntityBody() const;
-        const std::string& getBodyFilePath() const;
         std::string getCookie(const std::string& name) const;
         std::string   getStatusCode() const;
         double  getVersionNum() const;
@@ -69,7 +67,6 @@ class   HttpRequest
         void    setHttpVersion(const std::string& httpVersion);
         void    setHeaders(const std::map<std::string, std::string>& headers);
         void    setEntityBody(const std::string& entityBody);
-        void    setBodyFilePath(const std::string& path);
         void    setStatusCode(const std::string& StatusCode);
         void    setVersionNum(double versionNum);
 
