@@ -4,12 +4,13 @@
 #include <string>
 #include <cstdlib>
 #include <iostream>
+#include <ctime>
 
 enum State
 {
-    READING,   // accumulating request data
-    SENDING,   // writing response (may need multiple sends)
-    DONE       // finished, ready to close
+    READING,
+    SENDING,
+    DONE
 };
 
 class Connection
@@ -22,16 +23,18 @@ private:
     int serverPort;
     size_t serverIndex;
 
-    std::string buffer;        // raw incoming data
-    std::string lastRequest;   // full request
-    std::string writeBuffer;   // response
+    std::string buffer;
+    std::string lastRequest;
+    std::string writeBuffer;
     size_t bytesSent;
     State state;
     bool headerParsed;
-    size_t expectedRequestSize;
-
-    void updateRequestTracking();
-    void resetRequestTracking();
+    size_t contentLength;
+    size_t bodyBytesReceived;
+    std::string bodyFilePath;
+    int bodyFileFd;
+    int sendFileFd;
+    time_t lastActivity;
 
 public:
     Connection(int fd, const std::string& cIp, int cPort,
@@ -47,8 +50,6 @@ public:
     int getServerPort() const;
     size_t getServerIndex() const;
 
-    // 🔥 NEW FUNCTIONS
-
     std::string& getBuffer();
     void append(const char* data, size_t size);
 
@@ -57,6 +58,7 @@ public:
     void consumeRequest();
 
     const std::string& getRequest() const;
+    const std::string& getBodyFilePath() const;
 
     void setResponse(const std::string& res);
     std::string& getWriteBuffer();
@@ -65,6 +67,13 @@ public:
 
     State getState() const;
     void setState(State s);
+
+    time_t getLastActivity() const;
+    void updateLastActivity();
+
+    int  getSendFileFd() const;
+    void setSendFileFd(int fd);
+    void closeSendFileFd();
 };
 
 #endif

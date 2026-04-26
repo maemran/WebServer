@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/25 18:40:00 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/26 00:37:24 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,166 +16,176 @@
 
 HttpRequest::HttpRequest()
 {
-	statusCode = "200";
-	versionNum = 1.0;
+    statusCode = "200";
+    versionNum = 1.0;
 }
 
-HttpRequest::HttpRequest(const HttpRequest &other)
+HttpRequest::HttpRequest(const HttpRequest& other)
 {
-	// this->request = other.request;
-	this->requestLine = other.requestLine;
-	this->method = other.method;
-	this->uri = other.uri;
-	this->httpVersion = other.httpVersion;
-	this->headers = other.headers;
-	this->cookies = other.cookies;
-	this->entityBody = other.entityBody;
-	this->statusCode = other.statusCode;
-	this->versionNum = other.versionNum;
+    // this->request = other.request;
+    this->requestLine = other.requestLine;
+    this->method = other.method;
+    this->uri = other.uri;
+    this->httpVersion = other.httpVersion;
+    this->headers = other.headers;
+    this->cookies = other.cookies;
+    this->entityBody = other.entityBody;
+    this->statusCode = other.statusCode;
+    this->versionNum = other.versionNum;
 }
-HttpRequest &HttpRequest::operator=(const HttpRequest &other)
+HttpRequest&    HttpRequest::operator=(const HttpRequest& other)
 {
-	if (this != &other)
-	{
-		// this->request = other.request;
-		this->requestLine = other.requestLine;
-		this->method = other.method;
-		this->uri = other.uri;
-		this->httpVersion = other.httpVersion;
-		this->headers = other.headers;
-		this->cookies = other.cookies;
-		this->entityBody = other.entityBody;
-		this->statusCode = other.statusCode;
-		this->versionNum = other.versionNum;
-	}
-	return *this;
+    if (this != &other)
+    {
+        // this->request = other.request;
+        this->requestLine = other.requestLine;
+        this->method = other.method;
+        this->uri = other.uri;
+        this->httpVersion = other.httpVersion;
+        this->headers = other.headers;
+        this->cookies = other.cookies;
+        this->entityBody = other.entityBody;
+        this->statusCode = other.statusCode;
+        this->versionNum = other.versionNum;
+    }
+    return *this;
 }
 
 HttpRequest::~HttpRequest() {}
 
-const std::string &HttpRequest::getRequestLine() const
+const std::string& HttpRequest::getRequestLine() const
 {
-	return this->requestLine;
+    return this->requestLine;
 }
 
-const std::string &HttpRequest::getMethod() const
+const std::string& HttpRequest::getMethod() const
 {
-	return this->method;
+    return this->method;
 }
 
-URI &HttpRequest::getUri()
+URI& HttpRequest::getUri()
 {
-	return this->uri;
+    return this->uri;
 }
 
-const URI &HttpRequest::getUri() const
+const URI& HttpRequest::getUri() const
 {
-	return this->uri;
+    return this->uri;
 }
 
-const std::string &HttpRequest::getHttpVersion() const
+const std::string& HttpRequest::getHttpVersion() const
 {
-	return this->httpVersion;
+    return this->httpVersion;
 }
 
-const std::map<std::string, std::string> &HttpRequest::getHeaders() const
+const std::map<std::string, std::string>& HttpRequest::getHeaders() const
 {
-	return this->headers;
+    return this->headers;
 }
 
-const std::map<std::string, std::string> &HttpRequest::getCookies() const
+const std::map<std::string, std::string>& HttpRequest::getCookies() const
 {
-	return this->cookies;
+    return this->cookies;
 }
 
-const std::string &HttpRequest::getEntityBody() const
+const std::string& HttpRequest::getEntityBody() const
 {
-	return this->entityBody;
+    return this->entityBody;
 }
 
-std::string HttpRequest::getCookie(const std::string &name) const
+const std::string& HttpRequest::getBodyFilePath() const
 {
-	std::map<std::string, std::string>::const_iterator it = cookies.find(name);
+    return this->bodyFilePath;
+}
 
-	if (it == cookies.end())
-		return "";
-	return it->second;
+void HttpRequest::setBodyFilePath(const std::string& path)
+{
+    this->bodyFilePath = path;
+}
+
+std::string HttpRequest::getCookie(const std::string& name) const
+{
+    std::map<std::string, std::string>::const_iterator it = cookies.find(name);
+
+    if (it == cookies.end())
+        return "";
+    return it->second;
 }
 
 std::string HttpRequest::getStatusCode() const
 {
-	return this->statusCode;
+    return this->statusCode;
 }
 
 double HttpRequest::getVersionNum() const
 {
-	return this->versionNum;
+    return this->versionNum;
 }
 
-void HttpRequest::setRequestLine(const std::string &requestLine)
+void    HttpRequest::setRequestLine(const std::string& requestLine)
 {
-	this->requestLine = requestLine;
+    this->requestLine = requestLine;
 }
 
-void HttpRequest::setMethod(const std::string &method)
+void    HttpRequest::setMethod(const std::string& method)
 {
-	this->method = method;
+    this->method = method;
 }
 
-void HttpRequest::setUri(const URI &uri)
+void    HttpRequest::setUri(const URI& uri)
 {
-	this->uri = uri;
+    this->uri = uri;
 }
 
-void HttpRequest::setHttpVersion(const std::string &httpVersion)
+void    HttpRequest::setHttpVersion(const std::string& httpVersion)
 {
-	this->httpVersion = httpVersion;
+    this->httpVersion = httpVersion;
 }
 
-void HttpRequest::setHeaders(const std::map<std::string, std::string> &headers)
+void    HttpRequest::setHeaders(const std::map<std::string, std::string>& headers)
 {
-	this->headers = headers;
+    this->headers = headers;
 }
 
-void HttpRequest::setEntityBody(const std::string &entityBody)
+void    HttpRequest::setEntityBody(const std::string& entityBody)
 {
-	this->entityBody = entityBody;
+    this->entityBody = entityBody;
 }
 
-void HttpRequest::setStatusCode(const std::string &StatusCode)
+void    HttpRequest::setStatusCode(const std::string& StatusCode)
 {
-	this->statusCode = StatusCode;
+    this->statusCode = StatusCode;
 }
 
-HttpRequest::badRequestException::badRequestException(const char *statCode)
+HttpRequest::badRequestException::badRequestException(const char* statCode)
 {
-	this->statusCode = const_cast<char *>(statCode);
+    this->statusCode = const_cast<char *>(statCode);
 }
 
-const char *HttpRequest::badRequestException::what() const throw()
+const char* HttpRequest::badRequestException::what() const throw()
 {
-	return statusCode;
+    return statusCode;
 }
 
-void HttpRequest::setVersionNum(double versionNum)
+void    HttpRequest::setVersionNum(double versionNum)
 {
-	this->versionNum = versionNum;
+    this->versionNum = versionNum;
 }
 
 char toLower(char c)
 {
-	if (c >= 'A' && c <= 'Z')
-		return c + 32;
-	return c;
+    if (c >= 'A' && c <= 'Z')
+        return c + 32;
+    return c;
 }
 
-std::vector<std::string> HttpRequest::requestLexer(const std::string &request)
+std::vector<std::string>	HttpRequest::requestLexer(const std::string& request)
 {
 	int i = 0;
 	int start = 0;
 	std::string temp;
-	std::vector<std::string> requestElements;
-
+	std::vector<std::string>	requestElements;
+	
 	while (i < (int)request.length())
 	{
 		if (i != 0 && (request[i - 1] == '\r' && request[i] == '\n'))
@@ -183,8 +193,8 @@ std::vector<std::string> HttpRequest::requestLexer(const std::string &request)
 			for (; start < i - 1; start++)
 				temp += request[start];
 			start = i + 1;
-			if (temp != "")
-				requestElements.push_back(temp);
+            if (temp != "")
+			    requestElements.push_back(temp);
 			temp = "";
 		}
 		i++;
@@ -192,57 +202,61 @@ std::vector<std::string> HttpRequest::requestLexer(const std::string &request)
 	return requestElements;
 }
 
-std::string HttpRequest::extractBody(const std::string &request)
+std::string	HttpRequest::extractBody(const std::string& request)
 {
-	std::string requestWithoutBody;
-	size_t pos = request.find("\r\n\r\n");
-	if (pos == std::string::npos)
-		return request;
-	for (int i = 0; i < (int)pos + 4; i++)
-		requestWithoutBody += request[i];
-	pos += 4;
-	for (; pos < request.length(); pos++)
-		this->entityBody += request[pos];
-	return requestWithoutBody;
+    std::string requestWithoutBody;
+    size_t  pos = request.find("\r\n\r\n");
+    if (pos == std::string::npos)
+        return request;
+    for (int i = 0; i < (int)pos + 4; i++)
+        requestWithoutBody += request[i];
+    pos += 4;
+    for (;pos < request.length(); pos++)
+        this->entityBody += request[pos];
+    return requestWithoutBody;
 }
 
-void HttpRequest::requestCheck(const std::string &request)
+void HttpRequest::requestCheck(const std::string& request)
 {
-	int flag1 = 0, flag2 = 0;
-	if (request.c_str()[0] == '\r' && request.c_str()[1] == '\n' && request.c_str()[2] == '\0') // if the request just include "\r\n"
-		throw badRequestException("400");
-	for (int i = 0; i < (int)request.length(); i++)
-	{
-		if (i != 0 && request[i - 1] == '\r' && request[i] == '\n')
-			flag1 = 1;
-	}
-	for (int i = (int)request.length() - 1; i >= 0; i--)
-	{
-		if (request[(int)request.length() - 1] == '\n' && request[(int)request.length() - 2] == '\r')
-		{
-			flag2 = 1;
-			break;
-		}
-		if (i > 2 && (request[i - 3] == '\r' && request[i - 2] == '\n' && request[i - 1] == '\r' && request[i] == '\n'))
-			flag2 = 1;
-	}
-	for (int i = 0; i < (int)request.size(); i++)
-	{
-		if (i != 0 && ((request[i - 1] == '\r' && request[i] != '\n') || (request[i - 1] != '\r' && request[i] == '\n')))
-			throw badRequestException("400");
-	}
-	if (flag1 == 0 || flag2 == 0)
-		throw badRequestException("400");
+    int flag1 = 0, flag2 = 0;
+    if(request.c_str()[0] == '\r' && request.c_str()[1] == '\n'
+        && request.c_str()[2] == '\0') // if the request just include "\r\n"
+        throw badRequestException("400");
+    for (int i = 0; i < (int)request.length(); i++)
+    {
+        if (i != 0 && request[i - 1] == '\r' && request[i] == '\n')
+            flag1 = 1;
+    }
+    for (int i = (int)request.length() - 1; i >= 0; i--)
+    {
+        if (request[(int)request.length() - 1] == '\n'
+            && request[(int)request.length() - 2] == '\r')
+        {
+            flag2 = 1;
+            break;
+        }
+        if (i > 2 && (request[i - 3] == '\r' && request[i - 2] == '\n'
+			&& request[i - 1] == '\r' && request[i] == '\n'))
+            flag2 = 1;
+    }
+    for (int i = 0; i < (int)request.size(); i++)
+    {
+        if (i != 0 && ((request[i - 1] == '\r' && request[i] != '\n')
+            || (request[i - 1] != '\r' && request[i] == '\n')))
+            throw badRequestException("400");
+    }
+    if (flag1 == 0 || flag2 == 0)
+        throw badRequestException("400");
 }
 
-void HttpRequest::requestLineParser()
+void	HttpRequest::requestLineParser()
 {
 	int start = 0;
 	int end = 0;
 	int flag = 0;
 	std::string temp;
-	std::vector<std::string> tempVector;
-	const char *str = requestLine.c_str();
+	std::vector<std::string>    tempVector;
+	const char    *str = requestLine.c_str();
 
 	for (int i = 0; i < (int)requestLine.length(); i++)
 	{
@@ -252,22 +266,23 @@ void HttpRequest::requestLineParser()
 	if (flag == 1)
 	{
 		for (int i = 0; i < (int)requestLine.length(); i++)
-		{
-			if (((((str[i] >= 0 && str[i] <= 126) && str[i] != 32) && str[i + 1] == ' ') || (((str[i] >= 0 && str[i] <= 126) && str[i] != 32) && str[i + 1] == '\0')))
-			{
-				for (; start < i + 1; start++)
+    	{
+    	    if (((((str[i] >= 0 && str[i] <= 126) && str[i] != 32) && str[i + 1] == ' ')
+    	    	|| (((str[i] >= 0 && str[i] <= 126) && str[i] != 32) && str[i + 1] == '\0')))
+    	    {
+    	        for (; start < i + 1; start++)
 					temp += requestLine[start];
-				start = i + 2;
-				tempVector.push_back(temp);
-				temp = "";
-			}
-		}
+    	        start = i + 2;
+    	        tempVector.push_back(temp);
+    	        temp = "";
+    	    }
+    	}
 		this->method = tempVector[0];
 		if (tempVector.size() >= 2)
 			this->uri.setUri(tempVector[1]);
-		return;
+		return ;
 	}
-	for (int i = 0; i < (int)requestLine.length(); i++)
+	for(int i = 0; i < (int)requestLine.length(); i++)
 	{
 		if (str[i + 1] == ' ' || str[i + 1] == '\0')
 		{
@@ -303,143 +318,141 @@ void HttpRequest::requestLineParser()
 		temp += requestLine[start];
 	tempVector.push_back(temp);
 	this->method = tempVector[0];
-	if (tempVector.size() >= 2)
+    if (tempVector.size() >= 2)
 		this->httpVersion = tempVector[1];
-	if (tempVector.size() >= 3)
+    if (tempVector.size() >= 3)
 		this->uri.setUri(tempVector[2]);
 }
 
-void HttpRequest::storingHeaders(std::vector<std::string> requestElements)
+void    HttpRequest::storingHeaders(std::vector<std::string> requestElements)
 {
-	int start;
-	int flag;
-	std::string temp1, temp2;
-	for (int i = 1; i < (int)requestElements.size(); i++)
-	{
-		start = 0, flag = 0;
-		temp1 = "", temp2 = "";
-		for (int j = 0; j < (int)requestElements[i].length(); j++)
-		{
-			if (requestElements[i][j] == ':')
-			{
-				flag = 1;
-				for (; start < j; start++)
-					temp1 += toLower(requestElements[i][start]);
-				j++;
-				if (requestElements[i][j] != ' ')
-					throw badRequestException("400");
-				if (requestElements[i][j] == ' ')
-					j += 1;
-				for (; j < (int)requestElements[i].length(); j++)
-					temp2 += requestElements[i][j];
-			}
-		}
-		if (flag != 1)
-			this->headers.insert(std::make_pair(requestElements[i], ""));
-		else
-			this->headers.insert(std::make_pair(temp1, temp2));
-	}
+    int start;
+    int flag;
+    std::string temp1, temp2;
+    for (int i = 1; i < (int)requestElements.size(); i++)
+    {
+        start = 0, flag = 0;
+        temp1 = "", temp2 = "";
+        for (int j = 0; j < (int)requestElements[i].length(); j++)
+        {
+            if (requestElements[i][j] == ':')
+            {
+                flag = 1;
+                for (; start < j; start++)
+				    temp1 += toLower(requestElements[i][start]);
+                j++;
+                if (requestElements[i][j] != ' ')
+                    throw badRequestException("400");
+                if (requestElements[i][j] == ' ')
+                    j += 1;
+                for (; j < (int)requestElements[i].length(); j++)
+                    temp2 += requestElements[i][j];
+            }
+        }
+        if (flag != 1)
+            this->headers.insert(std::make_pair(requestElements[i], ""));
+        else
+            this->headers.insert(std::make_pair(temp1, temp2));
+    }
 }
 
-void HttpRequest::requestParser(const std::string &request)
+void    HttpRequest::requestParser(const std::string& request)
 {
-	std::vector<std::string> requestElements;
-	/*Request line & headers Parser*/
+	std::vector<std::string>	requestElements;
+    /*Request line & headers Parser*/
 	requestElements = requestLexer(request);
-	this->requestLine = requestElements[0];
-	requestLineParser();
-	storingHeaders(requestElements);
-	parseCookies();
+    this->requestLine = requestElements[0];
+    requestLineParser();
+    storingHeaders(requestElements);
+    parseCookies();
 }
 
-void HttpRequest::parseCookies()
+void    HttpRequest::parseCookies()
 {
-	std::map<std::string, std::string>::const_iterator it = headers.find("cookie");
+    std::map<std::string, std::string>::const_iterator it = headers.find("cookie");
 
-	cookies.clear();
-	if (it == headers.end())
-		return;
-	cookies = Cookie::parseCookieHeader(it->second);
+    cookies.clear();
+    if (it == headers.end())
+        return;
+    cookies = Cookie::parseCookieHeader(it->second);
 }
 
-void HttpRequest::methodValidation()
+void    HttpRequest::methodValidation()
 {
-	if (method != "GET" && method != "HEAD" && method != "POST" && method != "DELETE")
-		throw badRequestException("501");
+    if (method != "GET" && method != "HEAD"
+        && method != "POST" && method != "DELETE")
+        throw   badRequestException("501");
 }
 
-void HttpRequest::versionValidation()
+void    HttpRequest::versionValidation()
 {
-	if (httpVersion == "")
-		versionNum = 0.9;
-	else if (httpVersion == "HTTP/1.0" || httpVersion == "HTTP/1.1")
-		versionNum = 1.0;
-	else if (httpVersion == "HTTP/2" || httpVersion == "HTTP/3")
-		throw badRequestException("505");
-	else
-		throw badRequestException("400");
+    if (httpVersion == "")
+        versionNum = 0.9;
+    else if (httpVersion == "HTTP/1.0"
+		|| httpVersion == "HTTP/1.1")
+        versionNum = 1.0;
+    else if(httpVersion == "HTTP/2"
+        || httpVersion == "HTTP/3")
+        throw badRequestException("505");
+    else
+        throw badRequestException("400");
 }
 
-void HttpRequest::headersValidation()
+void    HttpRequest::headersValidation()
 {
-	for (std::map<std::string, std::string>::const_iterator it = headers.begin();
-		 it != headers.end(); ++it)
-	{
-		if (it->first.find(" ") != std::string::npos)
-			throw badRequestException("400");
-		if (it->second == "")
-			throw badRequestException("400");
-	}
+    for (std::map<std::string, std::string>::const_iterator it = headers.begin();
+    it != headers.end(); ++it)
+    {
+        if (it->first.find(" ") != std::string::npos)
+            throw badRequestException("400");
+        if (it->second == "")
+            throw badRequestException("400");
+    }
 }
 
-void HttpRequest::requestValidate()
+void    HttpRequest::requestValidate()
 {
-	methodValidation();
-	headersValidation();
-	versionValidation();
+    methodValidation();
+    headersValidation();
+    versionValidation();
 }
 
-void HttpRequest::requestHandler(std::string &request)
+void    HttpRequest::requestHandler(std::string& request)
 {
-	try
-	{
-		request = extractBody(request);
-		requestCheck(request);
-		requestParser(request);
-		try
-		{
-			getUri().uriHandler();
-			// std::cout << "------------------------------" << std::endl;
-		}
-		catch (URI::badURIException &e)
-		{
-			throw badRequestException("400");
-		}
-		requestValidate();
-		printClassAtributes();
-	}
-	catch (badRequestException &e)
-	{
-		statusCode = e.what();
-		std::cout << "Status Code: " << statusCode << std::endl;
-	}
+    try {
+        request = extractBody(request);
+        requestCheck(request);
+        requestParser(request);
+        try {
+            getUri().uriHandler();
+            // std::cout << "------------------------------" << std::endl;
+        }
+        catch (URI::badURIException& e) {throw badRequestException("400");}
+        requestValidate();
+        printClassAtributes();
+    }
+    catch (badRequestException& e)
+    {
+        statusCode = e.what();
+        std::cout << "Status Code: " << statusCode << std::endl;
+    }
 }
 
-void HttpRequest::printClassAtributes()
+void    HttpRequest::printClassAtributes()
 {
-	std::cout << "Method: " << method << std::endl;
-	std::cout << "URL: " << uri.getUri() << std::endl;
-	std::cout << "version: " << httpVersion << std::endl;
-	std::cout << "Version number: " << versionNum << std::endl;
-	for (std::map<std::string, std::string>::const_iterator it = headers.begin();
-		 it != headers.end(); ++it)
-	{
-		std::cout << it->first << " : " << it->second << std::endl;
-	}
-	for (std::map<std::string, std::string>::const_iterator it = cookies.begin();
-		 it != cookies.end(); ++it)
-	{
-		std::cout << "cookie[" << it->first << "] : " << it->second << std::endl;
-	}
-	// std::cout << "Entity Bode: " << entityBody << std::endl;
+    std::cout << "Method: " << method << std::endl;
+    std::cout << "URL: " << uri.getUri() << std::endl;
+    std::cout << "version: " << httpVersion << std::endl;
+    std::cout << "Version number: " << versionNum << std::endl;
+    for (std::map<std::string, std::string>::const_iterator it = headers.begin();
+    it != headers.end(); ++it)
+    {
+        std::cout << it->first << " : " << it->second << std::endl;
+    }
+    for (std::map<std::string, std::string>::const_iterator it = cookies.begin();
+    it != cookies.end(); ++it)
+    {
+        std::cout << "cookie[" << it->first << "] : " << it->second << std::endl;
+    }
+    std::cout << "Entity Bode: " << entityBody << std::endl;
 }

@@ -24,7 +24,12 @@
 #include <map>
 #include <stdexcept>
 #include <algorithm>
+#include <ctime>
+#include <cstdio>
+#include <fcntl.h>
 #include "connection.hpp"
+
+static const int CONNECTION_TIMEOUT_SECS = 20;
 
 ServerSocket::ServerSocket(const HttpConfig& config)
 {
@@ -81,25 +86,28 @@ void ServerSocket::run()
 {
     int epollFd = createEpoll();
     registerServerSockets(epollFd);
-    
-    struct epoll_event events[128]; // events[0] → fd 4 is ready events[1] → fd 8 is ready events[2] → fd 10 is ready
+
+    struct epoll_event events[128];
 
     while (true)
     {
-        int nfds = epoll_wait(epollFd, events, 128, -1); //Tell me which sockets are ready for something
-        //nfds is the numbers of ready sockets
-        if (nfds < 0)
+        // FIX: timeout changed from -1 (block forever) to 5000ms so that
+        // checkTimeouts() fires periodically even when there is no traffic.
+        int nfds = epoll_wait(epollFd, events, 128, 5000);
+        if (nfds < 0 && errno != EINTR)
             continue;
 
         for (int i = 0; i < nfds; i++)
         {
             int fd = events[i].data.fd;
 
-            if (isServerFd(fd)) // Because the action is different if server it should go to accept , if clent --> send data recv()
+            if (isServerFd(fd))
                 handleServerEvent(epollFd, fd);
             else
                 handleClientEvent(epollFd, fd);
         }
+        // FIX: close connections that have been idle for CONNECTION_TIMEOUT_SECS
+        checkTimeouts(epollFd);
     }
 }
 int ServerSocket::createEpoll()
@@ -188,6 +196,12 @@ void ServerSocket::closeConnection(int epollFd, int clientFd)
     removeConnection(clientFd);
 }
 
+// FIX: previously this function called responseHandler() which read the entire
+// request body and file body into memory before sending a single byte.
+// Now:
+//   - conn->append() streams the upload body to a temp file (see connection.cpp)
+//   - responseBodyFile holds the path of the file to serve (not its content)
+//   - conn->setSendFileFd() passes the open fd to handleSending() for chunked sending
 void ServerSocket::handleReading(int epollFd, Connection* conn)
 {
     int clientFd = conn->getClientFd();
@@ -201,24 +215,28 @@ void ServerSocket::handleReading(int epollFd, Connection* conn)
     }
 
     conn->append(buffer, bytes);
+    conn->updateLastActivity();
 
     if (!conn->isRequestComplete())
         return;
 
-    std::string request = conn->extractRequest();
+    std::string request = conn->extractRequest();  // headers only
+    std::string bodyFilePath = conn->getBodyFilePath(); // upload body on disk
     conn->consumeRequest();
-    // std::cout << "FULL REQUEST:\n" << request << std::endl;
 
     std::string responseStr;
+    std::string responseBodyFile;
     try
     {
         HttpRequest httpRequest;
         httpRequest.requestHandler(request);
+        httpRequest.setBodyFilePath(bodyFilePath);
 
         HttpResponse httpResponse(httpRequest, config, conn->getServerIndex());
         httpResponse.responseHandler();
 
         responseStr = httpResponse.getResponse();
+        responseBodyFile = httpResponse.getResponseBodyFilePath(); // empty for non-file responses
     }
     catch (const std::exception& e)
     {
@@ -231,7 +249,19 @@ void ServerSocket::handleReading(int epollFd, Connection* conn)
             "Internal Server Error";
     }
 
-    conn->setResponse(responseStr);
+    if (!bodyFilePath.empty())
+        std::remove(bodyFilePath.c_str()); // delete upload temp file after response is built
+
+    conn->setResponse(responseStr); // writeBuffer holds headers only for file responses
+
+    // FIX: open the file to serve — handleSending() streams it without loading into memory
+    if (!responseBodyFile.empty())
+    {
+        int fd = open(responseBodyFile.c_str(), O_RDONLY);
+        if (fd >= 0)
+            conn->setSendFileFd(fd);
+    }
+
     conn->setState(SENDING);
 
     struct epoll_event ev;
@@ -240,25 +270,48 @@ void ServerSocket::handleReading(int epollFd, Connection* conn)
     epoll_ctl(epollFd, EPOLL_CTL_MOD, clientFd, &ev);
 }
 
+// FIX: previously sent the entire writeBuffer (which contained the whole file body)
+// in one shot. For a 1GB video this meant 1GB sat in memory and the event loop was
+// occupied until the entire transfer finished, blocking all other clients.
+//
+// New two-phase design:
+//   Phase 1 — send HTTP headers from writeBuffer (a few hundred bytes, instant).
+//   Phase 2 — read 64KB from sendFileFd and send it, then RETURN to epoll_wait.
+//             The next EPOLLOUT event reads the next 64KB, and so on.
+//             Between every 64KB chunk, epoll can serve other clients normally.
 void ServerSocket::handleSending(int epollFd, Connection* conn)
 {
     int clientFd = conn->getClientFd();
     std::string& wb = conn->getWriteBuffer();
     size_t& sent = conn->getBytesSent();
 
-    int bytes = send(clientFd, wb.c_str() + sent, wb.size() - sent, 0);
-    if (bytes > 0)
-        sent += bytes;
+    // Phase 1: flush HTTP headers
+    if (sent < wb.size())
+    {
+        int bytes = send(clientFd, wb.c_str() + sent, wb.size() - sent, 0);
+        if (bytes > 0)
+            sent += bytes;
+        else if (bytes < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+            closeConnection(epollFd, clientFd);
+        return;
+    }
 
-    if (sent >= wb.size())
+    // Phase 2: stream file body one chunk at a time
+    int fileFd = conn->getSendFileFd();
+    if (fileFd >= 0)
     {
-        conn->setState(DONE);
-        closeConnection(epollFd, clientFd);
+        char chunk[65536];
+        ssize_t bytesRead = read(fileFd, chunk, sizeof(chunk));
+        if (bytesRead > 0)
+        {
+            send(clientFd, chunk, static_cast<size_t>(bytesRead), 0);
+            return; // come back next EPOLLOUT for the next chunk
+        }
+        conn->closeSendFileFd();
     }
-    else if (bytes < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
-    {
-        closeConnection(epollFd, clientFd);
-    }
+
+    conn->setState(DONE);
+    closeConnection(epollFd, clientFd);
 }
 
 void ServerSocket::handleClientEvent(int epollFd, int clientFd)
@@ -303,6 +356,25 @@ size_t ServerSocket::getServerIndexByFd(int serverFd)
             return i;
     }
     return 0;
+}
+
+// FIX: added timeout handling — connections idle for CONNECTION_TIMEOUT_SECS (20s)
+// are closed automatically. Called after every epoll_wait cycle.
+// Don't increment i when erasing — closeConnection() removes the entry from the
+// vector so the next element shifts into position i.
+void ServerSocket::checkTimeouts(int epollFd)
+{
+    time_t now = std::time(NULL);
+    for (size_t i = 0; i < connections.size(); )
+    {
+        if (now - connections[i].getLastActivity() > CONNECTION_TIMEOUT_SECS)
+        {
+            std::cout << "Closing idle connection fd=" << connections[i].getClientFd() << std::endl;
+            closeConnection(epollFd, connections[i].getClientFd());
+        }
+        else
+            i++;
+    }
 }
 
 const std::vector<Connection>& ServerSocket::getConnections() const
