@@ -3,7 +3,7 @@
 Connection::Connection(int fd, const std::string& cIp, int cPort,const std::string& sIp, int sPort, size_t sIndex)
     : clientFd(fd), clientIp(cIp), clientPort(cPort),
       serverIp(sIp), serverPort(sPort), serverIndex(sIndex),
-      bytesSent(0), state(READING)
+      bytesSent(0), state(READING), lastActivity(time(NULL))
 {
 }
 
@@ -17,7 +17,7 @@ Connection::Connection(const Connection& other)
       serverPort(other.serverPort), serverIndex(other.serverIndex),
       buffer(other.buffer), lastRequest(other.lastRequest),
       writeBuffer(other.writeBuffer), bytesSent(other.bytesSent),
-      state(other.state)
+      state(other.state), lastActivity(other.lastActivity)
 {
 }
 
@@ -36,6 +36,7 @@ Connection& Connection::operator=(const Connection& other)
         writeBuffer = other.writeBuffer;
         bytesSent = other.bytesSent;
         state = other.state;
+        lastActivity = other.lastActivity;
     }
     return *this;
 }
@@ -193,4 +194,14 @@ State Connection::getState() const
 void Connection::setState(State s)
 {
     state = s;
+}
+
+void Connection::updateActivity()
+{
+    lastActivity = time(NULL);
+}
+
+time_t Connection::getLastActivity() const
+{
+    return lastActivity;
 }

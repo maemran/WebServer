@@ -34,7 +34,9 @@ class ServerSocket
         void  handleReading(int epollFd, Connection* conn);
         void  handleSending(int epollFd, Connection* conn);
         void  closeConnection(int epollFd, int clientFd);
+        void  checkTimeouts(int epollFd);
         bool  isServerFd(int fd);
+        void  setNonBlock(int fd);
         std :: string getAcceptedIp(std :: string acceptedIp);
         int getAcceptedPort(int acceptedPort);
 

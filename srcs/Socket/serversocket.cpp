@@ -41,6 +41,15 @@ ServerSocket::~ServerSocket()
             close(serverFds[i]);
     }
 }
+void ServerSocket::setNonBlock(int fd)
+{
+    if (fcntl(fd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        close(fd);
+        throw std::runtime_error("fcntl F_SETFL failed");
+    }
+}
+
 void ServerSocket::start()
 {
     for (size_t i = 0; i < servers.size(); i++)
@@ -51,9 +60,7 @@ void ServerSocket::start()
         
         int opt = 1;
         setsockopt(serverFds[i], SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-        // Make server socket non-blocking
-        int flags = fcntl(serverFds[i], F_GETFL, 0); // this flag read the current configration from the socket
-        fcntl(serverFds[i], F_SETFL, flags | O_NONBLOCK);// the default socket is blocking , here i change propereties of fd to be non blocking 
+        setNonBlock(serverFds[i]);
         
 
         
@@ -86,10 +93,10 @@ void ServerSocket::run()
 
     while (true)
     {
-        int nfds = epoll_wait(epollFd, events, 128, -1); //Tell me which sockets are ready for something
-        //nfds is the numbers of ready sockets
+        int nfds = epoll_wait(epollFd, events, 128, 5000);
         if (nfds < 0)
             continue;
+        checkTimeouts(epollFd);
 
         for (int i = 0; i < nfds; i++)
         {
@@ -168,9 +175,7 @@ void ServerSocket::handleServerEvent(int epollFd, int serverFd)
         connections.push_back(Connection(clientFd, clientIp, clientPort,
                                         acceptedIp, acceptedport, serverIndex));
 
-        // Make client non-blocking
-        int flags = fcntl(clientFd, F_GETFL, 0);
-        fcntl(clientFd, F_SETFL, flags | O_NONBLOCK);
+        setNonBlock(clientFd);
 
         // Add client to epoll
         struct epoll_event clientEv;
@@ -178,6 +183,21 @@ void ServerSocket::handleServerEvent(int epollFd, int serverFd)
         clientEv.data.fd = clientFd;
        if (epoll_ctl(epollFd, EPOLL_CTL_ADD, clientFd, &clientEv) < 0)
             throw std::runtime_error("epoll_ctl client add failed");
+    }
+}
+
+void ServerSocket::checkTimeouts(int epollFd)
+{
+    time_t now = time(NULL);
+    for (size_t i = 0; i < connections.size(); )
+    {
+        if (now - connections[i].getLastActivity() >= 20)
+        {
+            std::cout << "Timeout: closing fd " << connections[i].getClientFd() << std::endl;
+            closeConnection(epollFd, connections[i].getClientFd());
+        }
+        else
+            i++;
     }
 }
 
@@ -201,6 +221,7 @@ void ServerSocket::handleReading(int epollFd, Connection* conn)
     }
 
     conn->append(buffer, bytes);
+    conn->updateActivity();
 
     if (!conn->isRequestComplete())
         return;
@@ -248,7 +269,10 @@ void ServerSocket::handleSending(int epollFd, Connection* conn)
 
     int bytes = send(clientFd, wb.c_str() + sent, wb.size() - sent, 0);
     if (bytes > 0)
+    {
         sent += bytes;
+        conn->updateActivity();
+    }
 
     if (sent >= wb.size())
     {

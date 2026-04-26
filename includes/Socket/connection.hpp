@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdlib>
 #include <iostream>
+#include <ctime>
 
 enum State
 {
@@ -27,6 +28,7 @@ private:
     std::string writeBuffer;   // response
     size_t bytesSent;
     State state;
+    time_t lastActivity;
     bool headerParsed;
     size_t expectedRequestSize;
 
@@ -65,6 +67,9 @@ public:
 
     State getState() const;
     void setState(State s);
+
+    void  updateActivity();
+    time_t getLastActivity() const;
 };
 
 #endif
