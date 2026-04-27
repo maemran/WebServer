@@ -2,41 +2,49 @@
 #define SERVER_HPP
 
 #include <netinet/in.h>
+#include <sys/epoll.h>
+#include <string>
+#include <vector>
 #include "ServerConfig.hpp"
 #include "HttpConfig.hpp"
 #include "connection.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+
 class ServerSocket
 {
     private:
-        std::vector<int> serverFds;
+        std::vector<int>          serverFds;
         std::vector<ServerConfig> servers;
-        HttpConfig config;
-        std :: string acceptedIp;
-        int acceptedport;
+        HttpConfig                config;
+        std::string               acceptedIp;
+        int                       acceptedport;
+        std::vector<Connection>   connections;
 
-        std::vector<Connection> connections;
         Connection* getConnectionByFd(int fd);
-        void removeConnection(int fd);
-        size_t getServerIndexByFd(int serverFd);
+        void        removeConnection(int fd);
+        size_t      getServerIndexByFd(int serverFd);
+
     public:
         ServerSocket(const HttpConfig& config);
         ~ServerSocket();
         ServerSocket(const ServerSocket& other);
-        ServerSocket&	operator=(const ServerSocket& other);
+        ServerSocket& operator=(const ServerSocket& other);
+
         void start();
-        void  run();
-        int   createEpoll();
-        void  registerServerSockets(int epollFd);
-        void  handleServerEvent(int epollFd, int serverFd);
-        void  handleClientEvent(int epollFd, int clientFd);
-        void  handleReading(int epollFd, Connection* conn);
-        void  handleSending(int epollFd, Connection* conn);
-        void  closeConnection(int epollFd, int clientFd);
-        bool  isServerFd(int fd);
-        std :: string getAcceptedIp(std :: string acceptedIp);
-        int getAcceptedPort(int acceptedPort);
+        void run();
+
+        int  createEpoll();
+        void registerServerSockets(int epollFd);
+        bool isServerFd(int fd);
+        void setNonBlock(int fd);
+
+        void handleServerEvent(int epollFd, int serverFd);
+        void handleClientEvent(int epollFd, int clientFd, uint32_t readyEvents);
+        void handleReading(int epollFd, Connection* conn);
+        void handleSending(int epollFd, Connection* conn);
+        void closeConnection(int epollFd, int clientFd);
+        void checkTimeouts(int epollFd);
 
         const std::vector<Connection>& getConnections() const;
 };

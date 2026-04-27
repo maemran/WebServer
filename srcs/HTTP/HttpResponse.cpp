@@ -6,7 +6,7 @@
 /*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/25 18:02:24 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/27 10:54:56 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include "CgiHandler.hpp"
 #include "Cookie.hpp"
 #include "Session.hpp"
+#include <cstdlib>
+#include <ctime>
 
 static std::string toLowerAscii(const std::string& value)
 {
@@ -85,7 +87,7 @@ static std::string getIndexScriptPath(const std::string& basePath,
 
 HttpResponse::HttpResponse() {}
 
-int HttpResponse::fileNum = 1;
+std::vector<std::string>    HttpResponse::uploadedFiles = std::vector<std::string>();
 
 HttpResponse::HttpResponse(const HttpResponse& other)
 {
@@ -120,14 +122,20 @@ HttpResponse::HttpResponse(const HttpRequest& request, const HttpConfig& config,
     this->config = config;
     this->serverIndex = serverIndex;
     indexFound = false;
-    uploadedFiles.push_back("./webroot/images/1");// convert it to static
     server = config.getServers()[serverIndex];
     statusCode = "200";
     reasonPhrase["200"] = "OK";
     reasonPhrase["201"] = "Created";
     reasonPhrase["204"] = "No Content";
+    reasonPhrase["300"] = "Multiple Choices";
     reasonPhrase["301"] = "Moved Permanently";
     reasonPhrase["302"] = "Moved Temporarily";
+    reasonPhrase["303"] = "See Other";
+    reasonPhrase["304"] = "Not Modified";
+    reasonPhrase["305"] = "Use Proxy";
+    reasonPhrase["306"] = "Unused";
+    reasonPhrase["307"] = "Temporary Redirect";
+    reasonPhrase["308"] = "Permanent Redirect";
     reasonPhrase["400"] = "Bad Request";
     reasonPhrase["404"] = "Not Found";
     reasonPhrase["403"] = "Forbidden";
@@ -633,8 +641,13 @@ void    HttpResponse::generateDirectoryListing(const std::string& path)
 	DIR* dir;
     struct dirent* ent;
     std::stringstream html;
+    std::string currentPath = request.getUri().getPath();
 
-	dir = opendir(path.c_str());
+    if (currentPath.empty())
+        currentPath = "/";
+    if (currentPath[currentPath.length() - 1] != '/')
+        currentPath += '/';
+    dir = opendir(path.c_str());
 	html << "<!DOCTYPE HTML>\n<html lang=\"en\">\n<head>\n"
              << "<meta charset=\"utf-8\">\n"
              << "<title>Directory listing for " << path << "</title>\n"
@@ -649,7 +662,7 @@ void    HttpResponse::generateDirectoryListing(const std::string& path)
         std::string fullPath = path + "/" + name;
         if (isDirectory(fullPath)) 
             name += "/";
-        html << "<li><a href=\"" << name << "\">" << name << "</a></li>\n";
+        html << "<li><a href=\"" << currentPath + name << "\">" << name << "</a></li>\n";
     }
 	html << "</ul>\n<hr>\n</body>\n</html>";
     addHeader("Content-Type", "text/html");
@@ -779,7 +792,11 @@ void     HttpResponse::POSTMethod()
     std::string extension = contentTypeToExtension();
     std::string uploadPath = loc.getRoot();
     std::string uploadedFile = request.getUri().getPath();
-    std::string fileName = ft_itos(fileNum) + extension;
+    
+    // Generate random filename
+    srand(static_cast<unsigned>(time(0)) + rand());
+    std::string randomName = ft_itos(1000000 + (rand() % 9000000));
+    std::string fileName = randomName + extension;
     
     if (uploadPath[uploadPath.length() - 1] != '/')
         uploadPath += '/';
@@ -796,24 +813,23 @@ void     HttpResponse::POSTMethod()
     body = readFile(fullPath);
     addHeader("Location", (uploadedFile + fileName));
     statusCode = "201";
-    fileNum++;
 }
 
 void    HttpResponse::DELMethodChecks()
 {
-    int flag = -1;
     std::string deletedPath = loc.getRoot();
     if (deletedPath[deletedPath.length() - 1] != '/')
         deletedPath += '/';
     deletedPath += request.getUri().getPath();
-    if (directory != "" || isDirectory(deletedPath))
+    
+    // Check if it's a directory or doesn't exist
+    if (isDirectory(deletedPath))
         throw errorResponseException("403");
-    for (int i = 0; i < (int)uploadedFiles.size(); i++)
-    {
-        if (uploadedFiles[i] == file || uploadedFiles[i] == deletedPath)
-            flag = i;
-    }
-    if (flag == -1)
+    struct stat s;
+    if (stat(deletedPath.c_str(), &s) != 0)
+        throw errorResponseException("404");
+    // Check if it's a regular file
+    if (!S_ISREG(s.st_mode))
         throw errorResponseException("403");
 }
 
@@ -825,8 +841,11 @@ void     HttpResponse::DELMethod()
         deletedPath += '/';
     deletedPath += request.getUri().getPath();
     
+    // Delete the file
     if (std::remove(deletedPath.c_str()) != 0)
         throw errorResponseException("403");
+    
+    // Remove from uploaded files tracking if it exists there
     for (std::vector<std::string>::iterator it = uploadedFiles.begin(); it != uploadedFiles.end();)
     {
         if (*it == deletedPath || *it == file)
@@ -835,7 +854,6 @@ void     HttpResponse::DELMethod()
             ++it;
     }
     statusCode = "204";
-    fileNum--;
 }
 
 void    HttpResponse::methodsHandler()

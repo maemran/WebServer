@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/23 23:03:55 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/27 13:31:49 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static HttpConfig prepareHttpConfig(const std::string& path)
 int main(int argc, char **argv)
 {
 	try {
-		std::string filename = "config.conf";
+		std::string filename = "./config_file/config.conf";
     	if (argc == 2)
     	    filename = argv[1];
     	HttpConfig config = prepareHttpConfig(filename);
@@ -66,25 +66,6 @@ int main(int argc, char **argv)
 	}
 	catch (std::exception& e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cout << e.what() << std::endl; 
 	}
-
-    //std::string request =
-    //    "GET /images/test.py?name=mohammad HTTP/1.0\r\n" // ///var/
-    //    // "Host: localhost:7070\r\n"
-    //    "User-Agent: Mozilla/5.0\r\n"
-    //    "Content-Type: text/html\r\n"
-    //    "Content-Length: 8\r\n"
-    //    // "Connection: close\r\n"
-    //    "\r\n"
-    //    "mohammad";
-	//std::cout << "hello" <<std::endl;
-    //HttpRequest obj;
-    //obj.requestHandler(request);
-    //HttpResponse resp(obj, config, 0);
-    //std::cout << "===============================" << std::endl;
-    //std::cout << "===> HTTP Response Handler <===" << std::endl;
-    //std::cout << "===============================" << std::endl;
-    //resp.responseHandler();
-    //std::cout << request << std::endl;
 }
