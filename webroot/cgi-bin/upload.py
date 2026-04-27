@@ -171,16 +171,81 @@ def handle_upload():
         )
         return
 
-    # Parse multipart form data
+    # Parse POST form data (multipart or urlencoded)
     form = cgi.FieldStorage(
         fp=sys.stdin.buffer,
         environ=os.environ,
         keep_blank_values=True
     )
 
+    # Common metadata
+    uploader    = form.getfirst("uploader",    "Anonymous").strip()
+    email       = form.getfirst("email",       "").strip()
+    description = form.getfirst("description", "").strip()
+
+    # ── TEXT submission mode (new upload_form.html) ─────────────────────────
+    text_value = form.getfirst("text", "")
+    if text_value is not None and text_value != "":
+        text_bytes = text_value.encode("utf-8")
+        text_size = len(text_bytes)
+
+        if text_size == 0:
+            error_page("The submitted text is empty.")
+            return
+
+        if text_size > MAX_SIZE:
+            error_page(
+                f"Submitted text is too large ({human_size(text_size)}).",
+                f"Maximum allowed size: {human_size(MAX_SIZE)}"
+            )
+            return
+
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+        original_name = "submission.txt"
+        saved_name = unique_filename(original_name)
+        save_path = os.path.join(UPLOAD_DIR, saved_name)
+
+        md5_hash = hashlib.md5(text_bytes).hexdigest()
+        sha256 = hashlib.sha256(text_bytes).hexdigest()
+
+        try:
+            with open(save_path, "w", encoding="utf-8") as f:
+                f.write(text_value)
+        except OSError as e:
+            error_page("Could not save the text on the server.", str(e))
+            return
+
+        log_path = os.path.join(UPLOAD_DIR, "upload_log.txt")
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_line = (
+            f"{timestamp} | {uploader} | {email} | "
+            f"TEXT -> {saved_name} | "
+            f"{human_size(text_size)} | MD5:{md5_hash[:12]}\n"
+        )
+        try:
+            with open(log_path, "a", encoding="utf-8") as log:
+                log.write(log_line)
+        except OSError:
+            pass
+
+        success_page({
+            "Submission type":   "Text",
+            "Saved as":          saved_name,
+            "Size":              human_size(text_size),
+            "MD5 checksum":      md5_hash,
+            "SHA-256 (short)":   sha256[:32] + "…",
+            "Uploaded by":       uploader,
+            "Email":             email or "—",
+            "Description":       description or "—",
+            "Saved at":          save_path,
+            "Timestamp":         timestamp,
+        })
+        return
+
     # ── Validate file field ───────────────────────────────────────────────────
     if "file" not in form:
-        error_page("No file field found in the form submission.")
+        error_page("No text content was submitted.", "Expected form field: text")
         return
 
     file_item = form["file"]
@@ -215,11 +280,6 @@ def handle_upload():
             f"Maximum allowed size: {human_size(MAX_SIZE)}"
         )
         return
-
-    # ── Read form metadata ────────────────────────────────────────────────────
-    uploader    = form.getfirst("uploader",    "Anonymous").strip()
-    email       = form.getfirst("email",       "").strip()
-    description = form.getfirst("description", "").strip()
 
     # ── Compute checksum ──────────────────────────────────────────────────────
     md5_hash = hashlib.md5(file_data).hexdigest()
