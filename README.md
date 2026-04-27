@@ -34,6 +34,81 @@ A web server is a software system that accepts HTTP requests from clients (typic
 
 - **Integration Flow:** All these components are tightly integrated. The config file defines how the socket layer is initialized. The event loop continuously monitors sockets for incoming data. Incoming data is parsed into HTTP requests, validated against config directives, routed to the correct handler (static file, CGI, redirect, error), and a properly formatted HTTP response is assembled and sent back to the client in chunks.
 
+### Config File Directives Used
+
+The file `config_file/config.conf` is organized with NGINX-style blocks and directives. Below is a summary of all directives used in this project configuration:
+
+- `http { ... }`: Top-level block that defines shared/global behavior.
+- `server { ... }`: Defines one virtual server (address/port + routing rules).
+- `location /path { ... }`: Defines behavior for a URI prefix.
+- `listen <host>:<port>`: Binds a server block to a specific interface and port (e.g., `127.0.0.1:8080`, `127.0.0.1:7070`).
+- `root <path>`: Sets the filesystem root used to resolve static resources (here `./webroot`).
+- `index <file...>`: Default file(s) to serve when requesting a directory (e.g., `index.html`, `post1.html`).
+- `allowed_methods <methods...>`: Restricts which HTTP methods are accepted per location.
+- `client_max_body_size <size>`: Maximum accepted request body size globally or per location.
+- `error_page <status> <uri>`: Custom error pages for statuses like `403`, `404`, and `500`.
+- `autoindex on|off`: Enables directory listing when no index file is found.
+- `cgi <extension> <interpreter>`: Maps file extensions to CGI interpreters (e.g., `.py` → Python, `.php` → PHP).
+- `return <code> <target>`: Immediate redirect response (e.g., `301 /blog/post2.html`).
+
+### HTTP Server Info (Messages, Requests, Responses, Methods)
+
+#### HTTP message format
+
+HTTP uses a text-based message format:
+
+1. **Start line**
+2. **Headers**
+3. **Empty line**
+4. **Optional body**
+
+#### Request format
+
+A client request starts with:
+
+- **Request line:** `METHOD SP URI SP HTTP/VERSION`
+- **Headers:** such as `Host`, `Content-Type`, `Content-Length`, `Connection`
+- **Body (optional):** mainly used by `POST`
+
+Example:
+
+```http
+POST /forms/contact_form.html HTTP/1.1
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 27
+
+name=John&message=HelloServer
+```
+
+#### Response format
+
+The server replies with:
+
+- **Status line:** `HTTP/VERSION SP STATUS_CODE SP REASON`
+- **Headers:** e.g., `Content-Type`, `Content-Length`, `Connection`, `Location`
+- **Body (optional):** HTML/data payload (omitted for `HEAD` body output)
+
+Example:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+Connection: close
+
+<html>...</html>
+```
+
+#### Implemented methods and their purpose
+
+- `GET`: Retrieve a resource (HTML file, image, directory listing, CGI output).
+- `HEAD`: Same headers/status handling as `GET`, but without sending the response body.
+- `POST`: Send data to the server (forms/uploads/CGI input processing).
+- `DELETE`: Remove a target resource (used in locations where deletion is allowed, such as uploads).
+
+Method acceptance is controlled by `allowed_methods` in each `location` block. If a method is not allowed for a matched location, the server returns the appropriate client error response.
+
 ---
 
 ## 🚀 Instructions
@@ -64,7 +139,49 @@ make
 ./webserv
 ```
 
-Once running, the server will begin listening on the port(s) defined in the configuration file. You can test it by opening your browser at `http://localhost:<port>` or using `curl`.
+Once running, the server will begin listening on the port(s) defined in the configuration file.
+
+### How to use and test the server
+
+#### 1) Using a browser
+
+Open your browser and visit:
+
+- `http://localhost:<port>`
+
+Example (if your config listens on port 8080):
+
+- `http://localhost:8080`
+
+You can also test project pages directly, for example:
+
+- `http://localhost:8080/blog/post1.html`
+- `http://localhost:8080/forms/contact_form.html`
+
+#### 2) Using telnet
+
+Connect to the server:
+
+```bash
+telnet localhost <port>
+```
+
+Example:
+
+```bash
+telnet localhost 8080
+```
+
+Then type a raw HTTP request and press Enter twice:
+
+```http
+GET / HTTP/1.1
+Host: localhost:8080
+Connection: close
+
+```
+
+The server should return an HTTP response (status line, headers, and body).
 
 ---
 
