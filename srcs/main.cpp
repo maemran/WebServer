@@ -6,7 +6,7 @@
 /*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/27 13:29:19 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/27 13:31:49 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,6 @@ int main(int argc, char **argv)
 	}
 	catch (std::exception& e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cout << e.what() << std::endl; 
 	}
 }
