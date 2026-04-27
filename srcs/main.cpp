@@ -6,7 +6,7 @@
 /*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:55:15 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/27 10:32:14 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/27 13:29:19 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static HttpConfig prepareHttpConfig(const std::string& path)
 int main(int argc, char **argv)
 {
 	try {
-		std::string filename = "config.conf";
+		std::string filename = "./config_file/config.conf";
     	if (argc == 2)
     	    filename = argv[1];
     	HttpConfig config = prepareHttpConfig(filename);
