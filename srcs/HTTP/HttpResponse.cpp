@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:51:29 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/27 07:51:42 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/27 10:54:56 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include "CgiHandler.hpp"
 #include "Cookie.hpp"
 #include "Session.hpp"
+#include <cstdlib>
+#include <ctime>
 
 static std::string toLowerAscii(const std::string& value)
 {
@@ -84,8 +86,6 @@ static std::string getIndexScriptPath(const std::string& basePath,
 }
 
 HttpResponse::HttpResponse() {}
-
-int HttpResponse::fileNum = 1;
 
 std::vector<std::string>    HttpResponse::uploadedFiles = std::vector<std::string>();
 
@@ -792,7 +792,11 @@ void     HttpResponse::POSTMethod()
     std::string extension = contentTypeToExtension();
     std::string uploadPath = loc.getRoot();
     std::string uploadedFile = request.getUri().getPath();
-    std::string fileName = ft_itos(fileNum) + extension;
+    
+    // Generate random filename
+    srand(static_cast<unsigned>(time(0)) + rand());
+    std::string randomName = ft_itos(1000000 + (rand() % 9000000));
+    std::string fileName = randomName + extension;
     
     if (uploadPath[uploadPath.length() - 1] != '/')
         uploadPath += '/';
@@ -809,24 +813,23 @@ void     HttpResponse::POSTMethod()
     body = readFile(fullPath);
     addHeader("Location", (uploadedFile + fileName));
     statusCode = "201";
-    fileNum++;
 }
 
 void    HttpResponse::DELMethodChecks()
 {
-    int flag = -1;
     std::string deletedPath = loc.getRoot();
     if (deletedPath[deletedPath.length() - 1] != '/')
         deletedPath += '/';
     deletedPath += request.getUri().getPath();
-    if (directory != "" || isDirectory(deletedPath))
+    
+    // Check if it's a directory or doesn't exist
+    if (isDirectory(deletedPath))
         throw errorResponseException("403");
-    for (int i = 0; i < (int)uploadedFiles.size(); i++)
-    {
-        if (uploadedFiles[i] == file || uploadedFiles[i] == deletedPath)
-            flag = i;
-    }
-    if (flag == -1)
+    struct stat s;
+    if (stat(deletedPath.c_str(), &s) != 0)
+        throw errorResponseException("404");
+    // Check if it's a regular file
+    if (!S_ISREG(s.st_mode))
         throw errorResponseException("403");
 }
 
@@ -838,8 +841,11 @@ void     HttpResponse::DELMethod()
         deletedPath += '/';
     deletedPath += request.getUri().getPath();
     
+    // Delete the file
     if (std::remove(deletedPath.c_str()) != 0)
         throw errorResponseException("403");
+    
+    // Remove from uploaded files tracking if it exists there
     for (std::vector<std::string>::iterator it = uploadedFiles.begin(); it != uploadedFiles.end();)
     {
         if (*it == deletedPath || *it == file)
@@ -848,7 +854,6 @@ void     HttpResponse::DELMethod()
             ++it;
     }
     statusCode = "204";
-    fileNum--;
 }
 
 void    HttpResponse::methodsHandler()

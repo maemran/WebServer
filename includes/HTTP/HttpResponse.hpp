@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/27 07:23:46 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/27 10:47:42 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ class   HttpResponse
         ServerConfig server;
         LocationConfig loc;
         int serverIndex;
-        static int fileNum;
         bool indexFound;
 
         void    findPath();

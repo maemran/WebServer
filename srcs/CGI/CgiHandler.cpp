@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiHandler.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saabo-sh <saabo-sh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/22 17:26:21 by saabo-sh          #+#    #+#             */
-/*   Updated: 2026/04/22 17:44:07 by saabo-sh         ###   ########.fr       */
+/*   Updated: 2026/04/27 10:28:30 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -482,7 +482,12 @@ HttpResponse CgiHandler::parseCgiOutput(const std::string& output, int exit_stat
 	if (reason == "OK" && status_str != "200")
 		reason = defaultReasonPhrase(status_str);
 	if (content_type_it == headers.end() && location_it == headers.end() && status_str != "204")
-		return makeErrorResponse("502", "Bad Gateway", "CGI: missing Content-Type header");
+	{
+		if (!body_part.empty())
+			headers["Content-Type"] = "text/html; charset=utf-8";
+		else
+			return makeErrorResponse("502", "Bad Gateway", "CGI: missing Content-Type header");
+	}
 
 	HttpResponse resp;
 	resp.setStatusCode(status_str);
