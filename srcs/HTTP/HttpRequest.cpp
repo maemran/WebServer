@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maemran <maemran@student.42.fr>            +#+  +:+       +#+        */
+/*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 06:46:08 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/25 18:40:00 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/27 07:54:27 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -416,7 +416,7 @@ void HttpRequest::requestHandler(std::string &request)
 			throw badRequestException("400");
 		}
 		requestValidate();
-		printClassAtributes();
+		// printClassAtributes();
 	}
 	catch (badRequestException &e)
 	{

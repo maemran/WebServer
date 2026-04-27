@@ -6,7 +6,7 @@
 /*   By: maemran < maemran@student.42amman.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 17:43:06 by maemran           #+#    #+#             */
-/*   Updated: 2026/04/23 16:57:43 by maemran          ###   ########.fr       */
+/*   Updated: 2026/04/27 07:23:46 by maemran          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ class   HttpResponse
         std::string body;
         std::string statusCode;
         std::vector<std::string>    headers;
-        std::vector<std::string>    uploadedFiles;
+        static std::vector<std::string>    uploadedFiles;
         std::map<std::string, std::string>  reasonPhrase;
         std::map<std::string, std::string>  extensionTypes;
         HttpRequest request;
